@@ -1,0 +1,175 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "data_type": "brand_guidelines",
+    "swap_instructions": "Update GOLD_ANCHOR in rubrics.py when real top-performing ads arrive from Slack.",
+    "data_integrity_note": "ONLY use metrics listed in approved_differentiators.metrics. Do NOT invent statistics, guarantees, or discounts.",
+    "last_updated": "2026-03-09"
+  },
+  "brand": {
+    "name": "Varsity Tutors",
+    "parent_company": "Nerdy",
+    "product_focus": "SAT 1-on-1 tutoring and test prep",
+    "platform": "Facebook and Instagram paid social ads"
+  },
+  "voice": {
+    "tone_descriptors": [
+      "Empowering — we believe every student can improve",
+      "Knowledgeable — we speak with expertise, not arrogance",
+      "Approachable — we are warm and human, never corporate",
+      "Results-focused — we lead with outcomes, never features"
+    ],
+    "writing_principles": [
+      "Lead with outcomes, not features — say what the student gains, not what we offer",
+      "Use specific numbers over vague adjectives — '200+ points' not 'better scores'",
+      "Speak to the parent's anxiety AND the student's ambition — both are in the room",
+      "Confident but not arrogant — expert but not elitist",
+      "One clear message per ad — never compete with yourself",
+      "Synthesize product details into natural copy — the product field is a fact sheet, not a script. Extract ONE primary benefit most relevant to this audience. Translate metrics into the audience's language.",
+      "Numbers survive verbatim — '200+ points', '3.4M ratings', '24 hours', '5%'. Everything else gets rewritten.",
+      "Write TO the audience, never ABOUT them — the audience field tells you who you are writing for, not content to reference directly in the ad."
+    ],
+    "forbidden_words_and_phrases": [
+      "world-class",
+      "cutting-edge",
+      "revolutionary",
+      "synergy",
+      "leverage",
+      "paradigm",
+      "we have tutors",
+      "sign up today",
+      "click here",
+      "limited time offer",
+      "act now"
+    ]
+  },
+  "approved_differentiators": {
+    "metrics": [
+      "Top 5% tutors — rigorously vetted, not an open marketplace",
+      "3.4 million learner session ratings",
+      "Matched with a tutor in 24 hours based on exact weak areas",
+      "1-on-1 personalized matching — not a one-size-fits-all course",
+      "200+ point average SAT score improvement",
+      "Free diagnostic assessment to start"
+    ],
+    "prohibited_claims": [
+      "Do NOT invent statistics not listed above",
+      "Do NOT promise score guarantees or refunds",
+      "Do NOT use percentage claims not listed above (e.g. '90% of students...')",
+      "Do NOT fabricate discounts or limited-time offers",
+      "Do NOT mention competitor names in ad copy"
+    ]
+  },
+  "hook_guidelines": {
+    "general_rule": "The hook must appear and be complete within the first 100 characters of primary_text. This is the Meta truncation threshold — everything after is hidden behind 'See More'.",
+    "question_hooks": {
+      "allowed": [
+        "Questions that surface a real anxiety the parent or student is already feeling",
+        "Questions about outcomes: score, college, readiness",
+        "Questions that position Varsity Tutors as the obvious answer"
+      ],
+      "forbidden": [
+        "Questions that feel accusatory or make the parent feel guilty",
+        "Rhetorical questions with no clear answer path"
+      ]
+    },
+    "stat_hooks": {
+      "allowed": [
+        "Any metric from approved_differentiators.metrics",
+        "Industry benchmark stats from competitive_context.json"
+      ],
+      "forbidden": [
+        "Any statistic not in the approved list",
+        "Invented percentages or study citations"
+      ]
+    },
+    "story_hooks": {
+      "allowed": [
+        "Third-person student transformation stories (no real names — fictional composite)",
+        "Parent perspective stories about their child's improvement",
+        "Score improvement arcs: starting score → ending score → timeframe"
+      ],
+      "forbidden": [
+        "Real student names or identifiable details (PII)",
+        "Stories with fabricated score guarantees implied"
+      ]
+    },
+    "fear_hooks": {
+      "_edge_case": "Edge Case 5 — Fear hooks must NEVER cross into shame or catastrophizing",
+      "allowed": [
+        "Anxiety of the unknown: 'Is your student ready?'",
+        "Time pressure: 'The SAT is 3 months away'",
+        "Missed opportunity framing: 'Most students who don't prep wish they had'",
+        "Competitive pressure: 'Other students are already preparing'"
+      ],
+      "forbidden": [
+        "NEVER shame the parent: 'If you don't act now, you've failed your child'",
+        "NEVER catastrophize: 'Your child's future is ruined'",
+        "NEVER use these words in fear hooks: ruined, failed, doomed, too late, worthless, behind, failure",
+        "NEVER imply the student is incapable or not smart enough"
+      ],
+      "required_pivot": "Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. The ad cannot end on fear."
+    },
+    "empathy_hooks": {
+      "allowed": [
+        "Acknowledging the stress of SAT prep without judgment",
+        "Validating that one-size-fits-all prep doesn't work for everyone",
+        "Affirming the student's effort and intelligence"
+      ],
+      "forbidden": [
+        "Pity framing — we empower, we do not feel sorry",
+        "Implying the student has been failed by others (lawsuit risk)"
+      ]
+    }
+  },
+  "cta_guidelines": {
+    "awareness_goal": "Learn More",
+    "conversion_goal": ["Start Free Assessment", "Sign Up", "Get Started"],
+    "preferred_conversion_cta": "Start Free Assessment",
+    "rules": [
+      "Match CTA to funnel stage — awareness ads use soft CTAs, conversion ads use action CTAs",
+      "Low-friction first step always outperforms high-commitment asks",
+      "Never use: 'Click Here', 'Buy Now', 'Purchase', 'Subscribe'"
+    ]
+  },
+  "image_prompt_guidelines": {
+    "_edge_case": "Edge Case 6 — Image models cannot render typography accurately",
+    "style": "UGC-style (user-generated content) — authentic, real-person look. NOT polished studio photography.",
+    "allowed_subjects": [
+      "Parent and teen at kitchen table, teen at laptop",
+      "Student at desk studying, looking focused or relieved",
+      "Smiling student with laptop showing score results",
+      "Parent and child having a positive conversation about school",
+      "Student in a video call with a tutor, both engaged"
+    ],
+    "required_elements": [
+      "Authentic, natural lighting — warm, not studio-lit",
+      "Real-looking people — not stock photo perfection",
+      "Emotion visible — relief, pride, focus, confidence"
+    ],
+    "forbidden_in_image_prompts": [
+      "NEVER request text, words, signs, or logos rendered inside the image",
+      "NEVER use phrases like: 'a sign that says', 'text reading', 'words that say', 'banner saying'",
+      "NEVER request brand logos or product names written in the image",
+      "NEVER request polished studio photography or commercial-looking setups",
+      "NEVER include competitor brand elements"
+    ]
+  },
+  "meta_ad_structure": {
+    "primary_text": {
+      "max_visible_chars": 125,
+      "hook_must_complete_by_char": 100,
+      "min_recommended_length": 80,
+      "max_recommended_length": 500,
+      "rule": "Hook must be complete within first 100 characters. Value proposition in first sentence. Minimum 80 chars to avoid stub output."
+    },
+    "headline": {
+      "min_words": 5,
+      "max_words": 8,
+      "rule": "Benefit-driven. Often truncated on mobile — front-load the outcome."
+    },
+    "description": {
+      "rule": "One sentence max. Secondary reinforcement only. Do not rely on it — often hidden on mobile."
+    }
+  }
+}

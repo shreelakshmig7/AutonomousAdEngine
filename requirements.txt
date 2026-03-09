@@ -1,0 +1,21 @@
+# AI Framework & APIs
+google-generativeai==0.8.3      # Gemini Flash (Drafter) + Pro (Judge) + fallback — one SDK
+python-dotenv==1.0.1            # Secure API key loading from .env
+
+# Data & Structured Output
+pydantic==2.7.1                 # Strict JSON schema validation for all LLM output
+pandas==2.2.2                   # Evaluation reports + iteration_log.csv exports
+
+# Visualization
+matplotlib==3.9.0               # quality_trends.png chart (bonus points)
+seaborn==0.13.2                 # Polished chart styling
+
+# Resilience
+tenacity==8.3.0                 # Exponential backoff + fallback model on rate limits
+
+# CLI Output
+rich==13.7.1                    # Live pipeline progress for demo video
+
+# Testing
+pytest==8.2.0                   # Core test framework — 12 required tests
+pytest-mock==3.14.0             # Mock all API calls — tests run fully offline

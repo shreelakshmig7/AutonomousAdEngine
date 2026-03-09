@@ -1,0 +1,118 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "data_type": "synthetic",
+    "swap_instructions": "Replace briefs array with real campaign briefs. Zero code changes required.",
+    "last_updated": "2026-03-09"
+  },
+  "briefs": [
+    {
+      "id": "brief_001",
+      "audience": "Parents of 11th graders in the Southeast (GA, NC, SC, FL) with household income $75K–$150K, actively searching 'SAT prep' and 'college admissions' in the last 30 days",
+      "product": "SAT 1-on-1 tutoring with free diagnostic assessment; matched with a tutor in 24 hours based on exact weak areas",
+      "goal": "conversion",
+      "tone": "empathetic and urgent",
+      "hook_type": "fear",
+      "difficulty": "medium"
+    },
+    {
+      "id": "brief_002",
+      "audience": "Parents in the Northeast (NY, NJ, CT, MA) with household income $150K+, who have already engaged with Princeton Review or Kaplan SAT content and are comparison-shopping",
+      "product": "SAT prep with top 5% vetted tutors and 3.4M learner ratings; 200+ point average improvement",
+      "goal": "conversion",
+      "tone": "confident and results-focused",
+      "hook_type": "stat",
+      "difficulty": "medium"
+    },
+    {
+      "id": "brief_003",
+      "audience": "High school juniors and seniors (ages 16–18) in the Midwest (IL, OH, MI, MN) who follow study-tok and college-prep accounts; mobile-first, short attention",
+      "product": "Personalized SAT prep with 1-on-1 matching; free first assessment",
+      "goal": "awareness",
+      "tone": "peer-level and empowering",
+      "hook_type": "question",
+      "difficulty": "easy"
+    },
+    {
+      "id": "brief_004",
+      "audience": "Parents of 10th and 11th graders in Texas and Arizona, first-generation college families, household income $50K–$90K; worried about cost and whether 'fancy' tutoring works for their kid",
+      "product": "1-on-1 SAT tutoring with free diagnostic; no long-term commitment; matched in 24 hours",
+      "goal": "awareness",
+      "tone": "warm, approachable, zero elitism",
+      "hook_type": "empathy",
+      "difficulty": "hard"
+    },
+    {
+      "id": "brief_005",
+      "audience": "Parents of 12th graders in California (Bay Area, LA) with household income $200K+; child already took SAT once, score 1200–1350; goal is 1450+ for top UC and privates",
+      "product": "Elite 1-on-1 SAT tutoring with top 5% tutors; targeted retake strategy; 200+ point improvement track record",
+      "goal": "conversion",
+      "tone": "premium, data-driven, no fluff",
+      "hook_type": "story",
+      "difficulty": "medium"
+    },
+    {
+      "id": "brief_006",
+      "audience": "Parents of students with a confirmed SAT test date in the next 60–90 days; US nationwide; have not yet booked any paid prep",
+      "product": "Intensive SAT prep with 24-hour tutor matching; free assessment to identify weak areas fast",
+      "goal": "conversion",
+      "tone": "urgent and action-oriented",
+      "hook_type": "fear",
+      "difficulty": "easy"
+    },
+    {
+      "id": "brief_007",
+      "audience": "Self-directed high school students (ages 15–17) in suburban markets; already use Khan Academy or similar; prefer evidence and numbers over emotional appeals",
+      "product": "SAT prep with measurable score gains; 3.4M session ratings; 200+ point average improvement",
+      "goal": "awareness",
+      "tone": "motivating and data-driven",
+      "hook_type": "stat",
+      "difficulty": "easy"
+    },
+    {
+      "id": "brief_008",
+      "audience": "Parents in Denver, Seattle, and Portland (Pacific Northwest / Mountain West); household income $100K–$175K; have clicked on 2+ tutoring or test-prep ads in the last 14 days",
+      "product": "1-on-1 SAT tutoring matched in 24 hours by subject-specific weakness; top 5% tutors; no one-size-fits-all course",
+      "goal": "conversion",
+      "tone": "knowledgeable and clearly differentiated",
+      "hook_type": "question",
+      "difficulty": "medium"
+    },
+    {
+      "id": "brief_009",
+      "audience": "Students who took the SAT once and scored 900–1050; retaking in 2–4 months; feel discouraged; mostly from Midwest and South; mixed urban/suburban",
+      "product": "Targeted SAT retake prep; 1-on-1 matched to exact weak areas; free assessment; 200+ point improvement possible",
+      "goal": "conversion",
+      "tone": "encouraging, no shame, outcome-focused",
+      "hook_type": "empathy",
+      "difficulty": "hard"
+    },
+    {
+      "id": "brief_010",
+      "audience": "Parents of 10th graders in the Southeast and Southwest; household income $60K–$120K; just starting to research 'when to start SAT prep' and 'college planning'",
+      "product": "Early SAT prep with personalized roadmap; free diagnostic; matched with top 5% tutor; 1-on-1, not a generic course",
+      "goal": "awareness",
+      "tone": "forward-thinking and reassuring",
+      "hook_type": "story",
+      "difficulty": "medium"
+    },
+    {
+      "id": "brief_011",
+      "audience": "Parents of students applying to T20 / Ivy-adjacent schools; Northeast and California; income $180K+; previous SAT score 1350–1450; targeting 1500+ for admission",
+      "product": "Elite SAT 1-on-1 tutoring; top 5% vetted tutors; 3.4M ratings; 200+ point improvement; 24-hour matching",
+      "goal": "conversion",
+      "tone": "premium, results-focused, confident but not arrogant",
+      "hook_type": "fear",
+      "difficulty": "hard"
+    },
+    {
+      "id": "brief_012",
+      "audience": "Parents in rural and exurban zip codes (e.g. IA, NE, KS, OK, AR, MS); household income $45K–$85K; limited local tutoring options; skeptical of 'online' effectiveness",
+      "product": "1-on-1 SAT tutoring online; free first assessment; matched in 24 hours; 3.4M sessions; no commute, same quality",
+      "goal": "awareness",
+      "tone": "value-driven, trustworthy, no hype",
+      "hook_type": "stat",
+      "difficulty": "hard"
+    }
+  ]
+}

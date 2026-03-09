@@ -1,0 +1,46 @@
+# ── Secrets ───────────────────────────────────────────────
+.env
+
+# ── AI / reference docs (not part of shipped project) ───────
+memory-bank/
+
+# ── Generated output (never commit pipeline results) ──────
+output/ads_library.json
+output/iteration_log.csv
+output/quality_trends.png
+output/images/
+
+# ── Python ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ───────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Testing & coverage ────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── macOS ─────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ── IDEs ──────────────────────────────────────────────────
+.cursor/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Distribution / packaging ──────────────────────────────
+dist/
+build/
+*.egg-info/

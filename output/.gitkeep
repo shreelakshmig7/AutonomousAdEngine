@@ -1,0 +1,1 @@
+# Keeps output/ in version control. Generated files (ads_library.json, iteration_log.csv, quality_trends.png, images/) are gitignored.

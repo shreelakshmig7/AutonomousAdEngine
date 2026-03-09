@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "data_type": "synthetic",
+    "swap_instructions": "Enrich with live Meta Ad Library data when available. Zero code changes required.",
+    "last_updated": "2026-03-09"
+  },
+  "research_source": "Meta Ad Library — active US ads, SAT prep category",
+  "varsity_tutors_position": {
+    "defensible_white_space": "1-on-1 personalization + top 5% vetted tutors + 3.4M learner ratings",
+    "key_differentiators": [
+      "Matched with a tutor in 24 hours based on exact weak areas",
+      "Top 5% vetted tutors — not a marketplace of anyone who applies",
+      "3.4 million learner session ratings",
+      "1-on-1 personalized matching — not a one-size-fits-all course",
+      "200+ point average score improvement"
+    ],
+    "positioning_rule": "Every ad must lean into personal matching outcomes. Never use generic 'we have tutors' copy."
+  },
+  "competitors": [
+    {
+      "name": "Princeton Review",
+      "owns": "Score guarantees and credibility through statistics",
+      "dominant_hook": "Stat — students score 200+ points higher",
+      "top_cta": "Start free practice test",
+      "emotional_angle": "Parent fear converted to measurable relief through specific numbers",
+      "recurring_patterns": [
+        "Specific score improvement numbers in headline",
+        "Test date urgency ('SAT is X weeks away')",
+        "Score-back guarantee framing",
+        "Expert-authority positioning"
+      ],
+      "what_to_learn": "Use specific score numbers. Create time-pressure urgency. Make relief feel measurable.",
+      "what_to_avoid": "Do not copy their guarantee framing — Varsity Tutors does not offer score guarantees"
+    },
+    {
+      "name": "Khan Academy",
+      "owns": "Free access and zero-pressure approachability",
+      "dominant_hook": "Empathy — free, official, no stress",
+      "top_cta": "Practice for free",
+      "emotional_angle": "Accessibility and zero pressure — College Board trusted, no commitment",
+      "recurring_patterns": [
+        "Free-first funnel — remove all financial friction",
+        "Official College Board partnership mentioned",
+        "Low-stakes, approachable language",
+        "Short, friendly copy — never overwhelming"
+      ],
+      "what_to_learn": "Low-friction first step. Approachable tone. Never make the student feel judged.",
+      "what_to_avoid": "Do not use 'free' as primary differentiator — Varsity Tutors competes on quality, not price"
+    },
+    {
+      "name": "Kaplan",
+      "owns": "Legacy trust and institutional authority",
+      "dominant_hook": "Authority — trusted by millions since 1938",
+      "top_cta": "Get free practice test",
+      "emotional_angle": "Legacy trust and score-back guarantee — institutional credibility",
+      "recurring_patterns": [
+        "Heritage and longevity signals ('since 1938', 'millions of students')",
+        "Score improvement guarantee with specific terms",
+        "Structured, formal tone — expert positioning",
+        "Multi-format options prominently featured"
+      ],
+      "what_to_learn": "Credibility signals work. Guarantees reduce purchase anxiety. Structure builds trust.",
+      "what_to_avoid": "Do not mimic institutional/formal tone — Varsity Tutors voice is empowering, not corporate"
+    },
+    {
+      "name": "Chegg",
+      "owns": "Affordability and low-commitment entry",
+      "dominant_hook": "Value — expert tutors at affordable rates",
+      "top_cta": "Try for free",
+      "emotional_angle": "Budget-conscious families, no commitment, easy exit",
+      "recurring_patterns": [
+        "Free trial as primary offer — remove all commitment friction",
+        "Price anchoring and value comparisons",
+        "On-demand availability messaging",
+        "Broad subject coverage highlighted"
+      ],
+      "what_to_learn": "Free first step dramatically lowers conversion friction. 'Try' beats 'Buy'.",
+      "what_to_avoid": "Do not position on price — Varsity Tutors is premium 1-on-1, not commodity tutoring"
+    }
+  ],
+  "industry_benchmarks": {
+    "source": "Meta IQ 2025, LeadEnforce education reports, edtech creative research",
+    "findings": [
+      "Specific metrics outperform vague claims by ~34% — always use numbers over adjectives",
+      "Social proof (ratings, reviews, student counts) consistently outperforms plain brand claims",
+      "Free first step outperforms paid commitment as CTA by 2.3x",
+      "UGC-style creative outperforms polished studio creative for awareness campaigns",
+      "Short-form video earns 1.7x higher CTR than static images in education",
+      "Lookalike audiences produce 27% lower CPA on average (Meta 2024)"
+    ]
+  },
+  "approved_hooks_by_type": {
+    "question": [
+      "Is your child's SAT score holding them back from their dream school?",
+      "What if your student could improve their SAT score by 200+ points?"
+    ],
+    "stat": [
+      "Students who prep with a 1-on-1 tutor score 200+ points higher on average.",
+      "3.4 million learners have trusted Varsity Tutors to improve their scores."
+    ],
+    "story": [
+      "My daughter went from a 1050 to a 1400 in 8 weeks with Varsity Tutors.",
+      "He'd taken the SAT twice. Then he found a tutor matched to his exact weak areas."
+    ],
+    "fear": [
+      "The SAT is 3 months away. Most students who don't prep wish they had.",
+      "Is your student ready for the SAT — or just hoping for the best?"
+    ],
+    "empathy": [
+      "SAT prep doesn't have to feel overwhelming. We make it personal.",
+      "Your student works hard. They deserve prep that works as hard as they do."
+    ]
+  }
+}
