@@ -1,9 +1,10 @@
 # AI Framework & APIs
-google-generativeai==0.8.3      # Gemini Flash (Drafter) + Pro (Judge) + fallback — one SDK
+google-generativeai==0.8.3      # Gemini 2.0 Flash (Drafter) — Google API key
+anthropic==0.69.0               # Claude Sonnet 4.5 (Judge) — satisfies langchain-anthropic>=0.69.0
 python-dotenv==1.0.1            # Secure API key loading from .env
 
 # Data & Structured Output
-pydantic==2.7.1                 # Strict JSON schema validation for all LLM output
+pydantic==2.11.2                 # Strict JSON schema validation for all LLM output
 pandas==2.2.2                   # Evaluation reports + iteration_log.csv exports
 
 # Visualization

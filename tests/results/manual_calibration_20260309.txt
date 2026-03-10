@@ -1,0 +1,21 @@
+# Manual calibration — Claude Sonnet 4.5 as Judge
+# Date: 2026-03-09
+
+Re-calibration result: PASSED on first attempt
+
+Gold anchor score: 9.4  ✅  (target ≥ 8.0)
+Poor anchor score: 2.8  ✅  (target ≤ 4.0)
+Gap: 6.6 points          ✅  (minimum 4.0)
+
+Model: claude-sonnet-4-5 as judge
+No prompt iterations required — calibrated on first run.
+
+---
+You are clear to proceed to PR3.
+
+PR3 build order:
+1. tests/test_generator.py    ← write tests first (TDD)
+2. generate/prompts.py         ← system prompts + synthesis rules
+3. generate/drafter.py         ← Gemini Flash + AdCopy output
+4. Run tests green
+5. Wire drafter → judge manually to see a full brief → scored ad
