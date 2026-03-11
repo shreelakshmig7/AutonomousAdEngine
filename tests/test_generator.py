@@ -4,7 +4,7 @@ test_generator.py
 Varsity Ad Engine — Nerdy / Gauntlet — Drafter + prompts tests
 ---------------------------------------------------------------
 TDD: 5 tests for AdDrafter, build_drafter_prompt, sanitize_for_injection.
-All API calls mocked via AdDrafter._call_gemini — tests run fully offline.
+All API calls mocked via AdDrafter._call_model — tests run fully offline.
 """
 
 import json
@@ -46,7 +46,7 @@ def test_drafter_returns_valid_adcopy(
     """Mock a perfect JSON response — assert AdCopy returned."""
     from generate.drafter import AdDrafter
 
-    with patch.object(AdDrafter, "_call_gemini", return_value=json.dumps(valid_ad_dict)):
+    with patch.object(AdDrafter, "_call_model", return_value=json.dumps(valid_ad_dict)):
         drafter = AdDrafter()
         result = drafter.draft_ad(sample_brief, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
     assert result["success"] is True
@@ -102,7 +102,7 @@ def test_drafter_enforces_seed_determinism(
     from generate.prompts import DEFAULT_SEED
 
     mock_call = MagicMock(return_value=json.dumps(valid_ad_dict))
-    with patch.object(AdDrafter, "_call_gemini", mock_call):
+    with patch.object(AdDrafter, "_call_model", mock_call):
         drafter = AdDrafter()
         drafter.draft_ad(
             sample_brief, SAMPLE_CONTEXT, SAMPLE_GUIDELINES, seed=DEFAULT_SEED
@@ -123,19 +123,52 @@ def test_drafter_applies_fallback_on_rate_limit(
     from generate.drafter import AdDrafter
     from generate.prompts import FALLBACK_DRAFTER_MODEL
 
-    with patch.object(
-        AdDrafter,
-        "_call_gemini",
-        side_effect=[
-            google.api_core.exceptions.ResourceExhausted("Rate limit hit"),
-            json.dumps(valid_ad_dict),
-        ],
+    with (
+        patch.object(
+            AdDrafter,
+            "_call_model",
+            side_effect=[
+                google.api_core.exceptions.ResourceExhausted("Rate limit hit"),
+                json.dumps(valid_ad_dict),
+            ],
+        ),
+        patch("generate.drafter.time.sleep"),
     ):
         drafter = AdDrafter()
         result = drafter.draft_ad(sample_brief, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
     assert result["success"] is True
     assert result["data"] is not None
     assert result["model_used"] == FALLBACK_DRAFTER_MODEL
+
+
+def test_drafter_both_primary_and_fallback_fail_returns_error_not_nan(
+    sample_brief: AdBrief,
+) -> None:
+    """When Gemini raises ResourceExhausted and Claude also fails, return clear error and model_used None."""
+    import google.api_core.exceptions
+
+    from generate.drafter import AdDrafter
+
+    with (
+        patch.object(
+            AdDrafter,
+            "_call_model",
+            side_effect=[
+                google.api_core.exceptions.ResourceExhausted("Rate limit"),
+                RuntimeError("Haiku failed"),
+            ],
+        ),
+        patch("generate.drafter.time.sleep"),
+    ):
+        drafter = AdDrafter()
+        result = drafter.draft_ad(sample_brief, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
+
+    assert result["success"] is False
+    assert result["data"] is None
+    assert result["model_used"] is None
+    assert result["error"] is not None
+    assert "Both primary and fallback failed" in result["error"]
+    assert "Haiku failed" in result["error"]
 
 
 def test_drafter_retries_on_primary_text_too_long(
@@ -165,7 +198,7 @@ def test_drafter_retries_on_primary_text_too_long(
     mock_call = MagicMock(
         side_effect=[json.dumps(too_long_dict), json.dumps(valid_ad_dict)]
     )
-    with patch.object(AdDrafter, "_call_gemini", mock_call):
+    with patch.object(AdDrafter, "_call_model", mock_call):
         drafter = AdDrafter()
         result = drafter.draft_ad(sample_brief, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
 

@@ -426,3 +426,75 @@ Length retry is **schema enforcement inside `drafter.py`** before the ad reaches
 
 ### Confidence
 High. A + B gives prompt alignment plus a safe fallback without truncation or schema weakening.
+
+---
+
+## Decision: PR3 Generate Module Architecture
+**Date:** 2026-03-09  
+**Files affected:** `generate/prompts.py`, `generate/drafter.py`, `generate/guardrails.py`, `data/loaders.py`, `data/__init__.py`, `evaluate/rubrics.py` (AdBrief + CTA_OPTIONS only), `tests/test_generator.py`, `tests/test_guardrails.py`, `tests/conftest.py`  
+**Removed:** `generate/constants.py` (contents moved into `prompts.py`)
+
+### Models Locked
+- **Drafter:** `gemini-2.5-flash` — fast, cheap, generation  
+- **Judge:** `claude-sonnet-4-5` — accurate evaluation (PR2; unchanged)  
+- **Fallback Drafter:** `gemini-2.0-flash` — same provider, one tier down on `ResourceExhausted`
+
+**Cross-provider architecture** — Gemini drafts, Claude judges. Stronger than same-provider self-evaluation; genuine multi-model orchestration for Gauntlet rubric.
+
+### Key Decisions
+
+1. **`response_mime_type="application/json"`** on all Gemini generation config — reduces markdown/code-fence wrapping of JSON. Learned from PR2 calibration runs.
+
+2. **`_clean_json_response()`** in `drafter.py` — defensive strip of code fences and brace extraction before every `json.loads()`; Gemini is not 100% consistent even with MIME type set.
+
+3. **`generate/constants.py` deleted** — model names and `DEFAULT_SEED` live in `generate/prompts.py`. Shared constants (`HEADLINE_*`, `HOOK_MAX_CHARS`, `CTA_OPTIONS`) imported from `evaluate/rubrics.py` only — single source of truth, no duplication.
+
+4. **`sanitize_for_injection()`** — returns `success: False` on pattern match; **never** strip-and-continue. Rejection only; pipeline returns structured error and does not call Gemini for that brief.
+
+5. **brand_guidelines (and competitive_context) injected into every drafter prompt** via `build_drafter_prompt()` — forbidden words, approved differentiators, synthesis rules present at **generation** time, not only at evaluation time.
+
+6. **`data/loaders.py` required in PR3** — `load_briefs()`, `load_competitive_context()`, `load_brand_guidelines()`; one loader module for smoke test, `main.py`, and `app.py`. No ad-hoc JSON loading in three places.
+
+7. **Gate order in `draft_ad()`** — (1) `validate_free_text` guardrails, (2) sanitize all brief fields, (3) `build_drafter_prompt`, (4) `_call_gemini`. Out-of-scope and injection never hit the LLM.
+
+8. **AdBrief + CTA_OPTIONS in `evaluate/rubrics.py`** — shared schema for generate and iterate; avoids circular imports if AdBrief lived only under `generate/`.
+
+### Deferred
+- **CSV export** — deferred to PR4/PR5; drafter outputs validated `AdCopy` in memory only for PR3 scope.
+
+### Regression Rule (PR2 → PR3)
+If any PR2 evaluator test fails after PR3 changes — **stop**; fix before PR4. Document what broke in this log.
+
+### Confidence
+High. PR3 deliverables aligned to TDD, mock `_call_gemini` boundary, and locked model list.
+
+---
+
+## Post-Run Analysis: brief_005 NaN Unresolvables
+**Date:** 2026-03-09
+
+### Finding
+4 of 5 **brief_005** variations logged **NaN** for all metrics in `iteration_log.csv`.
+
+### Root cause
+- **Gemini free tier quota** (e.g. 20 req/day) **exhausted mid-run** around the brief_004 / brief_005 boundary.
+- **Fallback to Claude Haiku** was **inconsistent** — some calls succeeded, others **failed silently** and logged **NaN** instead of an error message.
+
+### Evidence
+Running **brief_005 v0** directly **after quota reset** returned:
+- `status=published`, `score=8.2`, `model=gemini-2.5-flash`.
+- The **brief itself is not the problem**.
+
+### Fixes applied
+1. **`controller.py`** — fallback failure now logs the **actual error**, not NaN; `model_used` normalized to `None` when not a string.
+2. **`drafter.py`** — **5-second delay** added **before** fallback call so the rate-limit window can clear; **RetryError** (Tenacity exhausted) treated like **ResourceExhausted** and routed to fallback; **both** primary and fallback failure returns a single structured error string.
+
+### Impact on submission
+- **None.**
+- **50 ads published**, all above threshold.
+- NaN rows correctly logged as **unresolvable**.
+- System **did not publish bad ads**.
+
+### Lesson
+- **20 req/day free tier** is **insufficient** for a **60-attempt** pipeline.
+- **Production** deployment requires **paid Gemini tier** or **full fallback to Claude** for all drafter calls (or equivalent quota).

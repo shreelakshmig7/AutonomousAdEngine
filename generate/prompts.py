@@ -30,7 +30,8 @@ from evaluate.rubrics import (
 # Model constants (PR3 spec — do not redefine rubrics constants)
 # -----------------------------------------------------------------------------
 DRAFTER_MODEL: str = "gemini-2.5-flash"
-FALLBACK_DRAFTER_MODEL: str = "gemini-2.0-flash"
+# Fallback when Gemini rate-limits: 2.0-flash has free-tier limit 0 — use Claude Haiku instead
+FALLBACK_DRAFTER_MODEL: str = "claude-haiku-4-5-20251001"
 DEFAULT_SEED: int = 42
 
 # -----------------------------------------------------------------------------

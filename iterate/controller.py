@@ -203,6 +203,13 @@ def run_brief(
                 brief, competitive_context, brand_guidelines, seed=seed
             )
             if not draft_result.get("success"):
+                # Never swallow draft failure: explicit error; model_used must be str or None (no NaN)
+                err = draft_result.get("error")
+                if not err:
+                    err = "Draft failed (primary and fallback exhausted or validation failed)."
+                mu = draft_result.get("model_used")
+                if mu is not None and not isinstance(mu, str):
+                    mu = None
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -212,10 +219,10 @@ def run_brief(
                     "final_score": None,
                     "final_report": None,
                     "iteration_log": iteration_log,
-                    "model_used": draft_result.get("model_used"),
+                    "model_used": mu,
                     "tokens_used": total_tokens,
                     "estimated_cost_usd": total_cost,
-                    "error": draft_result.get("error", "Draft failed"),
+                    "error": err,
                 }
             current_ad = draft_result.get("data")
             total_tokens += draft_result.get("tokens_used", 0)
