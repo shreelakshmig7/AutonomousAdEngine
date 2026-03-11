@@ -30,7 +30,10 @@
 - `tests/test_evaluator.py` - 4 evaluator tests (gold, poor, threshold, weakest)
 - `tests/results/run_pr2_green_20260309.txt` - PR2 green run proof
 - `tests/test_iteration_cap.py` - 2 iteration cap tests (cap at 3, unresolvable)
-- `tests/test_generator.py` - 5 generator tests (schema, CSV, seed, fallback, image URL)
+- `generate/guardrails.py` - validate_free_text (off-topic rejection, pattern match only)
+- `tests/test_guardrails.py` - 5 guardrail tests (weather, pirate, recipe, valid brief, ambiguous)
+- `tests/test_generator.py` - 5 generator tests (valid AdCopy, prompt context, sanitize, seed, fallback)
+- `data/loaders.py` - load_briefs, load_competitive_context, load_brand_guidelines
 - `tests/test_integration.py` - 1 end-to-end pipeline test
 - `tests/results/` - TDD proof — saved test run outputs
 - `docs/DECISION_LOG.md` - Human-written decision log (WHY, failures, limits)
@@ -102,20 +105,15 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
   - [x] 2.5 Run tests — confirm all 4 PASS (green), save results
   - [ ] 2.6 Manual calibration check: gold anchor scores >= 8.0, poor anchor scores <= 4.0
 
-- [ ] 3.0 PR3 — Generate Module (Drafter + Prompts)
-  - [ ] 3.1 Write `tests/test_generator.py` first (TDD red phase) — all 5 generator tests with mocked API
-  - [ ] 3.2 Confirm all 5 tests FAIL and save results
-  - [ ] 3.3 Create `generate/prompts.py`:
-    - All ad copy constants: `HEADLINE_MIN/MAX_WORDS`, `CTA_OPTIONS`, `BRAND_DIFFERENTIATORS`, `HOOK_TYPES`
-    - Finalized Drafter system prompt with:
-      - Truncation rule: hook must appear in first 100 chars (Edge Case 2)
-      - Negative prompt section: approved metrics only, no invented stats/offers (Edge Case 3)
-      - Fear hook boundary: no shaming, no catastrophizing, always pivot to relief (Edge Case 5)
-      - Image prompt rules: no text/signs/logos in image, visual scenes only (Edge Case 6)
-    - `build_drafter_prompt()` with `{competitive_context}` and `{brief}` injection
-    - `sanitize_for_injection()` security function (Coding Standards §13.1)
-  - [ ] 3.4 Create `generate/drafter.py` — `AdDrafter` class with `draft_ad()` calling Gemini 1.5 Flash, `DEFAULT_SEED` on all calls, tenacity retry with `FALLBACK_DRAFTER_MODEL` on `ResourceExhausted`, full error handling
-  - [ ] 3.5 Run tests — confirm all 5 PASS (green), save results
+- [x] 3.0 PR3 — Generate Module (Drafter + Prompts + Guardrails + Loaders)
+  - [x] 3.1 Add AdBrief + CTA_OPTIONS to `evaluate/rubrics.py`; conftest fixtures `valid_ad_dict`, `sample_brief`
+  - [x] 3.2 Write `tests/test_guardrails.py` (5 tests) and `tests/test_generator.py` (5 tests); confirm RED, save `pr3_RED_*.txt`
+  - [x] 3.3 Create `generate/guardrails.py` — `validate_free_text(brief)` pattern-match only, rejection message states system purpose
+  - [x] 3.4 Create `generate/prompts.py` — constants (import from rubrics), 6 rules, `build_drafter_prompt()`, `sanitize_for_injection()`
+  - [x] 3.5 Create `generate/drafter.py` — `AdDrafter`, `draft_ad()` gates 1–4, `_call_gemini()` with tenacity retry, `_clean_json_response()`, fallback on ResourceExhausted
+  - [x] 3.6 Create `data/loaders.py` — `load_briefs()`, `load_competitive_context()`, `load_brand_guidelines()`
+  - [x] 3.7 Delete `generate/constants.py`; move model constants to `prompts.py`
+  - [x] 3.8 Run tests — confirm all 10 PASS (green), save `pr3_GREEN_*.txt`; full regression `pr3_REGRESSION_*.txt` (all 14 pass, PR2 unchanged)
 
 - [ ] 4.0 PR4 — Iterate Module + Main Pipeline (50+ Ads)
   - [ ] 4.1 Write `tests/test_iteration_cap.py` first (TDD red phase) — both iteration tests with mocked API

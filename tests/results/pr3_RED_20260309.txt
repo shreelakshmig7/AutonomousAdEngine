@@ -1,0 +1,80 @@
+/Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-8.2.0, pluggy-1.6.0 -- /Library/Developer/CommandLineTools/usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/shreelakshmigopinatharao/AutonomousAdEngine
+plugins: anyio-4.12.1, asyncio-0.23.8, langsmith-0.4.37, mock-3.14.0
+asyncio: mode=strict
+collecting ... collected 10 items
+
+tests/test_guardrails.py::test_guardrails_rejects_weather_query FAILED   [ 10%]
+tests/test_guardrails.py::test_guardrails_rejects_pirate_request FAILED  [ 20%]
+tests/test_guardrails.py::test_guardrails_rejects_recipe_request FAILED  [ 30%]
+tests/test_guardrails.py::test_guardrails_passes_valid_brief FAILED      [ 40%]
+tests/test_guardrails.py::test_guardrails_passes_ambiguous_but_in_scope FAILED [ 50%]
+tests/test_generator.py::test_drafter_returns_valid_adcopy FAILED        [ 60%]
+tests/test_generator.py::test_build_drafter_prompt_includes_context FAILED [ 70%]
+tests/test_generator.py::test_sanitize_for_injection_rejects_harmful_input FAILED [ 80%]
+tests/test_generator.py::test_drafter_enforces_seed_determinism FAILED   [ 90%]
+tests/test_generator.py::test_drafter_applies_fallback_on_rate_limit FAILED [100%]
+
+=================================== FAILURES ===================================
+____________________ test_guardrails_rejects_weather_query _____________________
+tests/test_guardrails.py:30: in test_guardrails_rejects_weather_query
+    from generate.guardrails import validate_free_text
+E   ModuleNotFoundError: No module named 'generate.guardrails'
+____________________ test_guardrails_rejects_pirate_request ____________________
+tests/test_guardrails.py:43: in test_guardrails_rejects_pirate_request
+    from generate.guardrails import validate_free_text
+E   ModuleNotFoundError: No module named 'generate.guardrails'
+____________________ test_guardrails_rejects_recipe_request ____________________
+tests/test_guardrails.py:54: in test_guardrails_rejects_recipe_request
+    from generate.guardrails import validate_free_text
+E   ModuleNotFoundError: No module named 'generate.guardrails'
+______________________ test_guardrails_passes_valid_brief ______________________
+tests/test_guardrails.py:65: in test_guardrails_passes_valid_brief
+    from generate.guardrails import validate_free_text
+E   ModuleNotFoundError: No module named 'generate.guardrails'
+________________ test_guardrails_passes_ambiguous_but_in_scope _________________
+tests/test_guardrails.py:74: in test_guardrails_passes_ambiguous_but_in_scope
+    from generate.guardrails import validate_free_text
+E   ModuleNotFoundError: No module named 'generate.guardrails'
+______________________ test_drafter_returns_valid_adcopy _______________________
+tests/test_generator.py:47: in test_drafter_returns_valid_adcopy
+    from generate.drafter import AdDrafter
+E   ModuleNotFoundError: No module named 'generate.drafter'
+__________________ test_build_drafter_prompt_includes_context __________________
+tests/test_generator.py:61: in test_build_drafter_prompt_includes_context
+    from generate.prompts import build_drafter_prompt
+E   ModuleNotFoundError: No module named 'generate.prompts'
+______________ test_sanitize_for_injection_rejects_harmful_input _______________
+tests/test_generator.py:73: in test_sanitize_for_injection_rejects_harmful_input
+    from generate.prompts import sanitize_for_injection
+E   ModuleNotFoundError: No module named 'generate.prompts'
+____________________ test_drafter_enforces_seed_determinism ____________________
+tests/test_generator.py:99: in test_drafter_enforces_seed_determinism
+    from generate.drafter import AdDrafter
+E   ModuleNotFoundError: No module named 'generate.drafter'
+_________________ test_drafter_applies_fallback_on_rate_limit __________________
+tests/test_generator.py:120: in test_drafter_applies_fallback_on_rate_limit
+    from generate.drafter import AdDrafter
+E   ModuleNotFoundError: No module named 'generate.drafter'
+=============================== warnings summary ===============================
+tests/test_generator.py::test_drafter_applies_fallback_on_rate_limit
+  /Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+    warnings.warn(message, FutureWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_guardrails.py::test_guardrails_rejects_weather_query - ModuleNotFoundError: No module named 'generate.guardrails'
+FAILED tests/test_guardrails.py::test_guardrails_rejects_pirate_request - ModuleNotFoundError: No module named 'generate.guardrails'
+FAILED tests/test_guardrails.py::test_guardrails_rejects_recipe_request - ModuleNotFoundError: No module named 'generate.guardrails'
+FAILED tests/test_guardrails.py::test_guardrails_passes_valid_brief - ModuleNotFoundError: No module named 'generate.guardrails'
+FAILED tests/test_guardrails.py::test_guardrails_passes_ambiguous_but_in_scope - ModuleNotFoundError: No module named 'generate.guardrails'
+FAILED tests/test_generator.py::test_drafter_returns_valid_adcopy - ModuleNotFoundError: No module named 'generate.drafter'
+FAILED tests/test_generator.py::test_build_drafter_prompt_includes_context - ModuleNotFoundError: No module named 'generate.prompts'
+FAILED tests/test_generator.py::test_sanitize_for_injection_rejects_harmful_input - ModuleNotFoundError: No module named 'generate.prompts'
+FAILED tests/test_generator.py::test_drafter_enforces_seed_determinism - ModuleNotFoundError: No module named 'generate.drafter'
+FAILED tests/test_generator.py::test_drafter_applies_fallback_on_rate_limit - ModuleNotFoundError: No module named 'generate.drafter'
+======================== 10 failed, 1 warning in 0.11s =========================

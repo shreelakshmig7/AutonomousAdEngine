@@ -347,3 +347,82 @@ Logged in DECISION_LOG.md. Safety gate is a PR2 deliverable, not a later additio
 | build_prompt() signature | Locked | DECISION_LOG.md + judge.py |
 | HOOK_MAX_CHARS naming | Locked | rubrics.py + schemas + prompts.py |
 | scan_output_safety() in PR2 | Locked | DECISION_LOG.md + rubrics.py |
+
+---
+
+## Decision: Guardrails Default-Deny — validate_free_text()
+**Date:** 2026-03-09  
+**Files affected:** `generate/guardrails.py`, `tests/test_guardrails.py`
+
+### What We Did
+Replaced allow-by-default Gate 1 logic with **default-deny**: input must match at least one **in-scope signal** to pass, unless blocked earlier by injection or off-topic patterns.
+
+**Priority order:**
+1. **Injection** — `INJECTION_PATTERNS` imported from `generate/prompts.py` (single source). Match → reject with `INJECTION_ATTEMPT_MESSAGE`, `reason: injection_attempt`.
+2. **Off-topic blocklist** — explicit patterns (weather, pirate, recipe, etc.). Match → reject with `OUT_OF_SCOPE_MESSAGE`, `reason: off_topic_pattern:...`.
+3. **Default deny** — if **no** `IN_SCOPE_SIGNALS` regex matches → reject with `OUT_OF_SCOPE_MESSAGE`, `reason: no_in_scope_signal`.
+
+All rejects return **`success: False`** and **`error`** set so `draft_ad()` Gate 1 stops before any LLM call.
+
+### Why
+Allow-by-default let through "Tell me a joke" and similar — not injection, but out of scope. Blocklisting every off-topic phrase is endless. **Require in-scope signals** (SAT, tutor, prep, campaign, brief, audience, conversion, awareness, hook, varsity, nerdy, etc.) catches jokes, poems, general chat, and random tasks with one rule.
+
+### What We Removed
+- **Length heuristic** (e.g. len > 20) — length is not a proxy for scope. Short valid briefs exist; short junk exists too. Signal check handles both.
+
+### What We Avoided
+- **`\bad\b`** in in-scope list — false positives on glad/dad. Use campaign/brief/audience/hook/advert/etc. instead.
+
+### AdBrief Path
+`AdBrief` still accepted: normalized to one string (`audience` + `product` + `tone`) then same three priorities. Real briefs from `briefs.json` contain signals by construction.
+
+### Tests
+Added `test_guardrails_rejects_no_signal_inputs`, `test_guardrails_rejects_injection_with_specific_message`, `test_guardrails_passes_brief_style_inputs`, etc. Full suite green; results saved to `tests/results/guardrails_fix_20260309.txt`.
+
+### Confidence
+High. Default-deny aligns Gate 1 with product scope without whack-a-mole blocklists.
+
+---
+
+## Decision: primary_text Length Enforcement — Prompt (A) + Retry (B)
+**Date:** 2026-03-09  
+**Trigger:** Gemini 2.5 Flash returned `primary_text` > 500 characters on first live draft run, causing `AdCopy` ValidationError (`string_too_long`).
+
+**Files affected:** `generate/prompts.py`, `generate/drafter.py`, `tests/test_generator.py`
+
+### Root Cause
+Prompt did not state the **500-character hard limit** explicitly. LLMs do not count characters reliably without explicit instruction.
+
+### Option D Rejected — Never Raise Schema Limit
+**500 characters** is a real **Meta platform constraint** documented in `brand_guidelines.json` / `evaluate/rubrics.py` (`AdCopy.primary_text` `max_length=500`). Raising the limit would generate ads truncated on Facebook — defeats the purpose. **Never weaken a platform constraint to fix a model output problem.**
+
+### Fix A — Prompt
+Added **PRIMARY_TEXT LENGTH LIMIT** block in `build_drafter_prompt()` **immediately before** the JSON output format section (proximity matters for attention).
+
+Content includes:
+- `primary_text` must be **500 characters or fewer**; count before outputting.
+- Meta shows ~125 chars before "See More" but **full text must stay under 500 total**.
+- If over 500: **cut the weakest sentence, not the hook**; do not summarize — cut; hook and CTA must survive.
+
+Covers **90%+** of cases at no extra API cost.
+
+### Fix B — Retry on ValidationError
+In `draft_ad()`, after `json.loads()`:
+- Wrap `AdCopy.model_validate(parsed)` in try/except `ValidationError`.
+- If error **`type == string_too_long`** and **`loc`** contains **`primary_text`**: **one** targeted retry via `_call_gemini()` with previous JSON embedded and explicit rewrite-under-500 instruction (all 5 fields, no markdown).
+- If retry still fails → outer `except ValidationError` returns structured failure.
+- Any **other** validation error → re-raise (no retry).
+
+Uses same `model_used` and `generation_config` as the first call.
+
+### Option C Rejected — Truncation at Char 500
+Truncating mid-sentence produces broken copy → poor **clarity** and **brand_voice** and wastes a judge call. **One retry is cleaner** than shipping truncated ads.
+
+### This Retry Is Not a Feedback-Loop Cycle
+Length retry is **schema enforcement inside `drafter.py`** before the ad reaches `judge.py`. It does **not** increment cycle count. **`MAX_CYCLES`** in `controller.py` is unchanged — quality iteration only.
+
+### Test
+`test_drafter_retries_on_primary_text_too_long`: mock first return >500 chars, second return valid; assert success, `len(primary_text) <= 500`, `_call_gemini` called twice. Results saved to `tests/results/primary_text_length_retry_20260309.txt`.
+
+### Confidence
+High. A + B gives prompt alignment plus a safe fallback without truncation or schema weakening.

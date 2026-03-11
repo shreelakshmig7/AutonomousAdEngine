@@ -9,8 +9,8 @@ constants live here — judge imports them at module level.
 
 Key constants / classes:
   QUALITY_THRESHOLD, MAX_CYCLES, DIMENSIONS, DIMENSION_PRIORITY, HOOK_MAX_CHARS
-  GOLD_ANCHOR, POOR_ANCHOR
-  AdCopy, DimensionScore, EvaluationReport
+  CTA_OPTIONS, GOLD_ANCHOR, POOR_ANCHOR
+  AdBrief, AdCopy, DimensionScore, EvaluationReport
   scan_output_safety()
 
 Author: Varsity Ad Engine
@@ -62,6 +62,34 @@ COMPETITOR_NAMES: list[str] = [
     "kaplan",
     "chegg",
 ]
+
+# Allowed CTA button values — matches AdCopy Literal type (PR3)
+CTA_OPTIONS: list[str] = [
+    "Learn More",
+    "Sign Up",
+    "Start Free Assessment",
+    "Get Started",
+]
+
+# -----------------------------------------------------------------------------
+# AdBrief — Input schema for briefs.json (PR3; shared by generate/ and iterate/)
+# -----------------------------------------------------------------------------
+class AdBrief(BaseModel):
+    """Validated brief from briefs.json. Used by drafter and controller."""
+
+    id: str = Field(..., description="Unique brief identifier e.g. brief_001")
+    audience: str = Field(..., min_length=20, description="Specific audience definition")
+    product: str = Field(..., min_length=10, description="Product and key selling points")
+    goal: Literal["awareness", "conversion"] = Field(..., description="Campaign objective")
+    tone: str = Field(..., description="Tone and voice direction")
+    hook_type: Literal["fear", "stat", "question", "empathy", "story"] = Field(
+        ..., description="Hook type for primary_text"
+    )
+    difficulty: Literal["easy", "medium", "hard"] = Field(
+        default="medium",
+        description="Expected difficulty for cycle 1 pass. Used in iteration_log and quality trend.",
+    )
+
 
 # -----------------------------------------------------------------------------
 # Calibration anchors — hardcoded, never generated (PRD §4)
