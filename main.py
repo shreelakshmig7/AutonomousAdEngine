@@ -7,6 +7,11 @@ run_pipeline_streaming() is a generator that yields progress for each
 brief+variation; writes ads_library.json, iteration_log.csv (one row per
 evaluation event), and quality_trends.png. Publish path triggers image gen.
 Uses rich for CLI. Does not crash if published < MIN_ADS_REQUIRED.
+
+Structured error handling:
+  load_briefs_result() — load/validate briefs, returns {success, data, error}
+  run_cli_pipeline()     — run pipeline once without Rich table; same shape
+  __main__               — uses load_briefs_result + try/except; sys.exit only
 """
 
 from __future__ import annotations
@@ -334,13 +339,121 @@ def run_pipeline_streaming(
 
 
 def load_briefs(path: str = "data/briefs.json") -> list[AdBrief]:
-    """Load and validate briefs from JSON. Skips _meta."""
-    with open(path) as f:
-        data = json.load(f)
-    raw = data.get("briefs", data) if isinstance(data, dict) else data
-    if not isinstance(raw, list):
-        return []
-    return [AdBrief.model_validate(b) for b in raw if isinstance(b, dict) and "id" in b]
+    """
+    Load and validate briefs from JSON. Skips _meta.
+
+    Returns:
+        List of AdBrief on success; empty list if file missing or invalid
+        (legacy callers). Prefer load_briefs_result() for structured errors.
+    """
+    result = load_briefs_result(path)
+    if result.get("success") and isinstance(result.get("data"), list):
+        return result["data"]
+    return []
+
+
+def load_briefs_result(path: str = "data/briefs.json") -> dict[str, Any]:
+    """
+    Load and validate briefs from JSON; structured result only.
+
+    Args:
+        path: Path to briefs JSON.
+
+    Returns:
+        {"success": bool, "data": list[AdBrief] | None, "error": str | None}
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Briefs file not found: {path}",
+        }
+    except (json.JSONDecodeError, OSError) as e:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Failed to read briefs: {e}",
+        }
+    try:
+        raw = data.get("briefs", data) if isinstance(data, dict) else data
+        if not isinstance(raw, list):
+            return {
+                "success": False,
+                "data": None,
+                "error": "briefs JSON must contain a list",
+            }
+        briefs = [
+            AdBrief.model_validate(b)
+            for b in raw
+            if isinstance(b, dict) and "id" in b
+        ]
+        if not briefs:
+            return {
+                "success": False,
+                "data": None,
+                "error": "No valid briefs with id in file",
+            }
+        return {"success": True, "data": briefs, "error": None}
+    except Exception as e:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Brief validation failed: {e}",
+        }
+
+
+def run_cli_pipeline(
+    briefs_path: str = "data/briefs.json",
+    competitive_context_path: str = "data/competitive_context.json",
+    brand_guidelines_path: str = "data/brand_guidelines.json",
+) -> dict[str, Any]:
+    """
+    Run the full pipeline once; structured result only (no raise to caller).
+
+    Args:
+        briefs_path: Path to briefs JSON.
+        competitive_context_path: Path to competitive context JSON.
+        brand_guidelines_path: Path to brand guidelines JSON.
+
+    Returns:
+        {"success": bool, "data": dict | None, "error": str | None}
+        data on success is the final complete yield dict from the generator.
+    """
+    briefs_result = load_briefs_result(briefs_path)
+    if not briefs_result.get("success"):
+        return {
+            "success": False,
+            "data": None,
+            "error": briefs_result.get("error") or "Failed to load briefs",
+        }
+    briefs = briefs_result["data"]
+    competitive_context = load_json(competitive_context_path)
+    brand_guidelines = load_json(brand_guidelines_path)
+
+    final: dict[str, Any] | None = None
+    try:
+        gen = run_pipeline_streaming(briefs, competitive_context, brand_guidelines)
+        for update in gen:
+            if update.get("status") == "complete":
+                final = update
+                break
+    except Exception as e:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Pipeline failed: {e}",
+        }
+
+    if final is None:
+        return {
+            "success": False,
+            "data": None,
+            "error": "Pipeline did not complete (no final status)",
+        }
+    return {"success": True, "data": final, "error": None}
 
 
 def load_json(path: str) -> dict:
@@ -353,18 +466,21 @@ def load_json(path: str) -> dict:
 
 
 if __name__ == "__main__":
+    import sys
+
     from rich.console import Console
-    from rich.live import Live
     from rich.table import Table
 
     console = Console()
-    briefs = load_briefs()
+
+    briefs_result = load_briefs_result()
+    if not briefs_result.get("success"):
+        console.print(f"[red]{briefs_result.get('error', 'No briefs loaded')}[/red]")
+        sys.exit(1)
+
+    briefs = briefs_result["data"]
     competitive_context = load_json("data/competitive_context.json")
     brand_guidelines = load_json("data/brand_guidelines.json")
-
-    if not briefs:
-        console.print("[red]No briefs loaded. Check data/briefs.json.[/red]")
-        raise SystemExit(1)
 
     table = Table(title="Pipeline progress")
     table.add_column("Brief", style="cyan")
@@ -372,21 +488,35 @@ if __name__ == "__main__":
     table.add_column("Status", style="green")
     table.add_column("Message")
 
-    gen = run_pipeline_streaming(briefs, competitive_context, brand_guidelines)
     final = None
-    for update in gen:
-        if update.get("status") == "complete":
-            final = update
-            break
-        if "brief_id" in update:
-            table.add_row(
-                update.get("brief_id", ""),
-                str(update.get("variation_index", "")),
-                update.get("status", ""),
-                update.get("message", ""),
-            )
-            console.print(f"[dim]{update.get('message', '')}[/dim]")
+    try:
+        gen = run_pipeline_streaming(briefs, competitive_context, brand_guidelines)
+        for update in gen:
+            if update.get("status") == "complete":
+                final = update
+                break
+            if "brief_id" in update:
+                table.add_row(
+                    update.get("brief_id", ""),
+                    str(update.get("variation_index", "")),
+                    update.get("status", ""),
+                    update.get("message", ""),
+                )
+                console.print(f"[dim]{update.get('message', '')}[/dim]")
+    except Exception as e:
+        console.print(f"[red]Pipeline failed: {e}[/red]")
+        sys.exit(1)
 
-    if final:
-        console.print(f"\n[green]Complete.[/green] Published: {final.get('total_published')}, Unresolvable: {final.get('total_unresolvable')}")
-        console.print(f"Avg score: {final.get('avg_score')}, Tokens: {final.get('total_tokens')}, Cost: ${final.get('estimated_cost_usd', 0):.6f}")
+    if not final:
+        console.print("[red]Pipeline did not complete.[/red]")
+        sys.exit(1)
+
+    console.print(
+        f"\n[green]Complete.[/green] Published: {final.get('total_published')}, "
+        f"Unresolvable: {final.get('total_unresolvable')}"
+    )
+    console.print(
+        f"Avg score: {final.get('avg_score')}, Tokens: {final.get('total_tokens')}, "
+        f"Cost: ${final.get('estimated_cost_usd', 0):.6f}"
+    )
+    sys.exit(0)

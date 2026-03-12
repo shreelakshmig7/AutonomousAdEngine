@@ -2,9 +2,10 @@
 app.py
 ------
 Streamlit Cloud entrypoint for Varsity Ad Engine.
-Loads ads from output/ads_library.json, runs main.py as subprocess with
-live stdout, and browses ads with brief_id and min-score filters.
+Loads ads from output/ads_library.json, runs main.py as subprocess,
+and browses ads with brief_id and min-score filters.
 Secrets: GOOGLE_API_KEY, ANTHROPIC_API_KEY via st.secrets → os.environ.
+All pipeline/load helpers return {"success", "data", "error"} — no raise to caller.
 Author: AutonomousAdEngine. Project: Varsity Ad Engine.
 """
 
@@ -22,10 +23,10 @@ import streamlit as st
 # Streamlit Cloud: set env before any code that reads API keys (subprocess inherits)
 if hasattr(st, "secrets"):
     try:
-        os.environ["GOOGLE_API_KEY"] = st.secrets["GOOGLE_API_KEY"]
-        os.environ["ANTHROPIC_API_KEY"] = st.secrets["ANTHROPIC_API_KEY"]
+        os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
+        os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
     except (KeyError, TypeError):
-        pass  # Local run without secrets; pipeline button will fail until secrets set
+        pass  # Local run without secrets; pipeline returns structured error
 
 import pandas as pd
 
@@ -34,23 +35,41 @@ REPO_ROOT: Path = Path(__file__).resolve().parent
 ADS_LIBRARY_PATH: Path = REPO_ROOT / "output" / "ads_library.json"
 MAIN_SCRIPT: Path = REPO_ROOT / "main.py"
 DEFAULT_MIN_SCORE: float = 7.0
+PIPELINE_TIMEOUT_SEC: int = 3600
 
 
-def load_ads_library() -> dict[str, Any]:
+def load_ads_library_result() -> dict[str, Any]:
     """
-    Load ads_library.json from disk.
+    Load ads_library.json from disk; structured result only.
 
     Returns:
-        Parsed JSON dict with key "ads" or empty dict on missing/invalid file.
+        {"success": bool, "data": dict, "error": str | None}
+        data is parsed JSON or {} when file missing (success True, empty ads).
     """
     if not ADS_LIBRARY_PATH.exists():
-        return {}
+        return {"success": True, "data": {}, "error": None}
     try:
         with open(ADS_LIBRARY_PATH, encoding="utf-8") as f:
-            data = json.load(f)
-        return data if isinstance(data, dict) else {}
-    except (json.JSONDecodeError, OSError):
-        return {}
+            raw = json.load(f)
+        if not isinstance(raw, dict):
+            return {
+                "success": False,
+                "data": {},
+                "error": "ads_library.json root must be an object",
+            }
+        return {"success": True, "data": raw, "error": None}
+    except json.JSONDecodeError as e:
+        return {
+            "success": False,
+            "data": {},
+            "error": f"Invalid JSON: {e}",
+        }
+    except OSError as e:
+        return {
+            "success": False,
+            "data": {},
+            "error": f"Cannot read file: {e}",
+        }
 
 
 def get_published_ads(ads: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -72,7 +91,11 @@ def get_published_ads(ads: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def render_stats_dashboard() -> None:
     """Render section 1: stats and bar chart from ads_library.json."""
     st.header("Stats Dashboard")
-    data = load_ads_library()
+    result = load_ads_library_result()
+    if not result.get("success"):
+        st.error(result.get("error") or "Failed to load ads library")
+        return
+    data = result.get("data") or {}
     ads = data.get("ads") if isinstance(data.get("ads"), list) else []
 
     if not ads:
@@ -102,7 +125,6 @@ def render_stats_dashboard() -> None:
     c3.metric("Highest scoring ad", f"{best[1]:.2f}")
     c4.metric("Lowest scoring ad", f"{worst[1]:.2f}")
 
-    # Bar chart: one bar per ad (label by brief_id + variation)
     labels = []
     values = []
     for a, sc in scores:
@@ -115,35 +137,66 @@ def render_stats_dashboard() -> None:
     st.bar_chart(chart_df)
 
 
-def run_pipeline_subprocess() -> int:
+def run_pipeline_subprocess_result() -> dict[str, Any]:
     """
-    Run python main.py as subprocess from repo root.
+    Run python main.py as subprocess from repo root; structured result only.
 
     Returns:
-        Process exit code.
+        {"success": bool, "data": {"stdout": str, "exit_code": int} | None, "error": str | None}
     """
+    if not MAIN_SCRIPT.exists():
+        return {
+            "success": False,
+            "data": None,
+            "error": "main.py not found at project root",
+        }
     env = os.environ.copy()
-    proc = subprocess.Popen(
-        [sys.executable, str(MAIN_SCRIPT)],
-        cwd=str(REPO_ROOT),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        env=env,
-        text=True,
-        bufsize=1,
-    )
-    log_placeholder = st.empty()
-    lines: list[str] = []
-    if proc.stdout:
-        for line in proc.stdout:
-            lines.append(line)
-            log_placeholder.code("".join(lines[-500:]), language=None)
-    proc.wait()
-    return proc.returncode if proc.returncode is not None else -1
+    if not env.get("GOOGLE_API_KEY") or not env.get("ANTHROPIC_API_KEY"):
+        return {
+            "success": False,
+            "data": None,
+            "error": "GOOGLE_API_KEY and ANTHROPIC_API_KEY must be set (secrets or .env)",
+        }
+    try:
+        completed = subprocess.run(
+            [sys.executable, str(MAIN_SCRIPT)],
+            cwd=str(REPO_ROOT),
+            capture_output=True,
+            text=True,
+            timeout=PIPELINE_TIMEOUT_SEC,
+            env=env,
+        )
+        stdout = (completed.stdout or "") + (
+            ("\n--- stderr ---\n" + completed.stderr) if completed.stderr else ""
+        )
+        exit_code = completed.returncode if completed.returncode is not None else -1
+        return {
+            "success": exit_code == 0,
+            "data": {"stdout": stdout, "exit_code": exit_code},
+            "error": None if exit_code == 0 else f"Pipeline exited with code {exit_code}",
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Pipeline timed out after {PIPELINE_TIMEOUT_SEC}s",
+        }
+    except OSError as e:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Failed to start pipeline: {e}",
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "data": None,
+            "error": f"Pipeline error: {e}",
+        }
 
 
 def render_run_pipeline() -> None:
-    """Render section 2: button to run main.py with live stdout."""
+    """Render section 2: button to run main.py; output shown after completion."""
     st.header("Run Pipeline")
     if not MAIN_SCRIPT.exists():
         st.error("main.py not found at project root.")
@@ -151,18 +204,24 @@ def render_run_pipeline() -> None:
 
     if st.button("Run Pipeline (Generate Ads)", type="primary"):
         with st.spinner("Running pipeline…"):
-            code = run_pipeline_subprocess()
-        if code == 0:
+            result = run_pipeline_subprocess_result()
+        if result.get("data") and result["data"].get("stdout"):
+            st.code(result["data"]["stdout"][-20000:], language=None)
+        if result.get("success"):
             st.success("Pipeline completed successfully.")
         else:
-            st.error(f"Pipeline exited with code {code}.")
+            st.error(result.get("error") or "Pipeline failed.")
         st.rerun()
 
 
 def render_browse_ads() -> None:
     """Render section 3: browse ads with sidebar filters."""
     st.header("Browse Ads")
-    data = load_ads_library()
+    result = load_ads_library_result()
+    if not result.get("success"):
+        st.error(result.get("error") or "Failed to load ads library")
+        return
+    data = result.get("data") or {}
     ads = data.get("ads") if isinstance(data.get("ads"), list) else []
 
     if not ads:
@@ -202,12 +261,9 @@ def render_browse_ads() -> None:
     for idx, a in enumerate(filtered):
         ad_body = a.get("ad") or {}
         scores = a.get("scores") or {}
-        with st.expander(
-            f"{ad_body.get('headline', 'Ad')[:60]}…"
-            if len(str(ad_body.get("headline", ""))) > 60
-            else ad_body.get("headline", f"Ad {idx + 1}"),
-            expanded=False,
-        ):
+        headline = ad_body.get("headline", f"Ad {idx + 1}")
+        title = headline if len(str(headline)) <= 60 else f"{str(headline)[:60]}…"
+        with st.expander(title, expanded=False):
             st.write("**brief_id:**", a.get("brief_id", "—"))
             st.write("**Headline:**", ad_body.get("headline", "—"))
             st.write("**Primary text:**", ad_body.get("primary_text", "—"))

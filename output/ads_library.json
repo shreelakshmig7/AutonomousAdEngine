@@ -1,0 +1,84 @@
+{
+  "ads": [
+    {
+      "brief_id": "brief_001",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your child's SAT score standing between them and their dream school? Students improve 200+ points with a top 5% matched tutor. Start free.",
+        "headline": "Raise Your SAT Score 200 Points",
+        "description": "Matched with a top 5% tutor in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Parent and teen at kitchen table, warm natural lighting, UGC style."
+      },
+      "scores": {
+        "average_score": 8.0
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 500,
+      "estimated_cost_usd": 0.001,
+      "status": "published",
+      "image_url": "output/images/brief_001_v0.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your child's SAT score standing between them and their dream school? Students improve 200+ points with a top 5% matched tutor. Start free.",
+        "headline": "Raise Your SAT Score 200 Points",
+        "description": "Matched with a top 5% tutor in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Parent and teen at kitchen table, warm natural lighting, UGC style."
+      },
+      "scores": {
+        "average_score": 8.0
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 500,
+      "estimated_cost_usd": 0.001,
+      "status": "published",
+      "image_url": "output/images/brief_001_v1.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your child's SAT score standing between them and their dream school? Students improve 200+ points with a top 5% matched tutor. Start free.",
+        "headline": "Raise Your SAT Score 200 Points",
+        "description": "Matched with a top 5% tutor in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Parent and teen at kitchen table, warm natural lighting, UGC style."
+      },
+      "scores": {
+        "average_score": 8.0
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 500,
+      "estimated_cost_usd": 0.001,
+      "status": "published",
+      "image_url": "output/images/brief_002_v0.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your child's SAT score standing between them and their dream school? Students improve 200+ points with a top 5% matched tutor. Start free.",
+        "headline": "Raise Your SAT Score 200 Points",
+        "description": "Matched with a top 5% tutor in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Parent and teen at kitchen table, warm natural lighting, UGC style."
+      },
+      "scores": {
+        "average_score": 8.0
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 500,
+      "estimated_cost_usd": 0.001,
+      "status": "published",
+      "image_url": "output/images/brief_002_v1.png"
+    }
+  ]
+}

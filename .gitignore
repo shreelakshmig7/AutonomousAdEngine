@@ -1,11 +1,9 @@
 # ── Secrets ───────────────────────────────────────────────
 .env
+.streamlit/secrets.toml
 
 # ── AI / reference docs (not part of shipped project) ───────
 memory-bank/
-
-# ── Generated output (never commit pipeline results) ──────
-
 
 # ── Python ────────────────────────────────────────────────
 __pycache__/
