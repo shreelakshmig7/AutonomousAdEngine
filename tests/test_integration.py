@@ -110,6 +110,10 @@ def test_main_pipeline_generates_outputs(
     ]
     result_iter = iter(results)
 
+    def fake_generate_image(self, prompt: str, ad_id: str) -> dict:
+        """Stub — no file write; return stable path for assert."""
+        return {"success": True, "data": f"output/images/{ad_id}.png", "error": None}
+
     with tempfile.TemporaryDirectory() as tmpdir:
         ads_path = Path(tmpdir) / "ads_library.json"
         log_path = Path(tmpdir) / "iteration_log.csv"
@@ -118,6 +122,10 @@ def test_main_pipeline_generates_outputs(
             patch("main.ITERATION_LOG_PATH", str(log_path)),
             patch("main.VARIATIONS_PER_BRIEF", 2),
             patch("main.run_brief", side_effect=lambda *a, **k: next(result_iter)),
+            patch(
+                "images.image_generator.AdImageGenerator.generate_image",
+                fake_generate_image,
+            ),
         ):
             gen = run_pipeline_streaming(two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
             for _ in gen:
@@ -135,20 +143,30 @@ def test_main_pipeline_generates_outputs(
         for entry in ads_list:
             for key in required_keys:
                 assert key in entry, f"Missing key {key} in entry"
+            # PR5 — image_url present when generator succeeds (mocked)
+            assert entry.get("image_url"), "image_url must be set for published ads when image gen succeeds"
             scores = entry.get("scores", {})
             avg = scores.get("average_score", entry.get("final_score", 0))
             assert avg >= QUALITY_THRESHOLD, f"Entry score {avg} below threshold"
 
         assert log_path.exists(), "iteration_log.csv should exist"
         log_content = log_path.read_text()
+        # PR5 — one row per evaluation event; header must list all columns
         required_cols = [
             "brief_id",
-            "variation_index",
             "difficulty",
-            "hook_type",
-            "cycles_required",
-            "final_average_score",
+            "variation",
+            "cycle",
+            "clarity",
+            "value_prop",
+            "cta",
+            "brand_voice",
+            "emotional_resonance",
+            "average_score",
+            "weakest_dimension",
             "status",
+            "tokens_used",
+            "cost_usd",
         ]
         for col in required_cols:
             assert col in log_content, f"Missing column {col} in iteration_log.csv"
@@ -165,9 +183,17 @@ def test_pipeline_yields_progress_updates(
     from main import run_pipeline_streaming
 
     results = [dict(mock_run_brief_published, brief_id=b.id, variation_index=i) for b in two_briefs for i in range(2)]
+
+    def fake_generate_image(self, prompt: str, ad_id: str) -> dict:
+        return {"success": True, "data": f"output/images/{ad_id}.png", "error": None}
+
     with (
         patch("main.VARIATIONS_PER_BRIEF", 2),
         patch("main.run_brief", side_effect=results),
+        patch(
+            "images.image_generator.AdImageGenerator.generate_image",
+            fake_generate_image,
+        ),
     ):
         gen = run_pipeline_streaming(two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
         yielded = list(gen)

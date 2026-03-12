@@ -278,6 +278,14 @@ def run_brief(
                 "cycle": cycle,
                 "scan_failed": True,
                 "error": scan_result.get("error"),
+                "clarity": None,
+                "value_proposition": None,
+                "call_to_action": None,
+                "brand_voice": None,
+                "emotional_resonance": None,
+                "average_score": None,
+                "weakest_dimension": None,
+                "status": "scan_failed",
             })
             if cycle >= MAX_CYCLES:
                 return {
@@ -320,10 +328,24 @@ def run_brief(
         total_tokens += 1500  # approximate judge call
         total_cost += _estimate_cost(1500, getattr(judge, "_model_name", "claude-sonnet-4-5"))
 
+        def _dim_score(name: str) -> int | None:
+            if not report:
+                return None
+            ds = getattr(report, name, None)
+            if ds is None or not hasattr(ds, "score"):
+                return None
+            return int(ds.score)
+
         iteration_log.append({
             "cycle": cycle,
+            "clarity": _dim_score("clarity"),
+            "value_proposition": _dim_score("value_proposition"),
+            "call_to_action": _dim_score("call_to_action"),
+            "brand_voice": _dim_score("brand_voice"),
+            "emotional_resonance": _dim_score("emotional_resonance"),
             "average_score": report.average_score if report else None,
             "weakest_dimension": report.weakest_dimension if report else None,
+            "status": "published" if report and report.passes_threshold else "below_threshold",
         })
 
         if report and report.passes_threshold:

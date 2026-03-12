@@ -1,17 +1,19 @@
 """
 main.py
 -------
-Varsity Ad Engine — Nerdy / Gauntlet — Pipeline entrypoint (PR4)
------------------------------------------------------------------
+Varsity Ad Engine — Nerdy / Gauntlet — Pipeline entrypoint (PR4 + PR5)
+-----------------------------------------------------------------------
 run_pipeline_streaming() is a generator that yields progress for each
-brief+variation; writes ads_library.json and iteration_log.csv.
-Uses rich for CLI output. Does not crash if published < MIN_ADS_REQUIRED.
+brief+variation; writes ads_library.json, iteration_log.csv (one row per
+evaluation event), and quality_trends.png. Publish path triggers image gen.
+Uses rich for CLI. Does not crash if published < MIN_ADS_REQUIRED.
 """
 
 from __future__ import annotations
 
 import csv
 import json
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Generator
 
@@ -26,10 +28,29 @@ MIN_ADS_REQUIRED: int = 50
 VARIATIONS_PER_BRIEF: int = 5
 ADS_LIBRARY_PATH: str = "output/ads_library.json"
 ITERATION_LOG_PATH: str = "output/iteration_log.csv"
+QUALITY_TRENDS_PATH: str = "output/quality_trends.png"
 
 # Cost estimation (PR4 briefing CORRECTION 8)
 GEMINI_FLASH_COST_PER_1K_TOKENS: float = 0.000075
 CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
+
+# PR5 CSV columns — one row per evaluation event
+CSV_FIELDNAMES: list[str] = [
+    "brief_id",
+    "difficulty",
+    "variation",
+    "cycle",
+    "clarity",
+    "value_prop",
+    "cta",
+    "brand_voice",
+    "emotional_resonance",
+    "average_score",
+    "weakest_dimension",
+    "status",
+    "tokens_used",
+    "cost_usd",
+]
 
 
 def estimate_cost(tokens: int, model: str | None) -> float:
@@ -53,6 +74,45 @@ def estimate_cost(tokens: int, model: str | None) -> float:
     return 0.0
 
 
+def _write_quality_trends_png(
+    cycle_to_scores: dict[int, list[float]],
+    path: str,
+) -> None:
+    """
+    Write matplotlib line chart: mean average_score per cycle.
+
+    Args:
+        cycle_to_scores: cycle -> list of average_score values.
+        path: Output PNG path.
+    """
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+    except Exception:
+        return
+    cycles = sorted(cycle_to_scores.keys())
+    if not cycles:
+        return
+    means = []
+    for c in cycles:
+        scores = [s for s in cycle_to_scores[c] if s is not None]
+        if scores:
+            means.append(sum(scores) / len(scores))
+        else:
+            means.append(0.0)
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    plt.figure(figsize=(8, 5))
+    plt.plot(cycles, means, marker="o", linewidth=2)
+    plt.xlabel("Cycle")
+    plt.ylabel("Mean average score")
+    plt.title("Quality trend across iteration cycles")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(path, dpi=120)
+    plt.close()
+
+
 def run_pipeline_streaming(
     briefs: list[AdBrief],
     competitive_context: dict,
@@ -61,9 +121,9 @@ def run_pipeline_streaming(
     """
     Run the full pipeline for all briefs and variations; yield progress updates.
 
-    For each brief × variation_index (0..VARIATIONS_PER_BRIEF-1) runs run_brief()
-    with seed = DEFAULT_SEED + variation_index. Writes ads_library.json (published
-    ads only) and iteration_log.csv. Final yield has status "complete" and aggregates.
+    For each brief × variation_index runs run_brief(). Writes ads_library.json,
+    iteration_log.csv (one row per evaluation event), quality_trends.png.
+    Final yield has status "complete" and aggregates.
 
     Args:
         briefs: List of validated AdBriefs.
@@ -71,17 +131,25 @@ def run_pipeline_streaming(
         brand_guidelines: Loaded brand_guidelines.json.
 
     Yields:
-        Progress dicts: brief_id, variation_index, status, cycle, score, weakest_dimension, message.
-        Final dict: status="complete", total_briefs, total_variations, total_published,
-                    total_unresolvable, avg_score, total_tokens, estimated_cost_usd.
+        Progress dicts and final complete dict.
     """
     ads_library: list[dict] = []
-    iteration_rows: list[dict] = []
+    iteration_rows: list[dict[str, Any]] = []
     total_published = 0
     total_unresolvable = 0
     total_tokens = 0
     total_cost = 0.0
     scores_for_avg: list[float] = []
+    # For quality_trends: cycle -> scores
+    cycle_to_scores: dict[int, list[float]] = defaultdict(list)
+
+    image_generator = None
+    try:
+        from images.image_generator import AdImageGenerator
+
+        image_generator = AdImageGenerator()
+    except Exception:
+        pass
 
     for brief in briefs:
         for variation_index in range(VARIATIONS_PER_BRIEF):
@@ -130,6 +198,38 @@ def run_pipeline_streaming(
                 "message": f"{brief.id} v{variation_index}: {status} (cycle {cycles_used})",
             }
 
+            difficulty = getattr(brief, "difficulty", "medium")
+            log_entries = result.get("iteration_log") or []
+
+            # One CSV row per evaluation event
+            for entry in log_entries:
+                c = int(entry.get("cycle") or 0)
+                avg = entry.get("average_score")
+                if avg is not None:
+                    try:
+                        cycle_to_scores[c].append(float(avg))
+                    except (TypeError, ValueError):
+                        pass
+                row_status = entry.get("status") or "below_threshold"
+                if entry.get("scan_failed"):
+                    row_status = "scan_failed"
+                iteration_rows.append({
+                    "brief_id": result.get("brief_id", brief.id),
+                    "difficulty": difficulty,
+                    "variation": variation_index,
+                    "cycle": c,
+                    "clarity": entry.get("clarity"),
+                    "value_prop": entry.get("value_proposition"),
+                    "cta": entry.get("call_to_action"),
+                    "brand_voice": entry.get("brand_voice"),
+                    "emotional_resonance": entry.get("emotional_resonance"),
+                    "average_score": avg,
+                    "weakest_dimension": entry.get("weakest_dimension"),
+                    "status": row_status,
+                    "tokens_used": tokens_used,
+                    "cost_usd": cost_usd,
+                })
+
             if status == "published":
                 total_published += 1
                 if final_score is not None:
@@ -137,14 +237,32 @@ def run_pipeline_streaming(
                 if final_ad is not None:
                     cycle_scores = {}
                     if final_report:
-                        for dim in ["clarity", "value_proposition", "call_to_action", "brand_voice", "emotional_resonance"]:
+                        for dim in [
+                            "clarity",
+                            "value_proposition",
+                            "call_to_action",
+                            "brand_voice",
+                            "emotional_resonance",
+                        ]:
                             ds = getattr(final_report, dim, None)
                             if ds and hasattr(ds, "score"):
                                 cycle_scores[dim] = ds.score
-                        cycle_scores["average_score"] = getattr(final_report, "average_score", final_score)
+                        cycle_scores["average_score"] = getattr(
+                            final_report, "average_score", final_score
+                        )
                     else:
                         cycle_scores["average_score"] = final_score or 0
-                    ads_library.append({
+
+                    ad_id = f"{result.get('brief_id', brief.id)}_v{variation_index}"
+                    image_url = None
+                    if image_generator is not None and getattr(final_ad, "image_prompt", None):
+                        img_result = image_generator.generate_image(
+                            final_ad.image_prompt, ad_id
+                        )
+                        if img_result.get("success") and img_result.get("data"):
+                            image_url = img_result["data"]
+
+                    entry = {
                         "brief_id": result.get("brief_id", brief.id),
                         "variation_index": variation_index,
                         "cycle": cycles_used,
@@ -154,36 +272,30 @@ def run_pipeline_streaming(
                         "tokens_used": tokens_used,
                         "estimated_cost_usd": cost_usd,
                         "status": status,
-                    })
+                    }
+                    if image_url:
+                        entry["image_url"] = image_url
+                    ads_library.append(entry)
             else:
                 total_unresolvable += 1
-
-            # iteration_log row: cycle_1_score, cycle_2_score, cycle_3_score from iteration_log in result
-            log_entries = result.get("iteration_log") or []
-            cycle_scores_list = [None, None, None]
-            for entry in log_entries:
-                c = entry.get("cycle", 0)
-                if 1 <= c <= 3:
-                    cycle_scores_list[c - 1] = entry.get("average_score")
-            cycles_required = cycles_used
-            final_avg = final_score if final_score is not None else (cycle_scores_list[cycles_required - 1] if cycles_required else None)
-            weakest_targeted = weakest or (log_entries[-1].get("weakest_dimension") if log_entries else None)
-            iteration_rows.append({
-                "brief_id": result.get("brief_id", brief.id),
-                "variation_index": variation_index,
-                "difficulty": getattr(brief, "difficulty", "medium"),
-                "hook_type": getattr(brief, "hook_type", ""),
-                "cycle_1_score": cycle_scores_list[0],
-                "cycle_2_score": cycle_scores_list[1],
-                "cycle_3_score": cycle_scores_list[2],
-                "cycles_required": cycles_required,
-                "final_average_score": final_avg,
-                "weakest_dimension_targeted": weakest_targeted,
-                "status": status,
-                "model_used": model_used,
-                "tokens_used": tokens_used,
-                "estimated_cost_usd": cost_usd,
-            })
+                # Unresolvable with no log entries still need a summary row if cycles ran
+                if not log_entries and cycles_used > 0:
+                    iteration_rows.append({
+                        "brief_id": result.get("brief_id", brief.id),
+                        "difficulty": difficulty,
+                        "variation": variation_index,
+                        "cycle": cycles_used,
+                        "clarity": None,
+                        "value_prop": None,
+                        "cta": None,
+                        "brand_voice": None,
+                        "emotional_resonance": None,
+                        "average_score": final_score,
+                        "weakest_dimension": weakest,
+                        "status": status,
+                        "tokens_used": tokens_used,
+                        "cost_usd": cost_usd,
+                    })
 
     # Write output files
     Path(ADS_LIBRARY_PATH).parent.mkdir(parents=True, exist_ok=True)
@@ -191,22 +303,18 @@ def run_pipeline_streaming(
         json.dump({"ads": ads_library}, f, indent=2)
 
     with open(ITERATION_LOG_PATH, "w", newline="") as f:
-        cols = [
-            "brief_id", "variation_index", "difficulty", "hook_type",
-            "cycle_1_score", "cycle_2_score", "cycle_3_score",
-            "cycles_required", "final_average_score",
-            "weakest_dimension_targeted", "status",
-            "model_used", "tokens_used", "estimated_cost_usd",
-        ]
-        w = csv.DictWriter(f, fieldnames=cols, extrasaction="ignore")
+        w = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES, extrasaction="ignore")
         w.writeheader()
         w.writerows(iteration_rows)
+
+    _write_quality_trends_png(cycle_to_scores, QUALITY_TRENDS_PATH)
 
     avg_score = sum(scores_for_avg) / len(scores_for_avg) if scores_for_avg else 0.0
 
     if total_published < MIN_ADS_REQUIRED:
         try:
             from rich.console import Console
+
             Console().print(
                 f"[yellow]Warning: Only {total_published} ads published. Target is {MIN_ADS_REQUIRED}.[/yellow]"
             )

@@ -5,10 +5,7 @@
 memory-bank/
 
 # ── Generated output (never commit pipeline results) ──────
-output/ads_library.json
-output/iteration_log.csv
-output/quality_trends.png
-output/images/
+
 
 # ── Python ────────────────────────────────────────────────
 __pycache__/

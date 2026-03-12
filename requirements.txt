@@ -1,5 +1,6 @@
 # AI Framework & APIs
 google-generativeai==0.8.3      # Gemini 2.0 Flash (Drafter) — Google API key
+google-genai==1.47.0            # Gemini 2.5 Flash Image only (images/image_generator.py); pinned exact
 anthropic==0.69.0               # Claude Sonnet 4.5 (Judge) — satisfies langchain-anthropic>=0.69.0
 python-dotenv==1.0.1            # Secure API key loading from .env
 
@@ -16,6 +17,9 @@ tenacity==8.3.0                 # Exponential backoff + fallback model on rate l
 
 # CLI Output
 rich==13.7.1                    # Live pipeline progress for demo video
+
+# Streamlit Cloud
+streamlit==1.40.2               # app.py dashboard + pipeline runner
 
 # Testing
 pytest==8.2.0                   # Core test framework — 12 required tests
