@@ -22,7 +22,12 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any, Generator
 
-from evaluate.rubrics import QUALITY_THRESHOLD, MAX_CYCLES, AdBrief
+from evaluate.rubrics import (
+    QUALITY_THRESHOLD,
+    MAX_CYCLES,
+    AdBrief,
+    EvaluationReport,
+)
 from generate.prompts import DEFAULT_SEED
 from iterate.controller import run_brief
 
@@ -240,23 +245,41 @@ def run_pipeline_streaming(
                 if final_score is not None:
                     scores_for_avg.append(final_score)
                 if final_ad is not None:
-                    cycle_scores = {}
-                    if final_report:
-                        for dim in [
-                            "clarity",
-                            "value_proposition",
-                            "call_to_action",
-                            "brand_voice",
-                            "emotional_resonance",
-                        ]:
-                            ds = getattr(final_report, dim, None)
-                            if ds and hasattr(ds, "score"):
-                                cycle_scores[dim] = ds.score
-                        cycle_scores["average_score"] = getattr(
-                            final_report, "average_score", final_score
-                        )
+                    # Published path: controller guarantees final_report is EvaluationReport.
+                    if not isinstance(final_report, EvaluationReport):
+                        # Should not happen after controller fix; avoid writing incomplete scores.
+                        cycle_scores = {
+                            "average_score": final_score or 0,
+                            "error": "final_report was not an EvaluationReport; re-run pipeline",
+                        }
                     else:
-                        cycle_scores["average_score"] = final_score or 0
+                        r = final_report
+                        cycle_scores = {
+                            "clarity": {
+                                "score": r.clarity.score,
+                                "rationale": r.clarity.rationale,
+                            },
+                            "value_proposition": {
+                                "score": r.value_proposition.score,
+                                "rationale": r.value_proposition.rationale,
+                            },
+                            "call_to_action": {
+                                "score": r.call_to_action.score,
+                                "rationale": r.call_to_action.rationale,
+                            },
+                            "brand_voice": {
+                                "score": r.brand_voice.score,
+                                "rationale": r.brand_voice.rationale,
+                            },
+                            "emotional_resonance": {
+                                "score": r.emotional_resonance.score,
+                                "rationale": r.emotional_resonance.rationale,
+                            },
+                            "average_score": r.average_score,
+                            "passes_threshold": r.passes_threshold,
+                            "weakest_dimension": r.weakest_dimension,
+                            "confidence": r.confidence,
+                        }
 
                     ad_id = f"{result.get('brief_id', brief.id)}_v{variation_index}"
                     image_url = None

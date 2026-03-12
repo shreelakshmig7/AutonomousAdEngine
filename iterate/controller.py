@@ -324,13 +324,45 @@ def run_brief(
             }
 
         report = judge_result.get("data")
+        # Publish path must always attach an EvaluationReport instance (not dict/serialized).
+        if report is not None and not isinstance(report, EvaluationReport):
+            try:
+                report = EvaluationReport.model_validate(report)
+            except Exception:
+                return {
+                    "brief_id": brief.id,
+                    "variation_index": variation_index,
+                    "status": "unresolvable",
+                    "cycles_used": cycle,
+                    "final_ad": current_ad,
+                    "final_score": None,
+                    "final_report": None,
+                    "iteration_log": iteration_log,
+                    "model_used": model_used,
+                    "tokens_used": total_tokens,
+                    "estimated_cost_usd": total_cost,
+                    "error": "Judge returned data that is not a valid EvaluationReport",
+                }
+        if report is None:
+            return {
+                "brief_id": brief.id,
+                "variation_index": variation_index,
+                "status": "unresolvable",
+                "cycles_used": cycle,
+                "final_ad": current_ad,
+                "final_score": None,
+                "final_report": None,
+                "iteration_log": iteration_log,
+                "model_used": model_used,
+                "tokens_used": total_tokens,
+                "estimated_cost_usd": total_cost,
+                "error": "Judge succeeded but returned no report data",
+            }
         current_report = report
         total_tokens += 1500  # approximate judge call
         total_cost += _estimate_cost(1500, getattr(judge, "_model_name", "claude-sonnet-4-5"))
 
         def _dim_score(name: str) -> int | None:
-            if not report:
-                return None
             ds = getattr(report, name, None)
             if ds is None or not hasattr(ds, "score"):
                 return None
@@ -343,12 +375,12 @@ def run_brief(
             "call_to_action": _dim_score("call_to_action"),
             "brand_voice": _dim_score("brand_voice"),
             "emotional_resonance": _dim_score("emotional_resonance"),
-            "average_score": report.average_score if report else None,
-            "weakest_dimension": report.weakest_dimension if report else None,
-            "status": "published" if report and report.passes_threshold else "below_threshold",
+            "average_score": report.average_score,
+            "weakest_dimension": report.weakest_dimension,
+            "status": "published" if report.passes_threshold else "below_threshold",
         })
 
-        if report and report.passes_threshold:
+        if report.passes_threshold:
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -371,7 +403,7 @@ def run_brief(
                 "status": "unresolvable",
                 "cycles_used": cycle,
                 "final_ad": None,
-                "final_score": report.average_score if report else None,
+                "final_score": report.average_score,
                 "final_report": report,
                 "iteration_log": iteration_log,
                 "model_used": model_used,
