@@ -429,6 +429,42 @@ High. A + B gives prompt alignment plus a safe fallback without truncation or sc
 
 ---
 
+## Decision: Publish Path — final_report Always EvaluationReport; ads_library Scores Explicit
+**Date:** 2026-03-11  
+**Trigger:** `ads_library.json` contained only `average_score` under `scores` — no per-dimension scores or rationales. PRD output schema expects full dimension breakdown.
+
+**Files affected:** `iterate/controller.py`, `main.py`
+
+### What We Did
+
+**Controller (`run_brief` publish path)**  
+- After `judge.evaluate_ad()` succeeds, `report = judge_result.get("data")` is **normalized** to a **Pydantic `EvaluationReport`** instance:
+  - If `report` is not `None` and not already `isinstance(report, EvaluationReport)`, call **`EvaluationReport.model_validate(report)`**.
+  - On validation failure → return **unresolvable** with error `"Judge returned data that is not a valid EvaluationReport"` (no publish without a valid report).
+  - If `report` is `None` after success → return **unresolvable** with error `"Judge succeeded but returned no report data"`.
+- **`current_report`** and all subsequent logic (iteration_log, publish return) assume **`report`** is a real **`EvaluationReport`**.
+- **Published return** always sets **`final_report: report`** where **`report`** is that instance — never a dict or partial object.
+
+**main.py (`ads_library.json` write)**  
+- When **`status == "published"`**, **`scores`** is built **explicitly** from **`final_report`** as **`EvaluationReport`** only:
+  - **Five dimensions** — each key **`clarity`**, **`value_proposition`**, **`call_to_action`**, **`brand_voice`**, **`emotional_resonance`** as **`{"score": int, "rationale": str}`** (matches PRD-style explainability).
+  - **Top-level fields:** **`average_score`**, **`passes_threshold`**, **`weakest_dimension`**, **`confidence`** (all from the same report; no recomputation from LLM-only fields).
+- If **`final_report`** is not an **`EvaluationReport`** (should not happen after controller fix), write **`average_score`** plus **`error`** string so incomplete runs are visible without silent dimension drop.
+
+### Why
+- **`main.py`** previously used **`getattr(final_report, dim, None)`** and only appended dimensions when sub-objects had **`.score`**. If **`final_report`** was **`None`** or a **dict**, the loop added nothing → only **`average_score`** from **`final_score`** landed in JSON.
+- **Publishing without a validated report** allowed downstream code to assume structure that was not guaranteed.
+- **Explicit serialization** makes **`ads_library.json`** self-contained for demos, CSV joins, and Gauntlet evidence without re-parsing or re-judging.
+
+### What We Avoided
+- **Weakening schema** — still require full judge output; no publishing on judge failure.
+- **Silent fallback** — no empty dimension map with only average; either full report or explicit error flag.
+
+### Confidence
+High. Integration and iteration-cap tests green; live pipeline produces full **`scores`** blocks per published ad.
+
+---
+
 ## Decision: PR3 Generate Module Architecture
 **Date:** 2026-03-09  
 **Files affected:** `generate/prompts.py`, `generate/drafter.py`, `generate/guardrails.py`, `data/loaders.py`, `data/__init__.py`, `evaluate/rubrics.py` (AdBrief + CTA_OPTIONS only), `tests/test_generator.py`, `tests/test_guardrails.py`, `tests/conftest.py`  

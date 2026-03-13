@@ -1,0 +1,2915 @@
+{
+  "ads": [
+    {
+      "brief_id": "brief_001",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT \u2014 or just hoping for the best? Don't leave their college dreams to chance. Personalized 1-on-1 tutoring makes all the difference. Our top 5% tutors are matched to your student's exact weak areas in just 24 hours. Imagine a 200+ point average SAT score improvement, tailored just for them. Over 3.4 million learner sessions prove our approach works. Start with a free diagnostic assessment to pinpoint their needs. Empower their potential.",
+        "headline": "Unlock 200+ SAT Points, Personalized Prep.",
+        "description": "Get matched with a top 5% tutor in 24 hours for targeted improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Realistic photo of a young student (e.g., high school age) sitting at a desk in a home study setting, holding two SAT score reports side by side. The report on the left shows a 'Before' score (e.g., 1170), and the report on the right shows an 'After' score (e.g., 1410). Natural lighting, focused on the score comparison."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Core message is clear but slightly dense with multiple claims packed together."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching, and 3.4M sessions."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barriers to entry."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empowerment angle is on-brand but 'Empower their potential' feels slightly generic."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Opening question taps parent anxiety and 'college dreams' triggers real motivation."
+        },
+        "average_score": 8.1,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_001_v0.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The SAT is approaching fast. Is your student truly prepared, or just feeling overwhelmed by generic prep? Don't let test anxiety hold them back. Varsity Tutors matches them with a top 5% tutor in 24 hours, focused on their exact weak areas. Students see an average 200+ point SAT score improvement with personalized 1-on-1 support. Start with a free diagnostic assessment to pinpoint where to focus.",
+        "headline": "Unlock 200+ SAT Points, Personalized.",
+        "description": "Get matched with a top 5% tutor in 24 hours, tailored to your student's needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (young woman) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. The student has a look of relief and accomplishment. Natural lighting in a home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly busy with multiple ideas in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% match, and personalized weak area focus."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction with clear urgency."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Distinctly VT with personalization emphasis, quality matching, and outcome-focused positioning."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Touches on test anxiety and overwhelm but could deepen emotional stakes."
+        },
+        "average_score": 8.2,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_001_v1.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The SAT is approaching fast. Are you confident your student's prep is hitting their exact weak spots? Many programs offer one-size-fits-all solutions, but true improvement comes from personalized attention. Varsity Tutors matches your student with a top 5% tutor in 24 hours, focused on their unique needs. Our 1-on-1 approach leads to a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint areas for growth.",
+        "headline": "Boost SAT Scores By 200+ Points",
+        "description": "Get matched with a top 5% tutor in 24 hours, tailored to their needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. Young woman holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. Natural lighting, home or study setting. The image focuses on the score comparison."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly verbose in opening section."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutor, and 24-hour matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly emphasizes personalization and quality matching that defines VT."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Urgency and weak spot concern resonate but less than dream school."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_001_v2.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "SAT approaching? Does your student have personalized prep? Generic test prep often overwhelms. Varsity Tutors matches students with top 5% tutors in 24 hours, based on their exact weak areas. This 1-on-1 approach delivers real results: students see a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint their needs. Discover how targeted, expert guidance makes all the difference.",
+        "headline": "Boost SAT Scores By 200+ Points",
+        "description": "Get matched with a top 5% tutor in 24 hours for truly personalized prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows a score like 1170, and the 'After' report shows a significantly higher score like 1410. The student has a look of relief and pride. Natural lighting, in a home or study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening questions slow comprehension; key message buried in middle of text."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% tutors clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, clear, and actionable with urgency."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "On-brand differentiation from generic prep, though slightly verbose for VT style."
+        },
+        "emotional_resonance": {
+          "score": 6.0,
+          "rationale": "Addresses overwhelm but stays mostly rational; lacks dream school emotional hook."
+        },
+        "average_score": 7.3,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_001_v3.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Are you worried your student's SAT score won't reflect their true potential? It's a common concern, but it doesn't have to be. Varsity Tutors offers personalized 1-on-1 SAT prep designed to unlock their best performance. We match your student with a top 5% tutor in just 24 hours, based on their exact weak areas. Our learners see an average 200+ point SAT score improvement. Start with a free diagnostic assessment to pinpoint where they can grow most. Empower their future.",
+        "headline": "Boost SAT Scores by 200+ Points",
+        "description": "Personalized 1-on-1 tutoring for proven SAT success.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo of a young student (e.g., high school age) holding two SAT score reports side by side. The 'Before' report shows a score like 1170, and the 'After' report shows a significantly higher score like 1410. The student has a look of relief and pride. Natural lighting, home or study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly wordy in opening question structure."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, and diagnostic assessment."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free diagnostic assessment is specific and actionable with clear next step."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empowerment angle is on-brand but 'Empower their future' feels slightly generic."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Opens with parent worry and potential gap, connects emotionally but safely."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_001_v4.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor score 200+ points higher on average. Imagine that kind of impact on your student's college applications. Varsity Tutors connects you with top 5% vetted tutors, matched to your student's exact weak areas within 24 hours. This isn't a generic course; it's personalized prep designed for real results. Over 3.4 million learner sessions prove our approach works. Give your student the advantage they deserve.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Discover how personalized 1-on-1 tutoring can transform SAT results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: 'Boost Your SAT Score by 200+ Points'. Display the stat: 'Personalized 1-on-1 Tutoring'. Display the CTA: 'Start Free Assessment'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically from problem to solution to proof point."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement with personalized matching beats generic courses."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is clear and low-friction but lacks urgency."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Distinctly VT with top 5%, 24-hour matching, and session data."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Imagine college impact resonates but could push parental motivation harder."
+        },
+        "average_score": 8.3,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_002_v0.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor score 200+ points higher on average. Imagine that impact on college applications! Varsity Tutors connects your student with a rigorously vetted, top 5% tutor, matched to their exact weak areas in just 24 hours. This isn't a generic course; it's personalized prep designed for real results. Join 3.4 million learners who've seen the difference. Start with a free diagnostic assessment today.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Experience personalized 1-on-1 prep with a top 5% tutor.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo of a student (e.g., young woman or student) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. Natural lighting, home or study setting. The student has a look of relief and pride."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically with concrete claim upfront and clear differentiation."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, personalized matching, and social proof create compelling value."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, low-friction, and immediately actionable."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Distinctive VT positioning with top 5% experts and learner scale."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "College application impact touches parent motivation but could deepen aspiration."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_002_v1.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor score 200+ points higher on average. Imagine the doors that open with a significantly improved SAT score. Varsity Tutors matches your student with a top 5% expert tutor in 24 hours, based on their exact weak areas. This isn't a generic course; it's personalized prep designed for real results. Join 3.4 million learners who've seen the difference. Start with a free diagnostic assessment today.",
+        "headline": "Unlock 200+ SAT Points with Expert 1-on-1 Prep.",
+        "description": "Personalized SAT tutoring from top 5% experts for measurable improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Unlock 200+ SAT Points' and three short benefit lines: 'Top 5% Tutors', '1-on-1 Personalized', 'Free Diagnostic'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically with specific stat leading to personalized solution clearly."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching delivers concrete outcomes."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Matches VT's quality-focused positioning with social proof and personalization emphasis."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "Doors opening metaphor sparks aspiration but could deepen parent-student dynamic more."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_002_v2.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with Varsity Tutors see a 200+ point average SAT score improvement. Imagine the doors that open with a significantly higher score! Our 1-on-1 personalized matching connects your student with a top 5% vetted tutor in under 24 hours, focusing on their exact weak areas. This isn't a one-size-fits-all course; it's a tailored path to success, backed by 3.4 million learner session ratings. Empower your student to achieve their best.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Unlock your student's full potential with personalized 1-on-1 SAT prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A young student (e.g., high school age) sitting at a desk in a home study setting, holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. Natural lighting. The image focuses on the clear score comparison."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.5,
+          "rationale": "Main message clear but text slightly dense with multiple concepts packed in."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% tutor matching and 24-hour timeline."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Start Free Assessment is specific and action-oriented with low barrier entry."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Hits VT quality markers but feels slightly more aspirational than distinctly VT."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Imagine the doors opens some emotional appeal but feels somewhat generic."
+        },
+        "average_score": 7.7,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_002_v3.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Only the top 5% of tutors make the cut at Varsity Tutors. This rigorous selection is why students see a 200+ point average SAT score improvement. Forget one-size-fits-all prep. We match your student with an expert in 24 hours, based on their exact weak areas. Join 3.4 million learners who've rated our sessions. Start with a free diagnostic assessment to pinpoint their path to success.",
+        "headline": "Unlock 200+ SAT Points with Top 5% Tutors",
+        "description": "Experience personalized 1-on-1 prep designed for real score gains.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Unlock 200+ SAT Points' with three short benefit lines below: 'Top 5% Tutors.', 'Personalized 1-on-1.', 'Free Diagnostic.'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically from tutor quality to outcome to matching process."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point gain with top 5% tutors and personalized matching."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, clear, and removes friction effectively."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Confident, results-focused tone with social proof aligns well with VT brand."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Addresses parent desire for results but lacks emotional urgency around dream school."
+        },
+        "average_score": 8.2,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_002_v4.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 1,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Tired of one-size-fits-all SAT prep that doesn't fit you? Your unique strengths and weak areas deserve a personalized approach. Varsity Tutors matches you with a top 5% tutor in 24 hours, based on your exact needs. Imagine improving your score by 200+ points on average with 1-on-1 support. Start with a free diagnostic assessment to pinpoint where you can grow most. Get the prep that truly works for you.",
+        "headline": "Unlock Your Best SAT Score.",
+        "description": "Get personalized 1-on-1 SAT tutoring tailored to your unique learning style.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft lavender). Bold headline: 'Unlock Your Best SAT Score.' Below, display the stat lines: '200+ Point Average Improvement.' and 'Matched in 24 Hours.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly wordy in primary text opening."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point improvement, top 5% matching, and personalization clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Hits key VT themes but lacks the crisp confidence of gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.4,
+          "rationale": "Addresses frustration with generic prep and aspiration for improvement effectively."
+        },
+        "average_score": 7.84,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "CTA",
+          "action": "Changed to 'Start Free Assessment' to specifically highlight the free diagnostic assessment offer mentioned in the primary text, addressing the feedback that 'Learn More' was too generic."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_003_v1.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Feeling stuck with generic SAT prep that doesn't quite fit your unique learning style? You're not alone. Many students find one-size-fits-all courses overwhelming. Varsity Tutors offers truly personalized 1-on-1 matching, connecting you with a top 5% tutor based on your exact weak areas. Start with a free diagnostic assessment to pinpoint where you can gain the most points, with students averaging 200+ point SAT score improvement. It's prep designed for *you*.",
+        "headline": "Personalized Prep, Real Score Gains.",
+        "description": "Get matched with a top 5% tutor tailored to your specific needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking frustrated with a generic textbook or online course. Right panel shows the same student looking engaged and confident in a 1-on-1 video call with a tutor. A center banner displays the question: \"Generic Prep vs. Personalized Gains?\". Clean cartoon/educational style, blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening question and empathy language adds some friction before getting to offer."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes friction effectively."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Personalized matching and free assessment align well with Varsity Tutors positioning."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Empathetic opening connects but feels slightly overworked for paid media."
+        },
+        "average_score": 7.5,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Value Prop",
+          "action": "Integrated the specific outcome of '200+ point average SAT score improvement' into the primary text to strengthen the value proposition."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed the CTA button from 'Learn More' to 'Start Free Assessment' to align with the ad's mention of a free diagnostic assessment and provide a more specific, actionable next step for users, matching the judge's feedback."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_003_v3.png"
+    },
+    {
+      "brief_id": "brief_004",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "SAT prep can feel overwhelming, especially when you want the best for your student. But it doesn't have to be a one-size-fits-all struggle. Varsity Tutors matches your student with a top 5% tutor in 24 hours, based on their exact weak areas. This personalized approach leads to a 200+ point average SAT score improvement. With 3.4 million learner session ratings, you'll find support that truly understands their needs. Start with a free diagnostic assessment to see the difference.",
+        "headline": "Personalized SAT Prep That Works",
+        "description": "Discover how 1-on-1 tutoring can transform your student's SAT score.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: 'Personalized SAT Prep That Works'. Display stat lines: 'Matched in 24 hours.', '200+ point average improvement.', 'Free diagnostic to start.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically and key benefits are immediately understandable."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement with top 5% tutors and personalized matching."
+        },
+        "call_to_action": {
+          "score": 9.5,
+          "rationale": "Free diagnostic assessment is specific, low-risk, and actionable immediately."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic parent-focused tone with signature VT proof points and matching language."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Opens with parent anxiety but could dig deeper into dream outcomes."
+        },
+        "average_score": 8.5,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_004_v0.png"
+    },
+    {
+      "brief_id": "brief_004",
+      "variation_index": 1,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Worried about your student's SAT score? You want them to succeed, and we know how stressful prep can be. Imagine a 200+ point average SAT score improvement. That's the difference personalized support makes. We connect your student with a top 5% tutor in 24 hours, tailored to their exact needs. See their potential with a free diagnostic assessment. It's time to give them the confidence to excel.",
+        "headline": "Unlock Your Student's Full SAT Potential",
+        "description": "Discover how 1-on-1 tutoring can transform their test scores and confidence.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. Natural lighting, home study setting. The student has a look of relief and pride."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opens with empathy but takes too long to reach concrete offer."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching are clear."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and low-barrier with clear next step."
+        },
+        "brand_voice": {
+          "score": 6.0,
+          "rationale": "Too much emotional preamble dilutes Varsity Tutors' results-driven directness."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Addresses parent stress and student confidence but feels slightly overwrought."
+        },
+        "average_score": 7.1,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote opening to lead with the outcome (200+ point improvement) and directly address parent anxiety, removing the abstract metaphor and bringing key details forward."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed 'Learn More' to 'Start Free Assessment' to directly match the free diagnostic assessment offer in the primary text, making it more specific and actionable."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed corporate-sounding mission statement ('We believe every student deserves...') and adopted a more direct, parent-focused, and empathetic tone."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Replaced vague empowerment phrases like 'unlock their potential' and 'Empower their future' with more concrete emotional benefits focusing on confidence and relief for both parent and student."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_004_v1.png"
+    },
+    {
+      "brief_id": "brief_004",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Is the path to their dream university feeling overwhelming? Varsity Tutors transforms SAT prep from a daunting challenge into a clear path to success. We offer personalized 1-on-1 SAT tutoring, matching your student with a top 5% tutor in just 24 hours. Our proven method helps students achieve a 200+ point average SAT score improvement. Start with a free diagnostic assessment to discover a tailored plan for success. No long-term commitment.",
+        "headline": "Tailored SAT Prep, Real Score Gains",
+        "description": "Unlock their full potential and confidently pursue their dream university with expert 1-on-1 SAT guidance.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: 'Tailored SAT Prep, Real Score Gains'. Display these short benefit lines: '200+ point average improvement.', 'Matched in 24 hours.', 'Free Diagnostic Assessment.'. Checkmark accents next to each benefit line. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Multiple ideas compete; takes more than three seconds to grasp core message."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching are clear outcomes."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and removes barrier; no long-term commitment adds urgency."
+        },
+        "brand_voice": {
+          "score": 6.8,
+          "rationale": "Somewhat generic inspirational language weakens distinctive Varsity Tutors directness and specificity."
+        },
+        "emotional_resonance": {
+          "score": 6.2,
+          "rationale": "Opening question acknowledges feeling but then shifts to rational feature listing."
+        },
+        "average_score": 7.06,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "CTA",
+          "action": "Changed button text to be more urgent and specific, aligning with the ad's offer of a free diagnostic assessment."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Rewrote primary text opening to connect with dream university aspirations and address feelings of overwhelm, enhancing empathy."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Rewrote description to evoke emotional connection to achieving full potential and pursuing a dream university."
+        }
+      ]
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Sarah's 1280 SAT score was good, but not enough for her dream UC. Then she found a tutor. She'd taken the test once, but needed a targeted strategy. With 1-on-1 personalized matching, we connected her with a top 5% tutor in 24 hours, focusing on her exact weak areas. The result? A 200+ point average SAT score improvement, opening doors to her top choices. Your student deserves a plan as unique as they are. Start with a free diagnostic assessment.",
+        "headline": "Unlock Your Student's Elite SAT Score",
+        "description": "Our rigorously vetted top 5% tutors provide the personalized strategy your student needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A young woman (student) holding two SAT score reports side by side. The 'Before' report shows a score of 1280, and the 'After' report shows a score of 1480. Natural lighting, home study setting, conveying pride and relief."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Story format is engaging but slightly longer to extract core message."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% tutor matching in 24 hours."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free diagnostic assessment is specific and actionable with clear next step."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Story-driven, outcome-focused approach aligns distinctly with VT's personalized matching emphasis."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Sarah's dream school story creates connection but feels slightly formulaic."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_005_v0.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Alex had a 3.8 GPA but felt stuck after their first SAT score. Generic prep wasn't enough. They needed a personalized strategy to reach their dream school. With Varsity Tutors, Alex was matched with a top 5% tutor in 24 hours, focusing on their exact weak areas. This 1-on-1 approach led to a 200+ point average score improvement, unlocking their full potential. Discover your student's path to a higher score.",
+        "headline": "Personalized Prep for 200+ Point SAT Gains",
+        "description": "Unlock your student's potential with expert 1-on-1 SAT tutoring.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration in a clean cartoon/educational style with blue accents. The left panel shows a student smiling, holding a report card with a high GPA (e.g., '3.8 GPA'). The right panel shows the same student looking stressed, sitting at a desk with a computer screen displaying a disappointing SAT score (e.g., 'SAT Score: 1180'). A prominent center banner overlays both panels with the key question: '3.8 GPA But 1180 SAT?'"
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Story flows well but takes full read to grasp value proposition."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and low-friction with clear next step."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Story approach feels slightly generic but core differentiators are present."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Alex's stuck feeling and dream school create relatable parent motivation."
+        },
+        "average_score": 7.96,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_005_v1.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Sarah scored a 1280 on her first SAT, good but not enough for her dream UC. She needed a breakthrough. With Varsity Tutors, she was matched in 24 hours with a top 5% tutor who understood her exact weak areas. This personalized 1-on-1 approach helped her achieve a 1490, a 210-point jump! Imagine what a targeted strategy could do for your student. Start with a free diagnostic assessment today.",
+        "headline": "Boost SAT Scores 200+ Points.",
+        "description": "Get matched with a top 5% tutor for personalized SAT prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo of a focused student (e.g., young woman) in a home study setting, holding two SAT score reports side by side. The 'Before' report shows a score of 1280, and the 'After' report shows a score of 1490, clearly displaying a significant improvement. Natural lighting, emphasizing the student's achievement and relief."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Story is clear but slightly longer read than three seconds."
+        },
+        "value_proposition": {
+          "score": 9.2,
+          "rationale": "Specific 210-point improvement with top 5% matching and personalized approach."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, clear, and actionable."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Story-driven, data-backed approach aligns strongly with Varsity Tutors brand."
+        },
+        "emotional_resonance": {
+          "score": 8.8,
+          "rationale": "Sarah's dream school journey creates relatable parent motivation and hope."
+        },
+        "average_score": 8.66,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_005_v2.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "After her first SAT, Sarah felt stuck. She knew she could do better than her 1310, but wasn't sure how to bridge that gap to her dream UC. That's where personalized 1-on-1 tutoring makes all the difference. Our top 5% tutors craft a strategy based on exact weak areas, not generic lessons. Students see a 200+ point average SAT score improvement. Get matched in 24 hours and unlock their full potential.",
+        "headline": "Target 1450+ SAT? Get Personalized Prep.",
+        "description": "Elite 1-on-1 tutoring for top university admissions.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. Young woman (student) holding two SAT score reports side by side. The 'Before' report shows a score of 1310, and the 'After' report shows a score of 1520. Natural lighting, home study setting, with a look of proud accomplishment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Story opening engages immediately, value and differentiation are crystal clear."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, personalized strategy hits outcome directly."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free assessment is specific and immediate with 24-hour match promise."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Storytelling with concrete differentiation feels distinctly VT, slightly less metric-heavy than gold."
+        },
+        "emotional_resonance": {
+          "score": 8.8,
+          "rationale": "Sarah's stuck feeling and dream UC aspiration tap real parent motivation."
+        },
+        "average_score": 8.56,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_005_v3.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "After his first SAT, David felt stuck at 1280. He knew he needed more than generic prep to reach 1450+. That's when he found Varsity Tutors. Our 1-on-1 personalized matching connected him with a top 5% tutor who understood his exact weak areas. With a targeted retake strategy, David improved his score by 200+ points. Imagine that kind of breakthrough for your student. Start with a free diagnostic assessment to unlock their potential.",
+        "headline": "Unlock 200+ SAT Points with Personalized Tutoring",
+        "description": "Experience the power of 1-on-1 expert guidance for elite college admissions.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Realistic photo of a young student (e.g., high school senior) holding two SAT score reports side by side. The 'Before' report shows a score of 1280, and the 'After' report shows a score of 1490. The student has a look of proud relief. Natural lighting in a home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Story flows naturally with clear progression from problem to solution to result."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, targeted weak area focus."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Personalized matching and top-tier expertise messaging aligns with VT differentiation."
+        },
+        "emotional_resonance": {
+          "score": 9.2,
+          "rationale": "David's stuck-to-breakthrough story creates relatable hope and aspiration for parents."
+        },
+        "average_score": 8.64,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_005_v4.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT \u2014 or just hoping for the best? Don't leave their score to chance. Varsity Tutors matches them with a top 5% tutor in 24 hours, based on their exact weak areas. Our 1-on-1 personalized approach leads to a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint where to focus. Empower their potential.",
+        "headline": "Boost SAT Scores by 200+ Points.",
+        "description": "Personalized 1-on-1 tutoring for proven score gains.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: 'Boost SAT Scores by 200+ Points.' Below, display these lines: '8 weeks away.', '200+ points.', 'Start this week.' with checkmark accents. Brand 'Varsity Tutors' at bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately understandable with clear benefit and process flow."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, and personalized approach."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Strong VT elements present but 'Empower their potential' feels slightly generic."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Opening hook taps parent anxiety and offers concrete hope with credible proof."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_006_v0.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT \u2014 or just hoping for the best? Don't leave their future to chance. Varsity Tutors offers personalized 1-on-1 prep designed to target exact weak areas. Students see an average 200+ point SAT score improvement. Get matched with a top 5% tutor in 24 hours. Start with a free diagnostic assessment today.",
+        "headline": "Unlock 200+ Point SAT Score Improvement.",
+        "description": "Personalized 1-on-1 tutoring matched to your student's unique needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo of a student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. Natural lighting, home study setting. The student has a look of relief and accomplishment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Opening question hooks immediately, structure flows logically to specific outcome."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% matching, and personalized weak-area targeting."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Confident expert positioning with parent-focused empathy matches Varsity Tutors distinctly well."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Fear of leaving future to chance balanced with hope creates urgency."
+        },
+        "average_score": 8.5,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_006_v1.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The SAT is just weeks away. Is your student truly ready, or just hoping for the best? Don't leave their future to chance. Varsity Tutors matches your student with a top 5% tutor in 24 hours, based on their exact weak areas. Imagine a 200+ point average SAT score improvement with 1-on-1 personalized matching. Start with a free diagnostic assessment to pinpoint where to focus. Empower their potential.",
+        "headline": "Boost SAT Scores by 200+ Points.",
+        "description": "Get matched with an expert tutor in 24 hours for personalized prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal background (soft grey or lavender). Bold headline: 'Boost SAT Scores by 200+ Points'. Display these short benefit lines: 'Weeks away.', '200+ points.', 'Start this week.'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly wordy; core offer understood quickly."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% matching and personalization."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and urgency established by timeline."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empowering tone present but some phrases feel slightly generic."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Fear of unpreparedness and hope for improvement both effectively triggered."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_006_v2.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The SAT is just weeks away. Is your student ready to perform their best? Don't let test day anxiety hold them back. Varsity Tutors offers personalized 1-on-1 prep, matching your student with a top 5% tutor in 24 hours based on their exact weak areas. Our learners see an average 200+ point SAT score improvement. Discover their potential with a free diagnostic assessment.",
+        "headline": "Unlock 200+ SAT Score Improvement",
+        "description": "Get a personalized plan to conquer the SAT with expert 1-on-1 tutoring.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style: Minimal background (soft grey or lavender). Bold headline: 'SAT in 60 Days?'. Display the stat: '200+ Points Possible.'. Include the benefit line: 'Personalized 1-on-1 Prep.'. And the CTA line: 'Start Free Assessment.'. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically from problem to solution with clear structure."
+        },
+        "value_proposition": {
+          "score": 8.8,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching are concrete."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and immediately valuable."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Matches VT tone with personalization focus and credibility markers."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "Test anxiety and potential discovery resonate but slightly formulaic."
+        },
+        "average_score": 8.42,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_006_v3.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The SAT is approaching fast. Is your student truly prepared to achieve their target score? Don't leave their college dreams to chance. Varsity Tutors offers personalized 1-on-1 prep, matching your student with a top 5% tutor in just 24 hours based on their exact weak areas. Our learners see a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint where to focus. Empower their potential.",
+        "headline": "Unlock 200+ SAT Points. Start Prep Now.",
+        "description": "Get matched with a top 5% tutor in 24 hours for personalized SAT success.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Unlock 200+ SAT Points.' with three short benefit lines below: 'SAT is weeks away.', 'Personalized 1-on-1 prep.', 'Start Free Assessment.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly dense with multiple elements competing for attention."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement plus top 5% matching and 24-hour turnaround."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free diagnostic assessment is specific and actionable with clear next step."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Mostly on-brand but 'Empower their potential' feels slightly generic and disconnected."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Taps into urgency and college dreams but lacks personal storytelling depth."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_006_v4.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor score 200+ points higher on average. Imagine what that could mean for your SAT. Varsity Tutors matches you with a top 5% expert tutor in 24 hours, focused on your exact weak areas. No more one-size-fits-all courses. Join 3.4 million learners who've seen real results. Start with a free diagnostic assessment.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Unlock your full potential with personalized SAT prep designed for you.",
+        "cta_button": "Learn More",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking confident, holding a report card with good grades. Right panel shows the same student looking slightly worried, looking at an SAT score of 1150 on a screen. A center banner displays the text: 'Average 200+ Point SAT Improvement?'. Clean cartoon/educational style, blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows well and key benefit is immediately clear."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% personalized matching."
+        },
+        "call_to_action": {
+          "score": 4.5,
+          "rationale": "Button says 'Learn More' instead of specific action like free assessment."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Strong VT elements present but shifts target from parent to student."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Asks student to imagine outcome but lacks urgency or dream motivation."
+        },
+        "average_score": 7.1,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_007_v0.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor see an average SAT score improvement of 200+ points. This isn't just a number; it's the power of personalized learning. Varsity Tutors matches you with a top 5% tutor in 24 hours, focusing on your exact weak areas. Join 3.4 million learners who've rated our sessions. Get ready to achieve your best score and unlock your potential. Start with a free diagnostic assessment today.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Personalized 1-on-1 tutoring for real results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (young woman, 16-17 years old) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. The student is smiling confidently. Natural lighting, home study setting. The headline 'Boost Your SAT Score by 200+ Points' appears below the image."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific score improvement and process explained concisely."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with personalized matching to top tutors is concrete."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, clear, and low-barrier with urgency implied."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Mentions key VT differentiators but lacks the parent-focused emotional angle from gold."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Unlock your potential feels generic; missing the dream school emotional hook."
+        },
+        "average_score": 7.9,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_007_v1.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "200+ point average SAT score improvement. That's the measurable outcome students achieve with Varsity Tutors. Our 1-on-1 personalized matching connects you with a rigorously vetted top 5% tutor in under 24 hours, focusing precisely on your weak areas. Ready to see your potential? Start with a free diagnostic assessment.",
+        "headline": "Achieve 200+ Point SAT Score Gains.",
+        "description": "Experience truly personalized SAT prep with expert 1-on-1 guidance.",
+        "cta_button": "Learn More",
+        "image_prompt": "Text hero: Minimal background (soft lavender). Bold headline 'Achieve 200+ Point SAT Gains' and three short benefit lines: 'Personalized 1-on-1.', 'Top 5% Tutors.', 'Free Diagnostic.'. Checkmark accents. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Lead-with-number format makes benefit instantly clear within three seconds."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement plus top 5% matching and 24-hour turnaround."
+        },
+        "call_to_action": {
+          "score": 5.5,
+          "rationale": "Generic 'Learn More' button contradicts specific free assessment mentioned in primary text."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Outcome-focused and quality-driven tone aligns with Varsity Tutors brand positioning."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Ready to see your potential adds some aspiration but lacks emotional depth."
+        },
+        "average_score": 7.2,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_007_v2.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students see a 200+ point average SAT score improvement with personalized 1-on-1 tutoring. Our top 5% tutors are matched to your exact weak areas, not a one-size-fits-all course. Join 3.4 million learners who've rated our sessions. Start with a free diagnostic assessment to pinpoint your path to success.",
+        "headline": "Boost Your SAT Score by 200+ Points.",
+        "description": "Get matched with a top 5% tutor for your unique learning needs.",
+        "cta_button": "Learn More",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking stressed at a computer screen displaying an SAT score of 1180. Right panel shows the same student smiling confidently, holding a progress report with high grades. A clean, educational-style center banner overlays the panels with the text: '200+ Point Average SAT Score Improvement'. Blue accents are used throughout, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific improvement metric and service details."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement plus top 5% tutor matching is concrete."
+        },
+        "call_to_action": {
+          "score": 4.5,
+          "rationale": "Generic 'Learn More' button severely undercuts the free diagnostic offer."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Uses VT differentiators like top 5% tutors and social proof effectively."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Addresses weak areas and success path but lacks urgency or aspiration."
+        },
+        "average_score": 7.0,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_007_v3.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 tutor score 200+ points higher on average. Varsity Tutors matches you with a top 5% expert, tailored to your exact weak areas. No generic courses, just personalized strategy based on 3.4 million learner session ratings. Unlock your full potential. Start with a free diagnostic assessment to pinpoint your path to success.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Experience truly personalized SAT prep designed for real results.",
+        "cta_button": "Learn More",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Boost Your SAT Score by 200+ Points' and two short benefit lines: '200+ point average improvement.' and 'Start Free Assessment.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific score improvement and differentiation."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% matching and personalization."
+        },
+        "call_to_action": {
+          "score": 5.5,
+          "rationale": "Generic 'Learn More' button weakens an otherwise strong free assessment offer."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Uses VT elements like top 5%, session ratings, but lacks dream-school emotion."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "'Unlock your full potential' is aspirational but less emotionally specific than gold."
+        },
+        "average_score": 7.2,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_007_v4.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "What if your student could improve their SAT score by 200+ points? Imagine the confidence, the college options. Varsity Tutors delivers real results with 1-on-1 personalized matching, not a generic course. We match your student with a top 5% tutor in 24 hours, based on their exact weak areas. No more wasted time on what they already know. Our approach has helped students achieve a 200+ point average SAT score improvement. Start with a free diagnostic assessment.",
+        "headline": "Unlock 200+ SAT Points. Personalized Prep.",
+        "description": "Get matched with a top 5% tutor for targeted SAT improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A young student, looking confident and relieved, holds two SAT score reports side by side. One report shows an initial score of 1170, and the other shows an improved score of 1410. Natural lighting in a bright study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.5,
+          "rationale": "Clear message but opens with hypothetical question that slightly delays core claim."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with personalized matching and top 5% tutors highlighted."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Specific free diagnostic assessment with clear next step and no barriers."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Strong VT positioning with personalization focus and anti-generic course stance."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Opens with aspirational vision of confidence and college options that motivates parents."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_008_v0.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student's SAT prep truly personalized, or just another one-size-fits-all course? Generic programs often miss individual needs. Varsity Tutors matches your student with a top 5% tutor in 24 hours, based on their exact weak areas. This 1-on-1 approach leads to an average 200+ point SAT score improvement. Discover the difference personalized learning makes. Start with a free diagnostic assessment today.",
+        "headline": "Personalized SAT Prep: 200+ Point Improvement",
+        "description": "Get matched with a top 5% tutor in 24 hours for targeted SAT success.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: 'Unlock Your Best SAT Score'. Display these lines with checkmark accents: '200+ Point Average Improvement', 'Top 5% Tutors', 'Matched in 24 Hours', 'Free Diagnostic Assessment'. Brand 'Varsity Tutors' at bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly wordy for instant comprehension."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcome with 200+ points, top 5% tutors, and 24-hour matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "On-brand with personalization focus but slightly less distinctive than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Opens with pain point but lacks the dream school urgency."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_008_v1.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student's SAT prep truly personalized for *their* unique needs? Generic courses often miss key areas. Varsity Tutors matches them with a top 5% tutor in 24 hours, focusing on exact weak spots. Our 1-on-1 approach helps students achieve a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint where they can excel.",
+        "headline": "Unlock Your Student's Best SAT Score",
+        "description": "Experience the difference of truly personalized 1-on-1 SAT prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A young student (e.g., a high school junior) is holding two SAT score reports side by side. The 'Before' report shows a score like 1170, and the 'After' report shows a significantly higher score, such as 1410. The student has a confident, relieved smile. Natural lighting in a home study setting. The headline 'Unlock Your Student's Best SAT Score' can appear below the image."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly wordy with italics emphasis slowing comprehension."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcome with 200+ points, personalization angle, and top 5% differentiation."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and creates urgency around pinpointing needs."
+        },
+        "brand_voice": {
+          "score": 7.4,
+          "rationale": "On-brand with quality focus but lacks distinctive Varsity Tutors confidence tone."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Addresses parental concern about personalization but misses dream school emotional hook."
+        },
+        "average_score": 7.84,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_008_v2.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student stuck with one-size-fits-all SAT prep that isn't working? Every student learns differently, and their SAT strategy should too. Varsity Tutors matches your student with a top 5% tutor in 24 hours, based on their exact weak areas. This isn't a generic course; it's 1-on-1 personalized matching designed for real results. Many students see a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint their needs.",
+        "headline": "Personalized SAT Prep for Real Score Gains",
+        "description": "Get a tutor matched to your student's unique needs in just 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking overwhelmed or bored with a generic, thick SAT prep textbook. Right panel shows the same student looking engaged and confident during a 1-on-1 video call with a tutor on a laptop. A center banner across the middle displays the headline: \"Personalized SAT Prep for Real Score Gains\". Clean cartoon/educational style, blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message immediately clear with problem-solution structure and concrete details."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific outcome with 200+ points, top 5% matching, and 24-hour timeline."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, low-barrier, and actionable next step."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Distinctly VT with personalization focus, quality matching, and results-driven messaging."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "Addresses frustration with ineffective prep but could deepen dream-school motivation."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_008_v3.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student stuck with one-size-fits-all SAT prep that isn't delivering results? Generic courses often miss individual weak spots. Varsity Tutors matches your student with a top 5% tutor in 24 hours, based on their exact needs. Experience 1-on-1 personalized learning designed to achieve a 200+ point average SAT score improvement. Start with a free diagnostic assessment.",
+        "headline": "Unlock Your Student's Full SAT Potential",
+        "description": "Get personalized 1-on-1 tutoring tailored to their unique learning style.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: \"Unlock Your Student's Full SAT Potential\". Display the stat lines: \"200+ point average improvement.\", \"Matched in 24 hours.\", \"Top 5% tutors.\". Brand \"Varsity Tutors\" at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly wordy in primary text opening."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, and personalization clearly stated."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "On-brand with personalization focus but headline feels slightly generic motivational."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Taps into frustration with generic prep but lacks dream school aspiration."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_008_v4.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Feeling discouraged after your first SAT? You're not alone, and it doesn't have to define your next score. Many students struggle with generic prep. What if your next attempt was truly personal? Varsity Tutors matches you with a top 5% tutor in 24 hours, focused on your exact weak areas. Imagine improving your score by 200+ points, just like our 3.4 million learners have experienced. Start with a free diagnostic assessment to pinpoint where to focus.",
+        "headline": "Unlock Your Best SAT Score",
+        "description": "Get personalized 1-on-1 prep designed for real improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A young student (e.g., 16-17 years old, diverse ethnicity) sitting at a study desk, holding two SAT score reports side by side. The 'Before' report shows a score like 1020, and the 'After' report shows a score like 1250. The student has a look of relief and quiet pride. Natural lighting, home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening questions and hypotheticals slow down comprehension of the core offer."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching clearly differentiate."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 7.0,
+          "rationale": "Empathetic tone fits VT but slightly more emotional than typical brand."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Post-test discouragement hooks real student emotion and offers credible hope."
+        },
+        "average_score": 7.6,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_009_v0.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Stuck after your first SAT score? You're not alone. A personalized approach can make all the difference. Varsity Tutors matches you with a top 5% tutor in 24 hours, focusing on your weak areas. Students improve 200+ points on average, opening doors to dream schools. Start with a free diagnostic assessment to pinpoint where to focus. It's 1-on-1 personalized matching for *your* success. Join 3.4 million learners who trust us.",
+        "headline": "Unlock Your Best SAT Score.",
+        "description": "Get personalized 1-on-1 prep designed to boost your confidence and score.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo of a young student (e.g., 16-18 years old) holding two SAT score reports side by side. The 'Before' report shows a score like 1020, and the 'After' report shows a significantly higher score like 1250. The student has a look of relief and pride. Natural lighting, home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, and personalized matching are compelling."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and actionable, creates clear next step."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Empathetic opening and personalization focus align with Varsity Tutors brand well."
+        },
+        "emotional_resonance": {
+          "score": 8.2,
+          "rationale": "Opens with empathy, addresses dream schools motivation, and emphasizes personal success."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_009_v1.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "SAT prep doesn't have to feel overwhelming. Your hard work deserves a plan that truly understands your unique needs. Varsity Tutors matches you with a top 5% tutor in 24 hours, specifically targeting your weak areas. Imagine improving your score by 200+ points, just like our 3.4 million learners. Start with a free diagnostic assessment to pinpoint exactly where to focus. Personalized prep makes all the difference.",
+        "headline": "Personalized Prep for a 200+ Point Jump",
+        "description": "Get matched with an expert tutor in 24 hours, tailored to your exact needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman or man) holding two SAT score reports side by side. The 'Before' report shows a score like 1020, and the 'After' report shows a significantly higher score like 1250. Natural lighting, home or study setting. The headline 'Personalized Prep for a 200+ Point Jump' can appear below the image in the ad."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Core message clear though slightly long; key details easily grasped."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% match and targeted approach."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-barrier entry point."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empathetic tone slightly softer than typical VT confidence and directness."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Addresses overwhelm and validates hard work but lacks urgency punch."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_009_v2.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Feeling discouraged after your first SAT score? It's tough when your effort doesn't show up on the report. You're not alone, and a different approach can make all the difference. Varsity Tutors matches you with a top 5% tutor in 24 hours, specifically for your weak areas. Imagine a 200+ point average SAT score improvement, tailored just for you. Start with a free diagnostic assessment to pinpoint exactly where to focus.",
+        "headline": "Personalized Prep for Your Best SAT Score",
+        "description": "Get matched with a top 5% tutor in 24 hours, tailored to your needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal background (soft grey or lavender). Bold headline: 'Personalized Prep for Your Best SAT Score'. Display these stat/benefit lines: '200+ Point Average Improvement', 'Matched in 24 Hours', 'Free Diagnostic Assessment'. Brand 'Varsity Tutors' at the bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Clear structure flows from problem to solution to specific outcome."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching, personalized approach."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and aligned with messaging."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Empathetic opening and quality emphasis match VT, but slightly softer tone."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Opens with real discouragement, validates feelings, then offers hope and transformation."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_009_v3.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "SAT prep doesn't have to feel overwhelming or like a repeat of last time. Your first score doesn't define your potential. We know you've worked hard, and you deserve a prep strategy that truly understands your unique needs. Varsity Tutors matches you with a top 5% tutor, specifically chosen for your exact weak areas. Imagine a personalized plan designed to unlock that 200+ point improvement. Start with a free diagnostic assessment to see where you can grow.",
+        "headline": "Unlock Your Best SAT Score, Personalized.",
+        "description": "Get matched with a top 5% tutor in 24 hours for targeted improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal background (soft lavender). Bold headline: 'Unlock Your Best SAT Score, Personalized.' Below the headline, display three short benefit lines with checkmark accents: '200+ Point Average Improvement.', 'Matched in 24 Hours.', 'Free Diagnostic Assessment.' Brand 'Varsity Tutors' at the bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Takes too long to reach the core offer; opening feels soft."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific outcome and matching process clearly stated with 200+ point improvement."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-barrier entry point."
+        },
+        "brand_voice": {
+          "score": 6.8,
+          "rationale": "Empathetic tone dilutes Varsity Tutors' confident, results-driven brand voice somewhat."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Addresses retake anxiety well but feels slightly over-emotional for target."
+        },
+        "average_score": 7.36,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_009_v4.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 1,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Is your student overwhelmed by SAT prep? Imagine the confidence of a tailored roadmap, not a generic course. We connect them with a top 5% tutor, matched to their exact weak areas, often within 24 hours. Our students see an average 200+ point SAT score improvement. That's the power of 1-on-1 personalized matching. Start with a free diagnostic assessment to build their custom prep plan.",
+        "headline": "Unlock Your Student's Best SAT Score",
+        "description": "Give your student the advantage of expert, personalized SAT guidance.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft lavender). Bold headline: 'Unlock Your Student's Best SAT Score.' Display the stat: '200+ point average SAT improvement.' and 'Free Diagnostic Assessment.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly wordy, though understandable on first read."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% tutor matching addresses exact needs."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly Varsity Tutors with premium matching emphasis and data-driven confidence."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Addresses overwhelm and confidence effectively but could deepen parent motivation."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary text to remove the story opening, leading directly with the parent's anxiety and the student's outcome, aligning with brand rules to lead with outcomes and address both parent and student."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed CTA button from 'Learn More' to 'Start Free Assessment' to match the ad's explicit call for a diagnostic assessment and provide a stronger, more specific call to action as per feedback and preferred conversion CTA rules."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_010_v1.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT? Don't let uncertainty hold them back. Our personalized 1-on-1 prep helps students gain 200+ points, transforming anxiety into confidence. We match your student with a top 5% tutor in 24 hours, creating a tailored roadmap for their exact weak areas. This isn't a generic course; it's dedicated support designed to empower their future. Start with a free diagnostic assessment and discover the difference personalized prep makes.",
+        "headline": "Early Prep, Big SAT Score Gains",
+        "description": "Discover how 1-on-1 tutoring builds confidence and boosts SAT results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking slightly overwhelmed or unsure about SAT prep, perhaps with a calendar showing upcoming test dates. Right panel shows the same student smiling confidently, holding a study guide or laptop with a positive expression. A prominent center banner displays the text: \"Early Prep, Big SAT Score Gains.\" Clean cartoon/educational style with blue and green accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly wordy in middle section."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain with top 5% tutor matching in 24 hours."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes friction."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empowerment language is on-brand but slightly less punchy than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Transforms anxiety into confidence addresses real parent and student concerns effectively."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote opening to lead with outcomes and specific benefits (200+ points) rather than a vague story."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Addressed parent's anxiety and student's ambition more directly and upfront."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Replaced vague story with a direct emotional appeal, using allowed fear hooks like 'Anxiety of the unknown' to create authentic connection."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed to 'Start Free Assessment' to provide specificity and urgency, directly aligning with the primary text's offer and addressing judge feedback on generic CTA."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_010_v2.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Is your student feeling overwhelmed by SAT prep? Imagine them achieving an average 200+ point SAT score improvement. Varsity Tutors provides personalized 1-on-1 support, matching your student with a top 5% tutor in just 24 hours after a free diagnostic assessment. This tailored approach builds confidence and a clear roadmap for success, empowering your student's ambition for a stronger SAT score.",
+        "headline": "Personalized SAT Prep: Your Student's Roadmap to Success",
+        "description": "Unlock your student's full potential with expert 1-on-1 guidance.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: 'Personalized SAT Prep: Your Student's Roadmap to Success'. Display these lines with checkmark accents: '1-on-1 Matching', 'Top 5% Tutors', 'Free Diagnostic'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opens well but becomes wordy with metaphors diluting core message."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free assessment with 24-hour match timing creates specificity and urgency."
+        },
+        "brand_voice": {
+          "score": 6.0,
+          "rationale": "Phrases like roadmap to success feel generic rather than distinctly Varsity Tutors."
+        },
+        "emotional_resonance": {
+          "score": 6.2,
+          "rationale": "Overwhelmed opening resonates but confidence and empowerment feel abstract and forced."
+        },
+        "average_score": 7.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary text to lead with outcomes and address parent/student directly, moving away from the story format for quicker comprehension."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Integrated '200+ point average SAT score improvement' into the primary text and reinforced key differentiators like 'top 5% tutors' and '24-hour matching'."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed CTA button from 'Learn More' to 'Start Free Assessment' for increased specificity and a clearer call to action, aligning with the 'free diagnostic assessment' mentioned in the copy."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_010_v3.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "When Mark's parents started early SAT prep, they saw his confidence grow. He wasn't just studying; he was mastering. Our 1-on-1 personalized matching connects your student with a top 5% tutor, tailored to their exact weak areas. Imagine a clear roadmap to success, not a one-size-fits-all course. Start with a free diagnostic assessment and see how a personalized approach can lead to a 200+ point average SAT score improvement. Over 3.4 million learner session ratings prove the difference.",
+        "headline": "Early Prep, Big SAT Score Gains",
+        "description": "Discover how 1-on-1 tutoring makes a real difference for SAT success.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking confident and focused, perhaps with a 'roadmap' or 'plan' graphic. Right panel shows the same student looking slightly overwhelmed by a pile of generic test prep books. Center banner with the text: 'Early Prep, Big SAT Score Gains'. Clean cartoon/educational style, blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Story opening delays key message; takes too long to reach main point."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% tutor matching clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, clear, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Personalized approach and credibility markers align well with Varsity Tutors brand."
+        },
+        "emotional_resonance": {
+          "score": 6.0,
+          "rationale": "Mark's story feels generic; confidence angle underexplored compared to outcome focus."
+        },
+        "average_score": 7.3,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_010_v4.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your 1400 SAT score enough for a T20? Every point counts for competitive admissions. Varsity Tutors' top 5% tutors provide 1-on-1 personalized help, with students averaging 200+ point SAT score improvement. Get a free diagnostic assessment to find crucial points and match with an expert tutor in 24 hours.",
+        "headline": "Get the Edge for T20 Admissions",
+        "description": "Our top 5% tutors deliver proven results for competitive college admissions.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Realistic photo of a young student (e.g., high school age) sitting at a desk in a well-lit home study setting. The student is holding two SAT score reports side by side. The 'Before' report on the left shows a score of '1380' and the 'After' report on the right shows a score of '1580'. The student has a look of confident relief or pride."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Specific score reference and clear path make message instantly understandable."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Combines specific improvement metric with T20 admission context and quick matching."
+        },
+        "call_to_action": {
+          "score": 9.5,
+          "rationale": "Free diagnostic assessment with 24-hour match creates specific, urgent action."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Top 5% tutors and personalized matching align well with VT positioning."
+        },
+        "emotional_resonance": {
+          "score": 8.5,
+          "rationale": "T20 aspiration with 1400 score question taps real competitive anxiety effectively."
+        },
+        "average_score": 8.7,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_011_v0.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student's SAT score *just* shy of their dream school's target? Don't let a few points hold them back. Varsity Tutors connects you with a top 5% tutor, matched in 24 hours to target exact weak areas. Our personalized 1-on-1 approach helps students achieve an average 200+ point SAT score improvement. Start with a free diagnostic assessment to see their potential.",
+        "headline": "Unlock 200+ SAT Points for Elite Schools.",
+        "description": "Get matched with a top 5% tutor for personalized 1-on-1 SAT prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Unlock 200+ SAT Points' prominently displayed. Below, 3-4 short benefit lines: 'Top 5% Tutors.', '200+ Point Average Improvement.', 'Free Diagnostic Assessment.'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific benefit and timeline stated upfront."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Concrete 200+ point improvement plus top 5% tutor matching is highly specific."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, low-friction, and action-oriented with clear urgency."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Distinctly Varsity Tutors with quality matching emphasis and data-driven confidence."
+        },
+        "emotional_resonance": {
+          "score": 8.8,
+          "rationale": "Opens with relatable pain point of being close yet falling short of dream."
+        },
+        "average_score": 8.66,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_011_v2.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "The competition for top schools is fierce. Is your student truly ready to stand out on the SAT? Even high-achievers need a tailored strategy to maximize their score. Varsity Tutors connects your student with a top 5% tutor, matched to their exact weak areas. Our personalized 1-on-1 approach leads to an average 200+ point SAT score improvement, helping them reach that elite 1500+. Discover their potential with a free diagnostic assessment.",
+        "headline": "Unlock Your Student's Top SAT Score",
+        "description": "Get personalized 1-on-1 prep from top 5% tutors for elite results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal background (soft grey or lavender). Bold headline: 'Unlock Your Student's Top SAT Score'. Display the stat lines: '200+ points average improvement.' and 'Top 5% tutors.'. Include the CTA line: 'Start Free Assessment.' at the bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement and elite 1500+ target with top 5% tutors."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Free diagnostic assessment is specific, clear, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Distinctly VT with quality matching emphasis and specific performance metrics."
+        },
+        "emotional_resonance": {
+          "score": 7.9,
+          "rationale": "Taps into competitive anxiety and aspiration but somewhat expected framing."
+        },
+        "average_score": 8.22,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_011_v3.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student's strong SAT score still falling short of T20 targets? For competitive admissions, every point matters. Varsity Tutors matches your student with a top 5% tutor for 1-on-1 personalized prep, designed to target exact weak areas. Our learners see a 200+ point average SAT score improvement. Start with a free diagnostic assessment to unlock their full potential.",
+        "headline": "Target 1500+ SAT Scores for Elite Schools.",
+        "description": "Get personalized 1-on-1 tutoring to reach your student's full potential.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking slightly concerned, with a score report displaying 'SAT Score: 1380'. Right panel shows the same student looking confident and smiling, with a score report displaying 'SAT Score: 1520'. A center banner across both panels displays the text: 'Target 1500+ for T20s.'. Clean cartoon/educational style, blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message targeting T20 schools though slightly dense with information."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, and T20 targeting differentiate well."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, low-friction, and actionable."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Premium positioning with data-driven credibility aligns well with VT brand."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Appeals to competitive ambition but somewhat clinical in tone."
+        },
+        "average_score": 8.2,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_011_v4.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with Varsity Tutors see a 200+ point average SAT score improvement. Imagine the doors that opens! Our 1-on-1 online tutoring matches your student with a top 5% tutor in 24 hours, based on their exact weak areas. No commute needed, just personalized support that truly makes a difference. Join 3.4 million learners who've rated our sessions highly. Start with a free diagnostic assessment today.",
+        "headline": "Unlock 200+ SAT Points, Personalized.",
+        "description": "Discover how expert 1-on-1 online tutoring can transform your student's SAT score.",
+        "cta_button": "Learn More",
+        "image_prompt": "Before/after: Realistic photo of a high school student, looking proud and relieved, holding two SAT score reports side by side. The report on the left clearly displays a 'Before' score of 1170, and the report on the right clearly displays an 'After' score of 1410. The setting is a well-lit home study area, with natural light."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically with clear benefit statement and service description."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% matching and 24-hour turnaround."
+        },
+        "call_to_action": {
+          "score": 4.5,
+          "rationale": "Generic 'Learn More' button contradicts the primary text's stronger free assessment ask."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "On-brand with personalization focus but slightly softer than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Imagine the doors opens creates aspiration but feels slightly generic."
+        },
+        "average_score": 7.1,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_012_v0.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 1,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Is your student truly ready for the SAT? Don't let uncertainty hold them back. 3.4 million learner session ratings prove personalized online tutoring works. Your student can get the focused 1-on-1 SAT prep they need, matched with a top 5% tutor in 24 hours, leading to an average 200+ point SAT score improvement. No commute, just real results from home. Start with a free diagnostic assessment.",
+        "headline": "Proven Online Prep, Real Results",
+        "description": "Connect with a top 5% tutor for 1-on-1 support.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline '3.4 Million Sessions. Real Results.' and two short benefit lines: 'Top 5% Tutors.' 'Matched in 24 Hours.' Brand 'Varsity Tutors' at bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening question and dense middle section require re-reading for key details."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, and online convenience clearly stated."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-barrier entry point."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Parent-focused tone with proof points aligns well with Varsity Tutors brand."
+        },
+        "emotional_resonance": {
+          "score": 6.0,
+          "rationale": "Opens with uncertainty hook but stays mostly rational with stats and features."
+        },
+        "average_score": 7.3,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Value Prop",
+          "action": "Added specific outcome: average 200+ point SAT score improvement."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed 'Learn More' to 'Start Free Assessment' to align with the free assessment offer in the primary text."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Introduced emotional motivator (parental anxiety about readiness) with a question and reassurance."
+        }
+      ],
+      "image_url": "output/runs/20260313_005732/images/brief_012_v1.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Unlock your student's potential with an average 200+ point SAT score improvement. Worried about limited local options or your student falling behind? Varsity Tutors connects them with a top 5% tutor, matched in 24 hours to their exact weak areas. Our 3.4 million learner sessions prove personalized online tutoring delivers real results. Imagine the relief and pride as their confidence soars, paving the way for a brighter future \u2013 all from home, no commute required.",
+        "headline": "Unlock Higher Scores with Proven Online Tutoring",
+        "description": "Experience personalized 1-on-1 prep from a top 5% tutor, starting with a free assessment.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: '3.4 Million Sessions. Real Results.' Below, display two short benefit lines: 'Top 5% Tutors.' and '200+ Point Average SAT Improvement.' Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Too many ideas compete; takes rereading to extract core message clearly."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement with top 5% matching delivers concrete outcome."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free assessment is specific, actionable, and removes friction effectively."
+        },
+        "brand_voice": {
+          "score": 7.0,
+          "rationale": "Hits VT markers but relief-pride-future language feels slightly generic inspirational."
+        },
+        "emotional_resonance": {
+          "score": 6.0,
+          "rationale": "Attempts emotion but relief-pride-brighter future language feels manufactured and overwritten."
+        },
+        "average_score": 7.2,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary text to lead with the main benefit (score improvement) and moved the proof point later for better comprehension."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed CTA button from 'Learn More' to 'Start Free Assessment' to be more specific and align with the offer in the description."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Enhanced emotional appeal in primary text by addressing parent anxiety and student pride, making the motivation feel less manufactured."
+        }
+      ]
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 3.4 million learners have experienced the power of personalized online tutoring. Your student can too. Varsity Tutors connects students with top 5% tutors, matched in 24 hours to their exact weak areas. No more commutes or limited local options. Just proven results, like a 200+ point average SAT score improvement. Start with a free diagnostic assessment.",
+        "headline": "Unlock 200+ SAT Points, No Commute",
+        "description": "Access expert 1-on-1 SAT tutoring from anywhere, tailored to your student's needs.",
+        "cta_button": "Learn More",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows a score like 1170, and the 'After' report shows a significantly higher score, like 1410. Natural lighting, home study setting. The image focuses on the clear score comparison."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.5,
+          "rationale": "Message is clear but slightly long, takes more than three seconds."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, and personalized matching clearly stated."
+        },
+        "call_to_action": {
+          "score": 5.5,
+          "rationale": "Learn More is generic and weak compared to Start Free Assessment."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Strong VT elements with social proof and personalization focus throughout."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Rational benefits emphasized but lacks emotional hook about dreams or aspirations."
+        },
+        "average_score": 7.06,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_012_v4.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT \u2014 or just hoping for the best? Don't leave their future to chance. Personalized 1-on-1 tutoring can make all the difference. We match your student with a top 5% tutor in 24 hours, focusing on their exact weak areas. Imagine a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint where they need support most. Empower their potential.",
+        "headline": "Unlock Your Student's Full SAT Potential",
+        "description": "Discover how personalized prep can transform their test scores.",
+        "cta_button": "Learn More",
+        "image_prompt": "Infographic: Split-panel illustration. Left panel shows a student looking confident, holding a report with a high SAT score (e.g., 1450). Right panel shows the same student looking stressed, looking at a lower SAT score (e.g., 1150) on a screen. A center banner displays the text: 'Is Your Student Ready?'. Clean cartoon/educational style with blue accents, no photorealism."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message clear but slightly wordy; main points understandable within seconds."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching all strong."
+        },
+        "call_to_action": {
+          "score": 4.5,
+          "rationale": "Generic 'Learn More' button undermines the free diagnostic assessment offer badly."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Mostly on-brand with personalization angle but 'Empower their potential' feels generic."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Opening question and future anxiety work well, decent parent motivation."
+        },
+        "average_score": 7.0,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_013_v0.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student ready for the SAT \u2014 or just hoping for the best? Don't let test day anxiety hold them back. Varsity Tutors offers personalized 1-on-1 prep, matching your student with a top 5% tutor in just 24 hours. Our students see a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint exact weak areas and build confidence. Learn how tailored support makes all the difference.",
+        "headline": "Boost Your SAT Score, Banish Doubt.",
+        "description": "Experience the confidence of personalized 1-on-1 SAT prep.",
+        "cta_button": "Learn More",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows a score of 1170, and the 'After' report shows a score of 1410. The student is smiling with relief and pride. Natural lighting, home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly verbose with multiple concepts competing."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point improvement and top 5% tutor matching are concrete."
+        },
+        "call_to_action": {
+          "score": 4.2,
+          "rationale": "Generic 'Learn More' button lacks urgency compared to free assessment offer."
+        },
+        "brand_voice": {
+          "score": 7.6,
+          "rationale": "On-brand with personalization and metrics but lacks distinctive Varsity Tutors punch."
+        },
+        "emotional_resonance": {
+          "score": 7.9,
+          "rationale": "Test anxiety and confidence building tap into real parent concerns effectively."
+        },
+        "average_score": 7.16,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_013_v1.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Is your student truly ready for the SAT, or just hoping for the best? The pressure is real, but effective prep doesn't have to be overwhelming. Varsity Tutors connects your student with a top 5% tutor, matched in 24 hours to their exact weak areas. Our 1-on-1 personalized approach helps students achieve a 200+ point average SAT score improvement. Start with a free diagnostic assessment to pinpoint where to focus. Empower their potential.",
+        "headline": "Boost SAT Scores by 200+ Points.",
+        "description": "Discover how personalized 1-on-1 tutoring makes a real difference.",
+        "cta_button": "Learn More",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: \"Boost SAT Scores by 200+ Points.\" Display the stat: \"200+ point average improvement.\" And a benefit: \"Matched in 24 hours.\" And a CTA line: \"Start Free Assessment.\""
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opening question engages quickly, key details surface within first few seconds."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching very concrete."
+        },
+        "call_to_action": {
+          "score": 4.2,
+          "rationale": "Generic 'Learn More' button undermines the free assessment offer in body."
+        },
+        "brand_voice": {
+          "score": 7.6,
+          "rationale": "Empowerment angle and personalization messaging align well with Varsity Tutors positioning."
+        },
+        "emotional_resonance": {
+          "score": 7.4,
+          "rationale": "Opening tension between readiness and hope creates parent anxiety effectively."
+        },
+        "average_score": 7.06,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_013_v2.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students average 200+ point SAT score improvement with 1-on-1 Varsity Tutors prep. Start with a free diagnostic.",
+        "headline": "Boost Your SAT Score by 200+ Points.",
+        "description": "Get matched with a top 5% tutor in 24 hours, tailored to your exact weak areas.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: '200+ Point SAT Boost'. Display these lines: 'Free Diagnostic Assessment', 'Personalized 1-on-1 Tutoring'. Brand 'Varsity Tutors' at bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Specific metric and clear offer understood immediately without re-reading."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Concrete 200+ point improvement plus top 5% tutor matching differentiates well."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, low-friction, and actionable."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Results-focused messaging aligns with Varsity Tutors but lacks emotional hook."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Focuses on rational benefits without tapping into student or parent aspirations."
+        },
+        "average_score": 7.9,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_014_v0.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "200+ point average SAT score improvement is possible. Get matched with a top 5% tutor in 24 hours. Start free.",
+        "headline": "Boost Your SAT Score by 200+ Points.",
+        "description": "Personalized 1-on-1 prep designed for your student's unique needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal soft grey background. Bold headline: 'Boost Your SAT Score by 200+ Points.' Below, display three bulleted lines with checkmark accents: 'Top 5% Tutors.', 'Matched in 24 Hrs.', 'Free Diagnostic.' Brand 'Varsity Tutors' at the bottom."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Clear message understood immediately with specific score improvement and timeframe."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific outcome and differentiator present but lacks emotional hook or proof."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Specific action with no barrier, though urgency could be stronger."
+        },
+        "brand_voice": {
+          "score": 6.5,
+          "rationale": "Efficient but missing distinctive VT warmth and parent-focused empathy."
+        },
+        "emotional_resonance": {
+          "score": 5.8,
+          "rationale": "Leads with data not dream; lacks motivational or aspirational framing."
+        },
+        "average_score": 7.32,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_014_v1.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students average 200+ point SAT score improvement with our 1-on-1 tutors. Get matched in 24 hours.",
+        "headline": "Personalized Prep, Proven 200+ Point Gains.",
+        "description": "Start with a free diagnostic assessment to pinpoint exact weak areas.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style: Minimal background (soft grey). Bold headline 'Personalized Prep, Proven 200+ Point Gains.' with checkmark accents. Display the stat '200+ Points Average Improvement.' and 'Matched in 24 Hours.' below. Include 'Start Free Assessment' as a clear call to action. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific metric and quick matching time."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Strong 200+ point improvement stat but lacks top-tier differentiation like matching quality."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and removes friction effectively."
+        },
+        "brand_voice": {
+          "score": 6.5,
+          "rationale": "Competent but lacks distinctive VT personality and premium positioning elements."
+        },
+        "emotional_resonance": {
+          "score": 5.5,
+          "rationale": "Focuses on rational benefits without tapping into parent aspirations or student struggles."
+        },
+        "average_score": 7.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_014_v2.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students average 200+ point SAT score improvement with 1-on-1 Varsity Tutors prep. Get your plan.",
+        "headline": "Boost Your SAT Score by 200+ Points",
+        "description": "Personalized 1-on-1 tutoring matched to your exact needs in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline: 'Boost Your SAT Score by 200+ Points.' Display the stat: '200+ Point Average Improvement.' And a call to action: 'Start Free Assessment.' Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific improvement metric upfront."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Strong specific outcome but lacks differentiation around tutor quality or matching."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Specific free assessment creates clear next step with low friction."
+        },
+        "brand_voice": {
+          "score": 6.8,
+          "rationale": "On-brand but misses distinctive top-5% tutor matching angle from gold."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Rational score promise without touching dream school or parent motivation."
+        },
+        "average_score": 7.66,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_014_v3.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students average 200+ point SAT score improvement with personalized 1-on-1 tutoring. Matched with a top 5% tutor in 24 hours.",
+        "headline": "Unlock 200+ SAT Score Improvement.",
+        "description": "Our rigorously vetted tutors provide 1-on-1 support tailored to your student's needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey or lavender). Bold headline: 'Unlock 200+ SAT Score Improvement'. Display the stat: '200+ Points'. Below, add 'Start Free Assessment'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text, no photo."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific outcome and timeline."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Strong specific outcome but lacks emotional hook or dream school context."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Clear specific action with free assessment, though lacks urgency trigger."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "On-brand with quality emphasis but missing distinctive parent-focused empathy angle."
+        },
+        "emotional_resonance": {
+          "score": 6.5,
+          "rationale": "Rational benefits presented without addressing parent hopes or student struggles."
+        },
+        "average_score": 7.6,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_014_v4.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who prep with a 1-on-1 math specialist average 200+ point SAT score improvement. Imagine that for your student's math section! Our expert tutors are matched to your student's exact weak areas in algebra, word problems, and the calculator section within 24 hours. Get personalized support that truly moves the needle. Start with a free diagnostic assessment to pinpoint where they need help most.",
+        "headline": "Achieve 200+ Point SAT Math Gains.",
+        "description": "Get matched with a top 5% math tutor in 24 hours for targeted SAT prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman) holding two SAT score reports side by side. The 'Before' report shows an SAT Math score of 520. The 'After' report shows an SAT Math score of 720. Natural lighting, home study setting."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening claim mixes overall SAT improvement with math-only focus, causing confusion."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 200+ point gain, top 5% tutors, 24-hour matching are concrete."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and clearly stated with urgency."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Personalized matching and expert focus align with VT but lacks distinctive energy."
+        },
+        "emotional_resonance": {
+          "score": 6.8,
+          "rationale": "Imagine that appeals emotionally but dream school motivation from gold standard missing."
+        },
+        "average_score": 7.36,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_015_v0.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students see a 200+ point average SAT score improvement with personalized 1-on-1 prep. Struggling with SAT Math? Our expert tutors specialize in algebra, word problems, and the calculator section. Get matched with a top 5% math tutor in 24 hours, tailored to your exact weak areas. Start with a free diagnostic assessment to pinpoint where to focus and build confidence for test day.",
+        "headline": "Master SAT Math: Boost Your Score 200+ Points.",
+        "description": "Get matched with a top 5% math tutor in 24 hours, starting with a free assessment.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero: Minimal background (soft grey). Bold headline 'Master SAT Math: Boost Your Score 200+ Points.' and three short benefit lines: '1-on-1 Math Experts', 'Matched in 24 Hours', 'Free Diagnostic'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear structure but slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain, specialized math focus, and personalized matching detailed well."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and removes barrier to entry effectively."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Strong VT elements with top 5% matching and diagnostic assessment language."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Addresses struggle and confidence but lacks dream school emotional hook."
+        },
+        "average_score": 8.1,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_015_v1.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 2,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students matched with a Varsity Tutors math specialist see 200+ point average SAT score improvement. If SAT Math feels like a puzzle, our top 5% tutors provide precise, 1-on-1 guidance. Get a free diagnostic assessment to pinpoint exact weak areas in algebra or problem-solving. You'll be matched with an expert tutor in 24 hours, ready to transform your math score.",
+        "headline": "Master SAT Math: Boost Your Score 200+ Points",
+        "description": "Personalized 1-on-1 tutoring targets your exact math challenges for real results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Before/after: Realistic photo. A student (e.g., young woman or man) holding two SAT score reports side by side. The 'Before' report shows a lower math score (e.g., 550 Math), and the 'After' report shows a significantly higher math score (e.g., 750 Math). Natural lighting, home or study setting, conveying relief and accomplishment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear: SAT math improvement through specialized tutoring."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point gain, top 5% tutors, 24-hour matching, diagnostic assessment."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Expert matching, precision, and data-driven approach distinctly represents Varsity Tutors."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "Puzzle metaphor touches frustration but could emphasize dream school stakes more."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_015_v2.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Students who target their SAT Math weak spots achieve 200+ point score improvements on average. Our top 5% math tutors are matched to your student in 24 hours, focusing precisely on algebra, word problems, and the calculator section. It's 1-on-1 personalized matching, not a one-size-fits-all course. Start with a free diagnostic assessment to pinpoint exact areas for growth and build confidence.",
+        "headline": "Boost SAT Math: 200+ Point Average.",
+        "description": "Get matched with a math specialist tutor in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style: Minimal background (soft grey). Bold headline: 'Boost SAT Math: 200+ Point Average.' Below, display these lines with checkmark accents: 'Matched in 24 hours.', 'Top 5% Math Tutors.', 'Free Diagnostic.' Brand 'Varsity Tutors' at the bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear focus on SAT Math with specific details, slightly dense but understandable."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcome, top 5% tutors, personalized matching, and free diagnostic creates strong value."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-barrier entry point."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly VT with personalized matching emphasis and quality tutor positioning."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Mentions confidence building but focuses more on tactical benefits than emotional drivers."
+        },
+        "average_score": 8.1,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_015_v3.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "200+ point average SAT score improvement is possible, even for math-only challenges. If algebra, word problems, or the calculator section are holding back your student's SAT score, a targeted approach is key. Varsity Tutors matches your student with a math-specialist tutor in 24 hours, focusing precisely on their weak areas. Our 1-on-1 personalized matching ensures every session builds confidence and mastery. Start with a free diagnostic assessment to pinpoint exact needs.",
+        "headline": "Master SAT Math. Boost Your Score.",
+        "description": "Pinpoint weak areas and build math mastery with expert 1-on-1 tutoring.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Text hero style. Minimal background (soft grey). Bold headline: 'Master SAT Math'. Display these lines below: '200+ Point Average Improvement.', 'Math-Specialist Tutors.', 'Free Diagnostic Assessment.'. Brand 'Varsity Tutors' at bottom. Modern, high-contrast text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 6.5,
+          "rationale": "Opening sentence is dense; takes effort to parse math-only focus angle."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement plus niche math-specialist matching delivers concrete value."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, actionable, and reduces friction effectively."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Matches VT's outcome-focused personalization but slightly over-explains the matching process."
+        },
+        "emotional_resonance": {
+          "score": 6.0,
+          "rationale": "Addresses pain points but stays mostly rational without emotional urgency."
+        },
+        "average_score": 7.3,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260313_005732/images/brief_015_v4.png"
+    }
+  ]
+}

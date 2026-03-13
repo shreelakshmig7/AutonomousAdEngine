@@ -118,6 +118,8 @@ def build_drafter_prompt(
     brief: AdBrief,
     competitive_context: dict,
     brand_guidelines: dict,
+    variation_index: int | None = None,
+    total_variations: int | None = None,
 ) -> str:
     """
     Build the complete Drafter prompt injecting brief, competitive context, and brand guidelines.
@@ -129,6 +131,8 @@ def build_drafter_prompt(
         brief: Validated AdBrief pydantic object.
         competitive_context: Loaded competitive_context.json as dict.
         brand_guidelines: Loaded brand_guidelines.json as dict.
+        variation_index: Optional 0-based index of this variation (for diversity instruction).
+        total_variations: Optional total number of variations per brief.
 
     Returns:
         str: Complete prompt ready to send to Gemini.
@@ -139,8 +143,37 @@ def build_drafter_prompt(
     guidelines_str = json.dumps(brand_guidelines, indent=2) if brand_guidelines else "{}"
     brief_str = brief.model_dump_json(indent=2)
 
+    variation_instruction = ""
+    if variation_index is not None and total_variations is not None and total_variations > 1:
+        n = variation_index + 1
+        variation_instruction = (
+            f"\n\nVARIATION DIVERSITY: This is variation {n} of {total_variations} for this brief. "
+            "Generate a DISTINCT headline and primary text — use a different hook angle, framing, or benefit so this ad is clearly different from other variations (e.g. different question, stat, or story lead). Do not repeat the same headline or opening line across variations."
+        )
+
+    tone_section = ""
+    if getattr(brief, "tone_override", None):
+        tone_section = f"""TONE OVERRIDE — OVERRIDES RULE 4 FOR THIS BRIEF ONLY:
+{brief.tone_override}
+This brief is intentionally testing the evaluation system. Follow this tone exactly.
+
+"""
+
+    if getattr(brief, "hard_constraints", None):
+        constraints_text = "\n".join(f"- {c}" for c in brief.hard_constraints)
+        length_section = f"""PRIMARY_TEXT HARD CONSTRAINTS — MUST FOLLOW EXACTLY:
+{constraints_text}
+These override all other length rules above."""
+    else:
+        length_section = """PRIMARY_TEXT LENGTH LIMIT — HARD CONSTRAINT:
+primary_text must be 500 characters or fewer. Count characters before outputting.
+The Meta ad platform truncates primary_text at 125 characters visible without
+"See More" — but the full text must stay under 500 characters total.
+If your draft exceeds 500 characters: cut the weakest sentence, not the hook.
+Do not summarize — cut. The hook and the CTA must survive any cuts."""
+
     return f"""You are an elite direct-response copywriter for Varsity Tutors (a Nerdy business).
-Generate high-converting Facebook and Instagram ad copy.
+Generate high-converting Facebook and Instagram ad copy.{variation_instruction}
 
 BRAND VOICE: Empowering, knowledgeable, approachable, results-focused.
 Lead with outcomes, not features. Confident but not arrogant. Expert but not elitist.
@@ -150,7 +183,11 @@ AD ANATOMY — generate ALL five components:
 2. headline: {HEADLINE_MIN_WORDS}-{HEADLINE_MAX_WORDS} words max. Benefit-driven.
 3. description: One sentence max. Secondary reinforcement.
 4. cta_button: One of {CTA_OPTIONS}. Match to goal (awareness vs conversion).
-5. image_prompt: UGC-style visual scene only. No text, signs, or logos in the image.
+5. image_prompt: Describe ONE of these ad image styles (match to your headline/stat):
+   - Infographic: Split-panel illustration. Left = student success (grades, progress report, trophy). Right = same student stressed (SAT score on screen, e.g. 1180). Center banner with the key question or stat (e.g. "3.8 GPA But 1180 SAT?"). Clean cartoon/educational style, blue accents, no photorealism.
+   - Before/after: Realistic photo. Person (e.g. young woman or student) holding two SAT score reports side by side — one "Before" (e.g. 1170), one "After" (e.g. 1410). Natural lighting, home or study setting. Headline can appear below the image in the ad; image focuses on the score comparison.
+   - Text hero: Minimal background (soft grey or lavender). Bold headline and 2–4 short stat/benefit lines (e.g. "8 weeks away.", "200+ points.", "Start this week."). Checkmark or bullet accents. Brand "Varsity Tutors" at bottom. Modern, high-contrast text, no photo.
+   Include the exact headline or key stat/CTA to be shown in the image so the layout is clear.
 
 RULE 1 — HOOK POSITION (first {HOOK_MAX_CHARS} characters):
 The hook must be complete within the first {HOOK_MAX_CHARS} characters of primary_text.
@@ -172,11 +209,11 @@ Fear hooks are allowed. Shame and catastrophizing are never allowed.
 Forbidden words in fear hooks: ruined, failed, doomed, too late, worthless, behind, failure.
 Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. The ad must never end on fear.
 
-RULE 5 — IMAGE PROMPT:
-image_prompt must describe a UGC-style authentic visual scene.
-NEVER request text, words, signs, logos, or brand names rendered in the image.
-NEVER use phrases: "a sign that says", "text reading", "words that say", "banner saying", "logo".
-Style: authentic, natural lighting, real people, not stock photography.
+RULE 5 — IMAGE PROMPT (ad creative styles):
+image_prompt must describe ONE of: Infographic (split-panel, key question/stat in center), Before/after (person with two score reports), or Text hero (bold headline + stat lines + CTA on minimal background).
+You MAY include the exact headline, key stat (e.g. "200+ points"), or CTA line to be displayed in the image so the generator can match the reference ad look.
+Do NOT use vague injection phrases: "a sign that says", "text reading", "words that say". Do use: "center banner with the text:", "headline:", "display the stat:", "score report showing 1170 and 1410".
+Style: polished ad creative; infographic = clean illustration; before/after = natural photo; text hero = minimal background, bold type.
 
 RULE 6 — FORBIDDEN WORDS:
 Never use: {forbidden_block}.
@@ -190,12 +227,7 @@ BRAND GUIDELINES:
 AD BRIEF:
 {brief_str}
 
-PRIMARY_TEXT LENGTH LIMIT — HARD CONSTRAINT:
-primary_text must be 500 characters or fewer. Count characters before outputting.
-The Meta ad platform truncates primary_text at 125 characters visible without
-"See More" — but the full text must stay under 500 characters total.
-If your draft exceeds 500 characters: cut the weakest sentence, not the hook.
-Do not summarize — cut. The hook and the CTA must survive any cuts.
+{tone_section}{length_section}
 
 OUTPUT FORMAT:
 Return ONLY valid JSON. No markdown. No code fences. No explanation.

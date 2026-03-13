@@ -3,14 +3,15 @@ controller.py
 -------------
 Varsity Ad Engine — Nerdy / Gauntlet — Iteration controller (PR4)
 -------------------------------------------------------------------
-AdController and run_brief() orchestrate draft → scan → judge → iterate.
-build_regeneration_prompt() targets only weakest_dimension; <1000 tokens.
-Gates 1–2 run in controller before calling drafter (defence in depth).
+run_brief() orchestrates draft → scan → judge → iterate. build_regeneration_prompt()
+uses a surgical Senior Ad Copy Editor persona: targeted optimizations on weak
+dimensions only, preservation of dimensions scoring >= 8, JSON output with
+optimized_ad and changes_made. Gates 1–2 run before calling drafter.
 
 Key constants / functions:
   DIMENSION_TO_GUIDELINE_KEY — map dimension to brand_guidelines slice
-  run_brief()               — full cycle for one brief variation
-  build_regeneration_prompt() — regen prompt for targeted fix
+  run_brief()               — full cycle; returns changes_made from last regen
+  build_regeneration_prompt() — surgical multi-dimension regen prompt
 """
 
 from __future__ import annotations
@@ -21,9 +22,12 @@ from typing import Any
 from evaluate.rubrics import (
     AdBrief,
     AdCopy,
+    DIMENSION_DISPLAY_NAMES,
+    DIMENSIONS,
     EvaluationReport,
     MAX_CYCLES,
     QUALITY_THRESHOLD,
+    STRONG_DIMENSION_THRESHOLD,
     scan_output_safety,
 )
 from generate.drafter import AdDrafter
@@ -43,6 +47,29 @@ DIMENSION_TO_GUIDELINE_KEY: dict[str, list[str]] = {
 }
 
 REASONABLE_RATIONALE_MAX_CHARS: int = 200
+# When multiple weak dimensions, cap rationale length so prompt stays bounded
+REASONABLE_RATIONALE_MAX_CHARS_MULTI: int = 120
+
+
+def _get_weak_and_strong_dimensions(report: EvaluationReport) -> tuple[list[str], list[str]]:
+    """
+    Split dimensions into weak (score < QUALITY_THRESHOLD) and strong (score >= STRONG_DIMENSION_THRESHOLD).
+
+    Returns:
+        (weak_list, strong_list) for use in surgical regeneration prompt.
+    """
+    weak: list[str] = []
+    strong: list[str] = []
+    for dim in DIMENSIONS:
+        ds = getattr(report, dim, None)
+        if ds is None or not hasattr(ds, "score"):
+            continue
+        s = float(ds.score)
+        if s < QUALITY_THRESHOLD:
+            weak.append(dim)
+        elif s >= STRONG_DIMENSION_THRESHOLD:
+            strong.append(dim)
+    return weak, strong
 
 
 def _get_guideline_slice(brand_guidelines: dict, keys: list[str]) -> str:
@@ -57,50 +84,112 @@ def _get_guideline_slice(brand_guidelines: dict, keys: list[str]) -> str:
 
 def build_regeneration_prompt(
     current_ad: AdCopy,
-    weakest_dimension: str,
-    judge_rationale: str,
     brand_guidelines: dict,
     brief_goal: str,
     brief_hook_type: str,
+    *,
+    report: EvaluationReport | None = None,
+    single_weak_dimension: str | None = None,
+    single_rationale: str | None = None,
 ) -> str:
     """
-    Build a focused regeneration prompt targeting only the weakest dimension.
-    Keeps prompt under 1000 tokens: no full brief, no cycle history, no competitive_context.
+    Build a surgical regeneration prompt: targeted optimizations on failed dimensions only.
+
+    When report is provided: uses all weak dimensions (score < 7) and strong dimensions (>= 8)
+    with chained "Required Fixes" and explicit preservation. When report is None (e.g. scan
+    failure): uses single_weak_dimension and single_rationale.
+
+    Returns a prompt that asks for JSON: {"optimized_ad": {...}, "changes_made": [{"dimension": "...", "action": "..."}]}.
 
     Args:
         current_ad: The failed ad to fix.
-        weakest_dimension: The one dimension to target.
-        judge_rationale: One sentence from the judge (truncated to 200 chars).
-        brand_guidelines: Full dict; only the slice for weakest_dimension is used.
-        brief_goal: "awareness" or "conversion" (CTA must match).
+        brand_guidelines: Full dict; slices per dimension used.
+        brief_goal: "awareness" or "conversion".
         brief_hook_type: So the fix does not break the original hook.
+        report: Full EvaluationReport when available; used to derive weak/strong and rationales.
+        single_weak_dimension: Used when report is None (e.g. scan fail).
+        single_rationale: Judge or scan rationale when report is None.
 
     Returns:
-        str: Prompt string for the drafter to produce a revised AdCopy.
+        str: Prompt string for the drafter.
     """
-    rationale = (judge_rationale or "")[:REASONABLE_RATIONALE_MAX_CHARS].strip()
-    keys = DIMENSION_TO_GUIDELINE_KEY.get(weakest_dimension, [])
-    guideline_slice = _get_guideline_slice(brand_guidelines, keys)
-
     ad_block = json.dumps(current_ad.model_dump(), indent=2)
+    context_line = f"BRIEF CONTEXT (do not change): goal={brief_goal}, hook_type={brief_hook_type}. CTA must still match goal."
 
-    return f"""You are revising existing Varsity Tutors ad copy. Fix ONLY the dimension that failed.
+    if report is not None:
+        weak_dims, strong_dims = _get_weak_and_strong_dimensions(report)
+        # If no weak dims (edge case), fall back to single weakest
+        if not weak_dims:
+            weak_dims = [report.weakest_dimension]
+        max_rationale = REASONABLE_RATIONALE_MAX_CHARS_MULTI if len(weak_dims) > 1 else REASONABLE_RATIONALE_MAX_CHARS
+        required_fixes: list[str] = []
+        for dim in weak_dims:
+            ds = getattr(report, dim, None)
+            rationale = (getattr(ds, "rationale", "") or "")[:max_rationale].strip()
+            keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
+            guideline_slice = _get_guideline_slice(brand_guidelines, keys)
+            display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
+            fix_block = f"For {display}: Judge feedback — {rationale}"
+            if guideline_slice:
+                fix_block += f". Use brand rules: {guideline_slice[:300]}"
+            required_fixes.append(fix_block)
+        preserve_line = ""
+        if strong_dims:
+            strong_names = [DIMENSION_DISPLAY_NAMES.get(d, d) for d in strong_dims]
+            preserve_line = f"Do not change the following (they scored 8 or higher): {', '.join(strong_names)}."
+        required_section = "\n".join(f"• {f}" for f in required_fixes)
+        return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
-BRIEF CONTEXT (do not change): goal={brief_goal}, hook_type={brief_hook_type}. CTA must still match goal.
+Inputs:
+1) The Original Ad Copy (below).
+2) Scores and rationales: the ad failed on the dimension(s) listed under Required Fixes.
+3) Weak dimensions (score < 7) to fix: {', '.join(DIMENSION_DISPLAY_NAMES.get(d, d) for d in weak_dims)}.
 
-CURRENT AD (all 5 fields — preserve what works, change only what fixes the weak dimension):
+Constraints:
+• Preservation: Do NOT change dimensions that scored 8 or higher.
+• Fixation: Focus 100% of your creative energy on rewriting only the specific Weak Dimensions.
+• JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<display name>", "action": "<short description of what you changed>"}}).
+
+{context_line}
+
+CURRENT AD:
 {ad_block}
 
-WEAK DIMENSION TO FIX: {weakest_dimension}
-JUDGE FEEDBACK: {rationale}
+Required Fixes:
+{required_section}
+{chr(10) + preserve_line if preserve_line else ""}
 
-RELEVANT BRAND RULES FOR THIS DIMENSION:
+Return valid JSON only, with this exact structure:
+{{"optimized_ad": {{ "primary_text": "...", "headline": "...", "description": "...", "cta_button": "...", "image_prompt": "..." }}, "changes_made": [{{"dimension": "Value Prop", "action": "Added 200+ point stat"}}, ...]}}
+"""
+
+    # Scan-fail or no report: single dimension
+    dim = single_weak_dimension or "brand_voice"
+    rationale = (single_rationale or "")[:REASONABLE_RATIONALE_MAX_CHARS].strip()
+    keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
+    guideline_slice = _get_guideline_slice(brand_guidelines, keys)
+    display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
+    return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+
+Inputs:
+1) The Original Ad Copy (below).
+2) Weak dimension to fix: {display}.
+3) Feedback: {rationale}
+
+Constraints:
+• Fixation: Focus 100% on rewriting only the parts that affect {display}.
+• JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<name>", "action": "<short description>"}}).
+
+{context_line}
+
+CURRENT AD:
+{ad_block}
+
+Relevant brand rules for this dimension:
 {guideline_slice if guideline_slice else "None specified."}
 
-INSTRUCTIONS:
-- Rewrite ONLY the parts of the ad that affect {weakest_dimension}.
-- Keep primary_text, headline, description, cta_button, image_prompt structure.
-- Do not change hook type or goal. Return valid JSON with exactly: primary_text, headline, description, cta_button, image_prompt.
+Return valid JSON only:
+{{"optimized_ad": {{ "primary_text": "...", "headline": "...", "description": "...", "cta_button": "...", "image_prompt": "..." }}, "changes_made": [{{"dimension": "{display}", "action": "..."}}]}}
 """
 
 
@@ -110,6 +199,7 @@ def run_brief(
     brand_guidelines: dict,
     variation_index: int = 0,
     seed: int = DEFAULT_SEED,
+    total_variations: int = 5,
 ) -> dict[str, Any]:
     """
     Run the full draft → scan → judge → iterate cycle for one brief variation.
@@ -122,8 +212,9 @@ def run_brief(
         brief: Validated AdBrief.
         competitive_context: Loaded competitive_context.json.
         brand_guidelines: Loaded brand_guidelines.json (used for forbidden phrases and regen slice).
-        variation_index: Index of this variation (0..VARIATIONS_PER_BRIEF-1).
+        variation_index: Index of this variation (0..total_variations-1).
         seed: Deterministic seed (typically DEFAULT_SEED + variation_index).
+        total_variations: Total number of variations per brief (for drafter diversity instruction).
 
     Returns:
         dict: brief_id, variation_index, status (published|unresolvable), cycles_used,
@@ -142,6 +233,7 @@ def run_brief(
             "final_score": None,
             "final_report": None,
             "iteration_log": [],
+            "changes_made": [],
             "model_used": None,
             "tokens_used": 0,
             "estimated_cost_usd": 0.0,
@@ -160,6 +252,7 @@ def run_brief(
                 "final_score": None,
                 "final_report": None,
                 "iteration_log": [],
+                "changes_made": [],
                 "model_used": None,
                 "tokens_used": 0,
                 "estimated_cost_usd": 0.0,
@@ -175,6 +268,7 @@ def run_brief(
     drafter = AdDrafter()
     judge = AdJudge()
     iteration_log: list[dict] = []
+    last_changes_made: list[dict[str, str]] = []
     current_ad: AdCopy | None = None
     current_report: EvaluationReport | None = None
     scan_fail_rationale: str = ""  # when scan fails, pass this as regen rationale
@@ -200,7 +294,12 @@ def run_brief(
         if current_ad is None:
             # First cycle: full draft from brief
             draft_result = drafter.draft_ad(
-                brief, competitive_context, brand_guidelines, seed=seed
+                brief,
+                competitive_context,
+                brand_guidelines,
+                seed=seed,
+                variation_index=variation_index,
+                total_variations=total_variations,
             )
             if not draft_result.get("success"):
                 # Never swallow draft failure: explicit error; model_used must be str or None (no NaN)
@@ -219,6 +318,7 @@ def run_brief(
                     "final_score": None,
                     "final_report": None,
                     "iteration_log": iteration_log,
+                    "changes_made": last_changes_made,
                     "model_used": mu,
                     "tokens_used": total_tokens,
                     "estimated_cost_usd": total_cost,
@@ -229,26 +329,37 @@ def run_brief(
             model_used = draft_result.get("model_used") or model_used
             total_cost += _estimate_cost(draft_result.get("tokens_used", 0), model_used)
         else:
-            # Regen cycle: build prompt and call drafter's LLM
-            weakest = (current_report and getattr(current_report, "weakest_dimension", None)) or "brand_voice"
-            if current_report and weakest:
-                dim_score = getattr(current_report, weakest, None)
-                rationale = getattr(dim_score, "rationale", "") if dim_score else ""
+            # Regen cycle: surgical prompt and parse optimized_ad + changes_made
+            if current_report is not None:
+                regen_prompt = build_regeneration_prompt(
+                    current_ad,
+                    brand_guidelines,
+                    brief.goal,
+                    brief.hook_type,
+                    report=current_report,
+                )
             else:
+                weakest = "brand_voice"
                 rationale = scan_fail_rationale
-            regen_prompt = build_regeneration_prompt(
-                current_ad,
-                weakest,
-                rationale,
-                brand_guidelines,
-                brief.goal,
-                brief.hook_type,
-            )
+                regen_prompt = build_regeneration_prompt(
+                    current_ad,
+                    brand_guidelines,
+                    brief.goal,
+                    brief.hook_type,
+                    single_weak_dimension=weakest,
+                    single_rationale=rationale,
+                )
             try:
                 raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0, "response_mime_type": "application/json"})
                 cleaned = drafter._clean_json_response(raw)
                 parsed = json.loads(cleaned)
-                current_ad = AdCopy.model_validate(parsed)
+                # Support wrapper {"optimized_ad": {...}, "changes_made": [...]} or legacy plain AdCopy
+                if "optimized_ad" in parsed:
+                    current_ad = AdCopy.model_validate(parsed["optimized_ad"])
+                    last_changes_made = parsed.get("changes_made") or []
+                else:
+                    current_ad = AdCopy.model_validate(parsed)
+                    last_changes_made = []
                 total_tokens += 500  # approximate regen call
                 total_cost += _estimate_cost(500, drafter._model_name)
             except Exception as e:
@@ -261,6 +372,7 @@ def run_brief(
                     "final_score": None,
                     "final_report": None,
                     "iteration_log": iteration_log,
+                    "changes_made": last_changes_made,
                     "model_used": model_used,
                     "tokens_used": total_tokens,
                     "estimated_cost_usd": total_cost,
@@ -278,6 +390,8 @@ def run_brief(
                 "cycle": cycle,
                 "scan_failed": True,
                 "error": scan_result.get("error"),
+                "primary_text": getattr(current_ad, "primary_text", "") or "",
+                "headline": getattr(current_ad, "headline", "") or "",
                 "clarity": None,
                 "value_proposition": None,
                 "call_to_action": None,
@@ -297,12 +411,13 @@ def run_brief(
                     "final_score": None,
                     "final_report": None,
                     "iteration_log": iteration_log,
+                    "changes_made": last_changes_made,
                     "model_used": model_used,
                     "tokens_used": total_tokens,
                     "estimated_cost_usd": total_cost,
                     "error": scan_result.get("error", "Safety violations"),
                 }
-            # Next iteration will use build_regeneration_prompt with weakest_dimension=brand_voice, rationale=scan error
+            # Next iteration will use build_regeneration_prompt with single_weak_dimension=brand_voice
             current_report = None
             continue
 
@@ -317,6 +432,7 @@ def run_brief(
                 "final_score": None,
                 "final_report": None,
                 "iteration_log": iteration_log,
+                "changes_made": last_changes_made,
                 "model_used": model_used,
                 "tokens_used": total_tokens,
                 "estimated_cost_usd": total_cost,
@@ -338,6 +454,7 @@ def run_brief(
                     "final_score": None,
                     "final_report": None,
                     "iteration_log": iteration_log,
+                    "changes_made": last_changes_made,
                     "model_used": model_used,
                     "tokens_used": total_tokens,
                     "estimated_cost_usd": total_cost,
@@ -353,6 +470,7 @@ def run_brief(
                 "final_score": None,
                 "final_report": None,
                 "iteration_log": iteration_log,
+                "changes_made": last_changes_made,
                 "model_used": model_used,
                 "tokens_used": total_tokens,
                 "estimated_cost_usd": total_cost,
@@ -362,14 +480,16 @@ def run_brief(
         total_tokens += 1500  # approximate judge call
         total_cost += _estimate_cost(1500, getattr(judge, "_model_name", "claude-sonnet-4-5"))
 
-        def _dim_score(name: str) -> int | None:
+        def _dim_score(name: str) -> float | None:
             ds = getattr(report, name, None)
             if ds is None or not hasattr(ds, "score"):
                 return None
-            return int(ds.score)
+            return round(float(ds.score), 1)
 
-        iteration_log.append({
+        log_entry: dict[str, Any] = {
             "cycle": cycle,
+            "primary_text": getattr(current_ad, "primary_text", "") or "",
+            "headline": getattr(current_ad, "headline", "") or "",
             "clarity": _dim_score("clarity"),
             "value_proposition": _dim_score("value_proposition"),
             "call_to_action": _dim_score("call_to_action"),
@@ -378,7 +498,10 @@ def run_brief(
             "average_score": report.average_score,
             "weakest_dimension": report.weakest_dimension,
             "status": "published" if report.passes_threshold else "below_threshold",
-        })
+        }
+        if last_changes_made:
+            log_entry["changes_made"] = last_changes_made
+        iteration_log.append(log_entry)
 
         if report.passes_threshold:
             return {
@@ -390,6 +513,7 @@ def run_brief(
                 "final_score": report.average_score,
                 "final_report": report,
                 "iteration_log": iteration_log,
+                "changes_made": last_changes_made,
                 "model_used": model_used,
                 "tokens_used": total_tokens,
                 "estimated_cost_usd": total_cost,
@@ -406,6 +530,7 @@ def run_brief(
                 "final_score": report.average_score,
                 "final_report": report,
                 "iteration_log": iteration_log,
+                "changes_made": last_changes_made,
                 "model_used": model_used,
                 "tokens_used": total_tokens,
                 "estimated_cost_usd": total_cost,
@@ -421,6 +546,7 @@ def run_brief(
         "final_score": None,
         "final_report": None,
         "iteration_log": iteration_log,
+        "changes_made": last_changes_made,
         "model_used": model_used,
         "tokens_used": total_tokens,
         "estimated_cost_usd": total_cost,

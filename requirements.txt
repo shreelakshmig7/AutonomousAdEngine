@@ -1,3 +1,8 @@
+# ------------------------------------------------------------------------------
+# Python: 3.10+ required (google.api_core and stack drop 3.9; Streamlit Cloud: use 3.10–3.12).
+# Install: python3.10 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+# ------------------------------------------------------------------------------
+
 # AI Framework & APIs
 google-generativeai==0.8.3      # Gemini 2.0 Flash (Drafter) — Google API key
 google-genai==1.47.0            # Gemini 2.5 Flash Image only (images/image_generator.py); pinned exact

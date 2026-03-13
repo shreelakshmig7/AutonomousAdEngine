@@ -19,9 +19,12 @@ from __future__ import annotations
 import csv
 import json
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Generator
 
+from constants import VARIATION_RUN_TIMEOUT_SECONDS
 from evaluate.rubrics import (
     QUALITY_THRESHOLD,
     MAX_CYCLES,
@@ -39,17 +42,20 @@ VARIATIONS_PER_BRIEF: int = 5
 ADS_LIBRARY_PATH: str = "output/ads_library.json"
 ITERATION_LOG_PATH: str = "output/iteration_log.csv"
 QUALITY_TRENDS_PATH: str = "output/quality_trends.png"
+RUNS_DIR: str = "output/runs"
 
 # Cost estimation (PR4 briefing CORRECTION 8)
 GEMINI_FLASH_COST_PER_1K_TOKENS: float = 0.000075
 CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
 
-# PR5 CSV columns — one row per evaluation event
+# PR5 CSV columns — one row per evaluation event (includes ad copy per cycle for self-healing proof)
 CSV_FIELDNAMES: list[str] = [
     "brief_id",
     "difficulty",
     "variation",
     "cycle",
+    "primary_text",
+    "headline",
     "clarity",
     "value_prop",
     "cta",
@@ -123,22 +129,72 @@ def _write_quality_trends_png(
     plt.close()
 
 
+def _make_fallback_result(brief: AdBrief, variation_index: int, error_msg: str) -> dict[str, Any]:
+    """
+    Build a stub result matching run_brief() shape for timeout/exception failures.
+
+    Args:
+        brief: The AdBrief for this variation.
+        variation_index: Variation index (0..VARIATIONS_PER_BRIEF-1).
+        error_msg: Error message (e.g. timeout text or str(exception)).
+
+    Returns:
+        dict: Full result shape so per-result processing and CSV logging work unchanged.
+    """
+    return {
+        "brief_id": brief.id,
+        "variation_index": variation_index,
+        "status": "unresolvable",
+        "error": error_msg,
+        "cycles_used": 0,
+        "final_ad": None,
+        "final_score": None,
+        "final_report": None,
+        "changes_made": [],
+        "model_used": None,
+        "tokens_used": 0,
+        "estimated_cost_usd": 0.0,
+        "iteration_log": [
+            {
+                "cycle": 0,
+                "status": f"unresolvable: {error_msg}",
+                "error": error_msg,
+                "brief_id": brief.id,
+                "variation": variation_index,
+                "average_score": None,
+                "clarity": None,
+                "value_proposition": None,
+                "call_to_action": None,
+                "brand_voice": None,
+                "emotional_resonance": None,
+                "weakest_dimension": None,
+                "tokens_used": 0,
+                "cost_usd": 0.0,
+            }
+        ],
+    }
+
+
 def run_pipeline_streaming(
     briefs: list[AdBrief],
     competitive_context: dict,
     brand_guidelines: dict,
+    output_base_dir: str | None = None,
 ) -> Generator[dict[str, Any], None, None]:
     """
     Run the full pipeline for all briefs and variations; yield progress updates.
 
     For each brief × variation_index runs run_brief(). Writes ads_library.json,
-    iteration_log.csv (one row per evaluation event), quality_trends.png.
-    Final yield has status "complete" and aggregates.
+    iteration_log.csv (one row per evaluation event), quality_trends.png into
+    a run-specific directory. When output_base_dir is None, uses
+    output/runs/<run_id>/ and also updates output/ for "latest".
 
     Args:
         briefs: List of validated AdBriefs.
         competitive_context: Loaded competitive_context.json.
         brand_guidelines: Loaded brand_guidelines.json.
+        output_base_dir: Optional dir for this run (e.g. tmpdir in tests).
+            When None, creates output/runs/<timestamp>/ and writes "latest" to output/.
 
     Yields:
         Progress dicts and final complete dict.
@@ -153,17 +209,29 @@ def run_pipeline_streaming(
     # For quality_trends: cycle -> scores
     cycle_to_scores: dict[int, list[float]] = defaultdict(list)
 
+    # Per-run output: timestamped folder or injected base dir (tests)
+    if output_base_dir is not None:
+        run_dir = Path(output_base_dir)
+    else:
+        run_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+        run_dir = Path(RUNS_DIR) / run_id
+    run_dir.mkdir(parents=True, exist_ok=True)
+    images_dir = run_dir / "images"
+    images_dir.mkdir(parents=True, exist_ok=True)
+    run_ads_path = run_dir / "ads_library.json"
+    run_log_path = run_dir / "iteration_log.csv"
+    run_trends_path = run_dir / "quality_trends.png"
+
     image_generator = None
     try:
         from images.image_generator import AdImageGenerator
 
-        image_generator = AdImageGenerator()
+        image_generator = AdImageGenerator(output_dir=str(images_dir))
     except Exception:
         pass
 
     for brief in briefs:
         for variation_index in range(VARIATIONS_PER_BRIEF):
-            seed = DEFAULT_SEED + variation_index
             yield {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -174,14 +242,40 @@ def run_pipeline_streaming(
                 "message": f"Drafting {brief.id} variation {variation_index}",
             }
 
-            result = run_brief(
-                brief,
-                competitive_context,
-                brand_guidelines,
-                variation_index=variation_index,
-                seed=seed,
-            )
+        with ThreadPoolExecutor(max_workers=VARIATIONS_PER_BRIEF) as executor:
+            futures = {
+                executor.submit(
+                    run_brief,
+                    brief,
+                    competitive_context,
+                    brand_guidelines,
+                    variation_index=i,
+                    seed=DEFAULT_SEED + i,
+                    total_variations=VARIATIONS_PER_BRIEF,
+                ): i
+                for i in range(VARIATIONS_PER_BRIEF)
+            }
+            results = []
+            for future in as_completed(futures):
+                variation_index = futures[future]
+                try:
+                    result = future.result(timeout=VARIATION_RUN_TIMEOUT_SECONDS)
+                    results.append(result)
+                except TimeoutError:
+                    results.append(
+                        _make_fallback_result(
+                            brief,
+                            variation_index,
+                            f"timeout after {VARIATION_RUN_TIMEOUT_SECONDS}s",
+                        )
+                    )
+                except Exception as e:
+                    results.append(_make_fallback_result(brief, variation_index, str(e)))
 
+        results.sort(key=lambda r: r.get("variation_index", 0))
+
+        for result in results:
+            variation_index = result.get("variation_index", 0)
             status = result.get("status", "unresolvable")
             cycles_used = result.get("cycles_used", 0)
             final_score = result.get("final_score")
@@ -228,6 +322,8 @@ def run_pipeline_streaming(
                     "difficulty": difficulty,
                     "variation": variation_index,
                     "cycle": c,
+                    "primary_text": entry.get("primary_text"),
+                    "headline": entry.get("headline"),
                     "clarity": entry.get("clarity"),
                     "value_prop": entry.get("value_proposition"),
                     "cta": entry.get("call_to_action"),
@@ -284,8 +380,19 @@ def run_pipeline_streaming(
                     ad_id = f"{result.get('brief_id', brief.id)}_v{variation_index}"
                     image_url = None
                     if image_generator is not None and getattr(final_ad, "image_prompt", None):
+                        # Inject this variation's copy so the image uses its headline/CTA, not generic text
+                        copy_line = (
+                            f'\n\nExact copy to display in this ad image (use verbatim): '
+                            f'Headline: "{final_ad.headline}". CTA: {final_ad.cta_button}.'
+                        )
+                        # Pass tone, goal, hook_type so image stays on-brand and not arrogant
+                        tone_goal_line = (
+                            f'\n\nGuardrails: Tone must be {brief.tone}; goal is {brief.goal}. '
+                            'Keep all text in the image empowering and approachable, not arrogant. Use the headline and CTA verbatim above.'
+                        )
+                        image_prompt_with_copy = (final_ad.image_prompt or "").strip() + copy_line + tone_goal_line
                         img_result = image_generator.generate_image(
-                            final_ad.image_prompt, ad_id
+                            image_prompt_with_copy, ad_id
                         )
                         if img_result.get("success") and img_result.get("data"):
                             image_url = img_result["data"]
@@ -301,6 +408,9 @@ def run_pipeline_streaming(
                         "estimated_cost_usd": cost_usd,
                         "status": status,
                     }
+                    changes_made = result.get("changes_made")
+                    if changes_made:
+                        entry["changes_made"] = changes_made
                     if image_url:
                         entry["image_url"] = image_url
                     ads_library.append(entry)
@@ -313,6 +423,8 @@ def run_pipeline_streaming(
                         "difficulty": difficulty,
                         "variation": variation_index,
                         "cycle": cycles_used,
+                        "primary_text": None,
+                        "headline": None,
                         "clarity": None,
                         "value_prop": None,
                         "cta": None,
@@ -325,17 +437,29 @@ def run_pipeline_streaming(
                         "cost_usd": cost_usd,
                     })
 
-    # Write output files
-    Path(ADS_LIBRARY_PATH).parent.mkdir(parents=True, exist_ok=True)
-    with open(ADS_LIBRARY_PATH, "w") as f:
+    # Write output files to run directory
+    with open(run_ads_path, "w") as f:
         json.dump({"ads": ads_library}, f, indent=2)
 
-    with open(ITERATION_LOG_PATH, "w", newline="") as f:
+    with open(run_log_path, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=CSV_FIELDNAMES, extrasaction="ignore")
         w.writeheader()
         w.writerows(iteration_rows)
 
-    _write_quality_trends_png(cycle_to_scores, QUALITY_TRENDS_PATH)
+    _write_quality_trends_png(cycle_to_scores, str(run_trends_path))
+
+    # When not using injected base dir (e.g. tests), also update "latest" in output/
+    if output_base_dir is None:
+        Path(ADS_LIBRARY_PATH).parent.mkdir(parents=True, exist_ok=True)
+        with open(run_ads_path) as src:
+            data = json.load(src)
+        with open(ADS_LIBRARY_PATH, "w") as f:
+            json.dump(data, f, indent=2)
+        with open(run_log_path) as src:
+            log_content = src.read()
+        with open(ITERATION_LOG_PATH, "w", newline="") as f:
+            f.write(log_content)
+        _write_quality_trends_png(cycle_to_scores, QUALITY_TRENDS_PATH)
 
     avg_score = sum(scores_for_avg) / len(scores_for_avg) if scores_for_avg else 0.0
 
@@ -504,6 +628,9 @@ if __name__ == "__main__":
     briefs = briefs_result["data"]
     competitive_context = load_json("data/competitive_context.json")
     brand_guidelines = load_json("data/brand_guidelines.json")
+
+    total_variations = len(briefs) * VARIATIONS_PER_BRIEF
+    print(f"Pipeline starting: {len(briefs)} briefs, {total_variations} variations total.", flush=True)
 
     table = Table(title="Pipeline progress")
     table.add_column("Brief", style="cyan")

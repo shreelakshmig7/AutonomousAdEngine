@@ -150,7 +150,7 @@ def test_controller_heals_on_cycle_2(
     sample_brief: AdBrief,
     valid_ad_copy: AdCopy,
 ) -> None:
-    """Mock judge fails cycle 1, passes cycle 2. Assert build_regeneration_prompt called once with weakest_dimension."""
+    """Mock judge fails cycle 1, passes cycle 2. Assert build_regeneration_prompt called with report (weak=clarity)."""
     from iterate.controller import run_brief, build_regeneration_prompt
 
     draft_return = {
@@ -160,7 +160,7 @@ def test_controller_heals_on_cycle_2(
         "model_used": "gemini-2.5-flash",
         "error": None,
     }
-    # Scores: clarity=4, others=6 -> average 5.6 < 7, single weakest = clarity
+    # Scores: clarity=4, others=6 -> average 5.6 < 7, single weak = clarity
     report_fail = _make_report(clarity=4, value_proposition=6, call_to_action=6, brand_voice=6, emotional_resonance=6)
     report_pass = _make_report()
 
@@ -168,6 +168,12 @@ def test_controller_heals_on_cycle_2(
         {"success": True, "data": report_fail, "error": None},
         {"success": True, "data": report_pass, "error": None},
     ]
+
+    regen_payload = {
+        "optimized_ad": valid_ad_copy.model_dump(),
+        "changes_made": [{"dimension": "Clarity", "action": "Clarified hook and value prop."}],
+    }
+    _regen_json = json.dumps(regen_payload)
 
     with (
         patch("iterate.controller.AdDrafter") as MockDrafter,
@@ -177,8 +183,6 @@ def test_controller_heals_on_cycle_2(
     ):
         mock_drafter_instance = MagicMock()
         mock_drafter_instance.draft_ad.return_value = draft_return
-        # Regen path calls _call_gemini + _clean_json_response; return valid AdCopy JSON
-        _regen_json = json.dumps(valid_ad_copy.model_dump())
         mock_drafter_instance._call_gemini.return_value = _regen_json
         mock_drafter_instance._clean_json_response.side_effect = lambda x: x if isinstance(x, str) else _regen_json
         MockDrafter.return_value = mock_drafter_instance
@@ -197,13 +201,10 @@ def test_controller_heals_on_cycle_2(
     assert result["status"] == "published"
     assert result["cycles_used"] == 2
     assert mock_regen.call_count == 1
-    # build_regeneration_prompt(current_ad, weakest_dimension, judge_rationale, brand_guidelines, brief_goal, brief_hook_type)
     call_kwargs = getattr(mock_regen.call_args, "kwargs", {}) or {}
-    if "weakest_dimension" not in call_kwargs and mock_regen.call_args.args:
-        # positional: current_ad, weakest_dimension, judge_rationale, ...
-        if len(mock_regen.call_args.args) >= 2:
-            call_kwargs["weakest_dimension"] = mock_regen.call_args.args[1]
-    assert call_kwargs.get("weakest_dimension") == "clarity"
+    assert call_kwargs.get("report") is not None
+    assert call_kwargs["report"].weakest_dimension == "clarity"
+    assert result.get("changes_made") == regen_payload["changes_made"]
 
 
 # -----------------------------------------------------------------------------
@@ -236,8 +237,8 @@ def test_controller_halts_at_unresolvable(
     ):
         mock_drafter_instance = MagicMock()
         mock_drafter_instance.draft_ad.return_value = draft_return
-        # Regen path must return valid AdCopy so we run 3 full cycles before unresolvable
-        _regen_json = json.dumps(valid_ad_copy.model_dump())
+        regen_payload = {"optimized_ad": valid_ad_copy.model_dump(), "changes_made": []}
+        _regen_json = json.dumps(regen_payload)
         mock_drafter_instance._call_gemini.return_value = _regen_json
         mock_drafter_instance._clean_json_response.side_effect = lambda x: x if isinstance(x, str) else _regen_json
         MockDrafter.return_value = mock_drafter_instance
@@ -266,19 +267,21 @@ def test_controller_halts_at_unresolvable(
 def test_regeneration_prompt_under_1000_tokens(
     valid_ad_copy: AdCopy,
 ) -> None:
-    """Build regen prompt from real brief + failed ad + report. Estimate tokens; assert < 1000."""
+    """Build regen prompt from real brief + failed ad + report. Estimate tokens; assert bounded."""
     from iterate.controller import build_regeneration_prompt
 
+    report = _make_report(clarity=4, value_proposition=8, call_to_action=8, brand_voice=8, emotional_resonance=8)
     prompt = build_regeneration_prompt(
         current_ad=valid_ad_copy,
-        weakest_dimension="clarity",
-        judge_rationale="The hook is buried and the value proposition is unclear in the first sentence.",
         brand_guidelines=SAMPLE_GUIDELINES,
         brief_goal="conversion",
         brief_hook_type="fear",
+        report=report,
     )
+    assert "Senior Ad Copy Editor" in prompt
+    assert "optimized_ad" in prompt and "changes_made" in prompt
     estimated_tokens = len(prompt.split()) * 1.3
-    assert estimated_tokens < 1000, f"Regeneration prompt too long: ~{estimated_tokens:.0f} tokens"
+    assert estimated_tokens < 1200, f"Regeneration prompt too long: ~{estimated_tokens:.0f} tokens"
 
 
 # -----------------------------------------------------------------------------

@@ -1,0 +1,5 @@
+# Hide entire top-right menu (Edit, Rerun, View all apps) and Stop button when pipeline runs.
+# "minimal" = show only options set via Cloud or st.set_page_config; if none, menu is hidden.
+# See: https://docs.streamlit.io/develop/api-reference/configuration/config.toml
+[client]
+toolbarMode = "minimal"

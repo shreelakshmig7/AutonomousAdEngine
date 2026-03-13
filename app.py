@@ -20,9 +20,18 @@ from pathlib import Path
 from typing import Any, Iterator
 
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
+
+# Plotly optional — if install fails on Cloud, app still loads with fallbacks
+try:
+    import plotly.express as px
+    import plotly.graph_objects as go
+
+    _PLOTLY_AVAILABLE = True
+except ImportError:
+    px = None  # type: ignore[assignment]
+    go = None  # type: ignore[assignment]
+    _PLOTLY_AVAILABLE = False
 
 # Streamlit Cloud: set env before any code that reads API keys (subprocess inherits)
 if hasattr(st, "secrets"):
@@ -44,10 +53,14 @@ if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY
 REPO_ROOT: Path = Path(__file__).resolve().parent
 ADS_LIBRARY_PATH: Path = REPO_ROOT / "output" / "ads_library.json"
 ITERATION_LOG_PATH: Path = REPO_ROOT / "output" / "iteration_log.csv"
+RUNS_DIR: Path = REPO_ROOT / "output" / "runs"
 MAIN_SCRIPT: Path = REPO_ROOT / "main.py"
 DEFAULT_MIN_SCORE: float = 7.0
 MIN_SCORE_SLIDER_MIN: float = 5.0
 MIN_SCORE_SLIDER_MAX: float = 10.0
+AD_PREVIEW_IMAGE_WIDTH: int = 360  # Max width (px) for ad image in expander so full ad fits in view
+PRIMARY_TEXT_VISIBLE_CHARS: int = 125  # Meta: ~125 chars visible before "...See More"
+CTA_DESTINATION_URL: str = "https://www.varsitytutors.com/"
 
 # Dimension keys in ads_library scores (nested dict with "score") — order for radar
 DIMENSION_KEYS: list[str] = [
@@ -66,17 +79,36 @@ DIMENSION_LABELS: dict[str, str] = {
 }
 
 
-def load_ads_library_result() -> dict[str, Any]:
+def list_run_ids() -> list[str]:
+    """
+    List run IDs from output/runs/ (timestamp dirs), newest first.
+    Does not include "latest"; caller prepends it for selector.
+
+    Returns:
+        Sorted list of run_id strings (e.g. 20260312_210000).
+    """
+    if not RUNS_DIR.is_dir():
+        return []
+    ids = [d.name for d in RUNS_DIR.iterdir() if d.is_dir() and d.name]
+    ids.sort(reverse=True)
+    return ids
+
+
+def load_ads_library_result(path: Path | None = None) -> dict[str, Any]:
     """
     Load ads_library.json from disk; structured result only.
+
+    Args:
+        path: Optional path to ads_library.json. When None, uses ADS_LIBRARY_PATH (latest).
 
     Returns:
         {"success": bool, "data": dict, "error": str | None}
     """
-    if not ADS_LIBRARY_PATH.exists():
+    p = path if path is not None else ADS_LIBRARY_PATH
+    if not p.exists():
         return {"success": True, "data": {}, "error": None}
     try:
-        with open(ADS_LIBRARY_PATH, encoding="utf-8") as f:
+        with open(p, encoding="utf-8") as f:
             raw = json.load(f)
         if not isinstance(raw, dict):
             return {
@@ -145,6 +177,8 @@ def stream_pipeline() -> Iterator[str]:
     if not env.get("GOOGLE_API_KEY") or not env.get("ANTHROPIC_API_KEY"):
         yield "ERROR: API keys not set\n"
         return
+    # Subprocess only: suppress all warnings so streamed log shows only pipeline progress
+    env["PYTHONWARNINGS"] = "ignore"
     try:
         process = subprocess.Popen(
             [sys.executable, str(MAIN_SCRIPT)],
@@ -216,17 +250,21 @@ def run_pipeline_stream_ui() -> None:
     st.rerun()
 
 
-def load_iteration_log_df() -> pd.DataFrame | None:
+def load_iteration_log_df(path: Path | None = None) -> pd.DataFrame | None:
     """
     Load iteration_log.csv if present.
+
+    Args:
+        path: Optional path to iteration_log.csv. When None, uses ITERATION_LOG_PATH (latest).
 
     Returns:
         DataFrame or None.
     """
-    if not ITERATION_LOG_PATH.exists():
+    p = path if path is not None else ITERATION_LOG_PATH
+    if not p.exists():
         return None
     try:
-        return pd.read_csv(ITERATION_LOG_PATH)
+        return pd.read_csv(p)
     except Exception:
         return None
 
@@ -238,7 +276,34 @@ def main() -> None:
         layout="wide",
     )
 
-    result = load_ads_library_result()
+    # Hide footer and bottom-right "Manage app" bar (Streamlit / Community Cloud).
+    st.markdown(
+        """
+        <style>
+        footer { visibility: hidden; }
+        [data-testid="stBottom"] { visibility: hidden; }
+        [data-testid="stDecoration"] { visibility: hidden; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    run_ids = list_run_ids()
+    run_options = ["Latest"] + run_ids
+    if "selected_run" not in st.session_state:
+        st.session_state["selected_run"] = "Latest"
+    run_index = run_options.index(st.session_state["selected_run"]) if st.session_state["selected_run"] in run_options else 0
+
+    # Resolve paths for selected run
+    if st.session_state["selected_run"] == "Latest" or not st.session_state["selected_run"]:
+        ads_path = None
+        log_path = None
+    else:
+        run_dir = RUNS_DIR / st.session_state["selected_run"]
+        ads_path = run_dir / "ads_library.json"
+        log_path = run_dir / "iteration_log.csv"
+
+    result = load_ads_library_result(ads_path)
     data = result.get("data") or {} if result.get("success") else {}
     ads = data.get("ads") if isinstance(data.get("ads"), list) else []
     published = get_published_ads(ads)
@@ -251,6 +316,16 @@ def main() -> None:
     # --- Sidebar ---
     with st.sidebar:
         render_sidebar_api_status()
+        st.divider()
+        chosen = st.selectbox(
+            "Run",
+            options=run_options,
+            index=run_index,
+            format_func=lambda x: "Latest (output/)" if x == "Latest" else x,
+        )
+        if chosen != st.session_state["selected_run"]:
+            st.session_state["selected_run"] = chosen
+            st.rerun()
         st.divider()
         if st.button("Run Pipeline", type="primary", use_container_width=True):
             st.session_state["run_pipeline_requested"] = True
@@ -350,22 +425,32 @@ def main() -> None:
     col_chart1, col_chart2 = st.columns(2)
     with col_chart1:
         st.subheader("Avg score by dimension")
-        fig_radar = go.Figure()
-        fig_radar.add_trace(
-            go.Scatterpolar(
-                r=radar_r_closed,
-                theta=radar_theta_closed,
-                fill="toself",
-                name="Average",
+        if _PLOTLY_AVAILABLE and go is not None:
+            fig_radar = go.Figure()
+            fig_radar.add_trace(
+                go.Scatterpolar(
+                    r=radar_r_closed,
+                    theta=radar_theta_closed,
+                    fill="toself",
+                    name="Average",
+                )
             )
-        )
-        fig_radar.update_layout(
-            polar=dict(radialaxis=dict(visible=True, range=[0, 10])),
-            showlegend=False,
-            margin=dict(l=40, r=40, t=40, b=40),
-            height=400,
-        )
-        st.plotly_chart(fig_radar, use_container_width=True)
+            fig_radar.update_layout(
+                polar=dict(radialaxis=dict(visible=True, range=[0, 10])),
+                showlegend=False,
+                margin=dict(l=40, r=40, t=40, b=40),
+                height=400,
+            )
+            st.plotly_chart(fig_radar, use_container_width=True)
+        else:
+            st.warning(
+                "Plotly not installed — radar chart unavailable. "
+                "Add `plotly` to requirements and redeploy."
+            )
+            dim_df = pd.DataFrame(
+                {"dimension": radar_theta, "avg_score": radar_r}
+            )
+            st.bar_chart(dim_df.set_index("dimension"))
 
     with col_chart2:
         st.subheader("Avg score by brief")
@@ -373,40 +458,87 @@ def main() -> None:
             {"brief_id": list(brief_means.keys()), "avg_score": list(brief_means.values())}
         )
         brief_df = brief_df.sort_values("brief_id")
-        fig_bar = px.bar(
-            brief_df,
-            x="brief_id",
-            y="avg_score",
-            range_y=[0, 10],
-        )
-        fig_bar.update_layout(height=400, margin=dict(l=40, r=40, t=40, b=40))
-        st.plotly_chart(fig_bar, use_container_width=True)
-
-    # Line chart: average score per cycle from iteration_log.csv
-    st.subheader("Quality improvement over retry cycles")
-    log_df = load_iteration_log_df()
-    if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns:
-        cycle_df = (
-            log_df.groupby("cycle", as_index=False)["average_score"]
-            .mean()
-            .dropna()
-        )
-        cycle_df = cycle_df[cycle_df["cycle"].isin([1, 2, 3])]
-        if not cycle_df.empty:
-            cycle_df["cycle_label"] = cycle_df["cycle"].apply(lambda c: f"Cycle {int(c)}")
-            fig_line = px.line(
-                cycle_df,
-                x="cycle_label",
-                y="average_score",
-                markers=True,
+        if _PLOTLY_AVAILABLE and px is not None:
+            fig_bar = px.bar(
+                brief_df,
+                x="brief_id",
+                y="avg_score",
                 range_y=[0, 10],
             )
-            fig_line.update_layout(height=350, margin=dict(l=40, r=40, t=40, b=40))
-            st.plotly_chart(fig_line, use_container_width=True)
+            fig_bar.update_layout(height=400, margin=dict(l=40, r=40, t=40, b=40))
+            st.plotly_chart(fig_bar, use_container_width=True)
         else:
-            st.info("No cycle 1–3 data in iteration log.")
+            st.bar_chart(brief_df.set_index("brief_id"))
+
+    log_df = load_iteration_log_df(log_path)
+
+    # --- Self-Healing Proof: ads that failed cycle 1 and were healed (published) in 2+ cycles ---
+    st.subheader("Self-Healing Proof")
+    if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns:
+        has_copy = "primary_text" in log_df.columns
+        has_status = "status" in log_df.columns
+        groups = log_df.groupby(["brief_id", "variation"], dropna=False)
+        healed: list[tuple[Any, Any, pd.Series, pd.Series]] = []
+        for (bid, var), grp in groups:
+            cycles = pd.to_numeric(grp["cycle"], errors="coerce").dropna()
+            if cycles.empty or cycles.max() < 2:
+                continue
+            c1_rows = grp[grp["cycle"] == 1]
+            c_final = int(cycles.max())
+            final_rows = grp[grp["cycle"] == c_final]
+            if c1_rows.empty or final_rows.empty:
+                continue
+            final_row = final_rows.iloc[-1]
+            # Only show as healed when the final cycle actually published (reached threshold)
+            if has_status and str(final_row.get("status")).strip().lower() != "published":
+                continue
+            healed.append((bid, var, c1_rows.iloc[0], final_row))
+        if not healed:
+            st.info("All ads passed on first attempt — no healing needed.")
+        else:
+            for bid, var, r1, r2 in healed:
+                s1 = float(r1["average_score"]) if pd.notna(r1.get("average_score")) else 0.0
+                s2 = float(r2["average_score"]) if pd.notna(r2.get("average_score")) else 0.0
+                delta = round(s2 - s1, 1)
+                if delta > 0:
+                    title = f"Brief {bid} · Var {var} — Score lifted from {s1} → {s2} (+{delta})"
+                elif delta < 0:
+                    title = f"Brief {bid} · Var {var} — Published after retries: score {s1} → {s2} ({delta})"
+                else:
+                    title = f"Brief {bid} · Var {var} — Published after retries: score {s1} → {s2}"
+                with st.expander(title, expanded=False):
+                    col_initial, col_healed = st.columns(2)
+                    with col_initial:
+                        st.markdown("### Initial Draft")
+                        pt1 = "—"
+                        if has_copy and "primary_text" in r1.index:
+                            pt1 = r1["primary_text"]
+                            if pt1 is None or (isinstance(pt1, float) and pd.isna(pt1)):
+                                pt1 = "—"
+                            else:
+                                pt1 = str(pt1).strip() or "—"
+                        st.info(pt1)
+                        st.metric("Avg Score", round(s1, 1) if s1 else "—")
+                        w1 = r1.get("weakest_dimension")
+                        if w1 is None or (isinstance(w1, float) and pd.isna(w1)):
+                            w1 = "—"
+                        st.error(f"Weakest dimension: {w1}")
+                    with col_healed:
+                        st.markdown("### Healed Draft")
+                        pt2 = "—"
+                        if has_copy and "primary_text" in r2.index:
+                            pt2 = r2["primary_text"]
+                            if pt2 is None or (isinstance(pt2, float) and pd.isna(pt2)):
+                                pt2 = "—"
+                            else:
+                                pt2 = str(pt2).strip() or "—"
+                        st.success(pt2)
+                        lift = round(s2 - s1, 1)
+                        delta_str = f"+{lift}" if lift > 0 else (f"{lift}" if lift < 0 else None)
+                        st.metric("Avg Score", round(s2, 1) if s2 else "—", delta=delta_str)
+                        st.write("All dimensions passed 7.0")
     else:
-        st.info("Run the pipeline to generate iteration_log.csv for cycle trends.")
+        st.caption("Run the pipeline to generate iteration_log.csv (with primary_text per cycle) for self-healing proof.")
 
     st.divider()
 
@@ -436,8 +568,41 @@ def main() -> None:
         avg = scores.get("average_score", "—")
         title = f"Brief {bid} · Var {var} — {avg} avg"
         with st.expander(title, expanded=False):
+            # Ad preview: Meta structure — primary text → image → headline → description → CTA
+            st.caption("Varsity Tutors · Sponsored")
+            primary_text = (ad_body.get("primary_text") or "").strip() or "—"
+            if len(primary_text) <= PRIMARY_TEXT_VISIBLE_CHARS:
+                st.write(primary_text)
+            else:
+                read_more_key = f"read_more_{bid}_{var}"
+                expanded = st.session_state.get(read_more_key, False)
+                if expanded:
+                    st.write(primary_text)
+                    if st.button("show less", key=f"less_{bid}_{var}", type="secondary"):
+                        st.session_state[read_more_key] = False
+                        st.rerun()
+                else:
+                    st.write(primary_text[:PRIMARY_TEXT_VISIBLE_CHARS] + " …")
+                    if st.button("read more", key=f"more_{bid}_{var}", type="secondary"):
+                        st.session_state[read_more_key] = True
+                        st.rerun()
+            image_url = a.get("image_url")
+            if image_url:
+                img_path = REPO_ROOT / str(image_url)
+                if img_path.is_file():
+                    st.image(str(img_path), width=AD_PREVIEW_IMAGE_WIDTH, use_container_width=False)
+                else:
+                    st.caption(f"Image path not found: {image_url}")
             st.markdown(f"**{headline}**")
-            st.write(ad_body.get("primary_text", "—"))
+            desc = ad_body.get("description")
+            if desc:
+                st.caption(desc)
+            cta = ad_body.get("cta_button")
+            if cta:
+                st.link_button(cta, url=CTA_DESTINATION_URL, type="primary")
+            # Dimension scores below ad
+            st.divider()
+            st.caption("Scores by dimension")
             for key in DIMENSION_KEYS:
                 label = DIMENSION_LABELS[key]
                 v = _dimension_numeric(scores, key)
@@ -446,13 +611,6 @@ def main() -> None:
                     st.progress(min(1.0, max(0.0, v / 10.0)))
                 else:
                     st.caption(f"{label}: —")
-            image_url = a.get("image_url")
-            if image_url:
-                img_path = REPO_ROOT / str(image_url)
-                if img_path.is_file():
-                    st.image(str(img_path), use_container_width=True)
-                else:
-                    st.caption(f"Image path not found: {image_url}")
 
 
 if __name__ == "__main__":

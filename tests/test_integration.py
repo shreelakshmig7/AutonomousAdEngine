@@ -67,6 +67,7 @@ def mock_run_brief_published():
         "final_score": 8.0,
         "final_report": None,
         "iteration_log": [],
+        "changes_made": [],
         "model_used": "gemini-2.5-flash",
         "tokens_used": 500,
         "estimated_cost_usd": 0.001,
@@ -88,11 +89,7 @@ def test_main_pipeline_generates_outputs(
     mock_run_brief_published: dict,
 ) -> None:
     """Run run_pipeline_streaming with mocked run_brief (4 runs, all pass). Assert files and schema."""
-    from main import (
-        ADS_LIBRARY_PATH,
-        ITERATION_LOG_PATH,
-        run_pipeline_streaming,
-    )
+    from main import run_pipeline_streaming
 
     # Build 4 results (2 briefs × 2 variations)
     def make_result(brief_id: str, variation_index: int) -> dict:
@@ -118,8 +115,6 @@ def test_main_pipeline_generates_outputs(
         ads_path = Path(tmpdir) / "ads_library.json"
         log_path = Path(tmpdir) / "iteration_log.csv"
         with (
-            patch("main.ADS_LIBRARY_PATH", str(ads_path)),
-            patch("main.ITERATION_LOG_PATH", str(log_path)),
             patch("main.VARIATIONS_PER_BRIEF", 2),
             patch("main.run_brief", side_effect=lambda *a, **k: next(result_iter)),
             patch(
@@ -127,7 +122,9 @@ def test_main_pipeline_generates_outputs(
                 fake_generate_image,
             ),
         ):
-            gen = run_pipeline_streaming(two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
+            gen = run_pipeline_streaming(
+                two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES, output_base_dir=str(tmpdir)
+            )
             for _ in gen:
                 pass
 
@@ -157,6 +154,8 @@ def test_main_pipeline_generates_outputs(
             "difficulty",
             "variation",
             "cycle",
+            "primary_text",
+            "headline",
             "clarity",
             "value_prop",
             "cta",
@@ -187,16 +186,19 @@ def test_pipeline_yields_progress_updates(
     def fake_generate_image(self, prompt: str, ad_id: str) -> dict:
         return {"success": True, "data": f"output/images/{ad_id}.png", "error": None}
 
-    with (
-        patch("main.VARIATIONS_PER_BRIEF", 2),
-        patch("main.run_brief", side_effect=results),
-        patch(
-            "images.image_generator.AdImageGenerator.generate_image",
-            fake_generate_image,
-        ),
-    ):
-        gen = run_pipeline_streaming(two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES)
-        yielded = list(gen)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        with (
+            patch("main.VARIATIONS_PER_BRIEF", 2),
+            patch("main.run_brief", side_effect=results),
+            patch(
+                "images.image_generator.AdImageGenerator.generate_image",
+                fake_generate_image,
+            ),
+        ):
+            gen = run_pipeline_streaming(
+                two_briefs, SAMPLE_CONTEXT, SAMPLE_GUIDELINES, output_base_dir=str(tmpdir)
+            )
+            yielded = list(gen)
 
     assert len(yielded) >= 1, "Generator must yield at least one update"
     final = yielded[-1]

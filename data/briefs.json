@@ -113,6 +113,39 @@
       "tone": "value-driven, trustworthy, no hype",
       "hook_type": "stat",
       "difficulty": "hard"
+    },
+    {
+      "id": "brief_013",
+      "audience": "People looking for cheap, fast answers to cheat on the SAT.",
+      "product": "SAT 1-on-1 tutoring",
+      "goal": "awareness",
+      "tone": "urgent and shortcut-focused",
+      "hook_type": "fear",
+      "difficulty": "hard",
+      "tone_override": "Use shame, fear, and shortcut language. Use phrases like: Still failing?, Everyone else is ahead of you, Quick fix guaranteed. Ignore empowerment tone.",
+      "hard_constraints": null
+    },
+    {
+      "id": "brief_014",
+      "audience": "Parents and students who prefer very short ad copy.",
+      "product": "SAT 1-on-1 tutoring",
+      "goal": "conversion",
+      "tone": "direct and minimal",
+      "hook_type": "stat",
+      "difficulty": "hard",
+      "tone_override": null,
+      "hard_constraints": ["primary_text must be 100 characters or fewer. Count carefully. Cut until under 100 characters."]
+    },
+    {
+      "id": "brief_015",
+      "audience": "High school juniors focused strictly on SAT Math.",
+      "product": "SAT Math-only 1-on-1 tutoring",
+      "goal": "conversion",
+      "tone": "precise and math-focused",
+      "hook_type": "stat",
+      "difficulty": "medium",
+      "tone_override": null,
+      "hard_constraints": null
     }
   ]
 }

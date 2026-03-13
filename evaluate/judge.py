@@ -108,7 +108,7 @@ class AdJudge:
         return f"""You are a rigorous Marketing QA Judge for Varsity Tutors. Most ads fail.
 Ruthlessly filter mediocre content. Publishable bar: 7.0/10 average.
 
-SCORE each dimension 1-10:
+SCORE each dimension 1.0–10.0 (decimals allowed, e.g. 7.5, 8.2):
 clarity             | 10=clear in <3s  | 7=mostly clear | 4=re-reading needed | 1=confusing
 value_proposition   | 10=specific outcome | 7=decent | 4=generic | 1=feature-only
 call_to_action      | 10=specific+urgent | 7=clear | 4=vague | 1=missing
@@ -125,12 +125,13 @@ AD TO SCORE:
 {ad_block}
 
 RESPOND ONLY with valid JSON (no markdown, no code block). Keep each rationale to ONE short sentence (under 15 words) so the response is not truncated.
+Scores are floats in 1.0–10.0 (e.g. 7.5, 8.2). average_score will be computed from dimension scores.
 {{
-  "clarity": {{"score": <1-10>, "rationale": "<one short sentence>"}},
-  "value_proposition": {{"score": <1-10>, "rationale": "<one short sentence>"}},
-  "call_to_action": {{"score": <1-10>, "rationale": "<one short sentence>"}},
-  "brand_voice": {{"score": <1-10>, "rationale": "<one short sentence>"}},
-  "emotional_resonance": {{"score": <1-10>, "rationale": "<one short sentence>"}},
+  "clarity": {{"score": <1.0-10.0 float>, "rationale": "<one short sentence>"}},
+  "value_proposition": {{"score": <1.0-10.0 float>, "rationale": "<one short sentence>"}},
+  "call_to_action": {{"score": <1.0-10.0 float>, "rationale": "<one short sentence>"}},
+  "brand_voice": {{"score": <1.0-10.0 float>, "rationale": "<one short sentence>"}},
+  "emotional_resonance": {{"score": <1.0-10.0 float>, "rationale": "<one short sentence>"}},
   "average_score": <float>,
   "weakest_dimension": "<one of: clarity, value_proposition, call_to_action, brand_voice, emotional_resonance>",
   "passes_threshold": <true|false>,

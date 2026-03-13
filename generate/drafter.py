@@ -188,6 +188,8 @@ class AdDrafter:
         competitive_context: dict,
         brand_guidelines: dict,
         seed: int = DEFAULT_SEED,
+        variation_index: int | None = None,
+        total_variations: int | None = None,
     ) -> dict[str, Any]:
         """
         Generate a structured AdCopy from a brief using Gemini 2.5 Flash.
@@ -200,6 +202,8 @@ class AdDrafter:
             competitive_context: Loaded competitive_context.json.
             brand_guidelines: Loaded brand_guidelines.json.
             seed: Deterministic seed (passed when SDK supports it).
+            variation_index: Optional 0-based variation index (for distinct headline/copy).
+            total_variations: Optional total variations per brief.
 
         Returns:
             dict: {"success": bool, "data": AdCopy | None, "tokens_used": int, "model_used": str | None, "error": str | None}
@@ -225,7 +229,13 @@ class AdDrafter:
                     "error": f"Injection detected: {sanitized.get('error', '')}",
                 }
 
-        prompt = build_drafter_prompt(brief, competitive_context, brand_guidelines)
+        prompt = build_drafter_prompt(
+            brief,
+            competitive_context,
+            brand_guidelines,
+            variation_index=variation_index,
+            total_variations=total_variations,
+        )
 
         generation_config = {
             "temperature": 0,

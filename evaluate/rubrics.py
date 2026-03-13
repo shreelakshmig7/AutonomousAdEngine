@@ -19,7 +19,7 @@ Project: Varsity Ad Engine — Nerdy / Gauntlet AI Program
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -28,6 +28,8 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 # Quality & iteration constants (Coding Standards §6; DECISION_LOG)
 # -----------------------------------------------------------------------------
 QUALITY_THRESHOLD: float = 7.0
+# Dimensions scoring >= this are preserved in iteration (no edits)
+STRONG_DIMENSION_THRESHOLD: float = 8.0
 MAX_CYCLES: int = 3
 EXCELLENT_THRESHOLD: float = 7.5
 DIMENSIONS: list[str] = [
@@ -47,6 +49,15 @@ DIMENSION_PRIORITY: list[str] = [
     "brand_voice",
     "call_to_action",
 ]
+
+# Display names for change log and prompts (iterator output)
+DIMENSION_DISPLAY_NAMES: dict[str, str] = {
+    "clarity": "Clarity",
+    "value_proposition": "Value Prop",
+    "call_to_action": "CTA",
+    "brand_voice": "Brand Voice",
+    "emotional_resonance": "Emotion",
+}
 
 # Meta truncation — hook must complete within this many chars (Edge Case 2)
 HOOK_MAX_CHARS: int = 100
@@ -89,6 +100,8 @@ class AdBrief(BaseModel):
         default="medium",
         description="Expected difficulty for cycle 1 pass. Used in iteration_log and quality trend.",
     )
+    tone_override: Optional[str] = Field(default=None, description="Optional override for tone; used for debug / safety briefs.")
+    hard_constraints: Optional[List[str]] = Field(default=None, description="Optional hard constraints e.g. primary_text under 100 chars.")
 
 
 # -----------------------------------------------------------------------------
@@ -146,8 +159,8 @@ class AdCopy(BaseModel):
     image_prompt: str = Field(
         ...,
         min_length=20,
-        max_length=300,
-        description="UGC-style visual instructions. No text/logos in image.",
+        max_length=450,
+        description="Ad image: infographic, before/after, or text-hero style; may include headline/stat for layout.",
     )
 
     @field_validator("headline")
@@ -172,14 +185,12 @@ class AdCopy(BaseModel):
     @field_validator("image_prompt")
     @classmethod
     def no_text_in_image_prompt(cls, v: str) -> str:
-        """Reject image prompts that request rendered text — image models fail at typography (Edge Case 6)."""
+        """Block open-ended injection; allow structured ad styles (infographic, before/after, text hero) with headline/stat."""
         forbidden = [
             "a sign that says",
-            "text reading",
             "words that say",
             "banner saying",
             "logo",
-            "brand name",
         ]
         lower = v.lower()
         for phrase in forbidden:
@@ -192,9 +203,9 @@ class AdCopy(BaseModel):
 # DimensionScore & EvaluationReport — Judge output schema
 # -----------------------------------------------------------------------------
 class DimensionScore(BaseModel):
-    """Score + rationale for one evaluation dimension."""
+    """Score + rationale for one evaluation dimension. Score may be decimal (e.g. 7.5, 8.2)."""
 
-    score: int = Field(..., ge=1, le=10)
+    score: float = Field(..., ge=1.0, le=10.0, description="1.0–10.0; decimals allowed.")
     rationale: str = Field(..., min_length=10, description="1–2 sentence explanation for this score.")
 
 
@@ -226,7 +237,7 @@ class EvaluationReport(BaseModel):
     )
     passes_threshold: bool = Field(
         ...,
-        description="Computed: True if average_score >= QUALITY_THRESHOLD.",
+        description="Computed: True if all dimension scores >= QUALITY_THRESHOLD.",
     )
     confidence: Literal["high", "medium", "low"] = Field(...)
 
@@ -234,16 +245,16 @@ class EvaluationReport(BaseModel):
     def enforce_computed_fields(self) -> "EvaluationReport":
         """Override LLM-reported values with computed ground truth (Edge Case 4 tie-break)."""
         scores = {
-            "clarity": self.clarity.score,
-            "value_proposition": self.value_proposition.score,
-            "call_to_action": self.call_to_action.score,
-            "brand_voice": self.brand_voice.score,
-            "emotional_resonance": self.emotional_resonance.score,
+            "clarity": round(self.clarity.score, 1),
+            "value_proposition": round(self.value_proposition.score, 1),
+            "call_to_action": round(self.call_to_action.score, 1),
+            "brand_voice": round(self.brand_voice.score, 1),
+            "emotional_resonance": round(self.emotional_resonance.score, 1),
         }
         self.average_score = round(sum(scores.values()) / len(scores), 2)
-        self.passes_threshold = self.average_score >= QUALITY_THRESHOLD
+        self.passes_threshold = all(s >= QUALITY_THRESHOLD for s in scores.values())
         min_score = min(scores.values())
-        tied = [dim for dim, s in scores.items() if s == min_score]
+        tied = [dim for dim, s in scores.items() if abs(s - min_score) < 0.01]
         if len(tied) == 1:
             self.weakest_dimension = tied[0]
         else:
@@ -262,6 +273,7 @@ class EvaluationReport(BaseModel):
 def scan_output_safety(ad: AdCopy, forbidden_phrases: list[str] | None = None) -> dict:
     """
     Scan generated ad for competitor names, PII patterns, and forbidden words.
+    Includes primary_text, headline, description, and image_prompt (text in image).
     Call before evaluate_ad(). Pipeline: generate → scan → score.
 
     Args:
@@ -273,7 +285,9 @@ def scan_output_safety(ad: AdCopy, forbidden_phrases: list[str] | None = None) -
               or {"success": True, "safe": False, "error": "description", "violations": [...]}
     """
     violations: list[str] = []
-    text_to_scan = f"{ad.primary_text} {ad.headline} {ad.description}".lower()
+    # Include image_prompt so text described for the image is also checked (tone/forbidden)
+    image_prompt_text = getattr(ad, "image_prompt", "") or ""
+    text_to_scan = f"{ad.primary_text} {ad.headline} {ad.description} {image_prompt_text}".lower()
 
     if forbidden_phrases is None:
         forbidden_phrases = [
