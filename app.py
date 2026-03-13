@@ -81,15 +81,20 @@ DIMENSION_LABELS: dict[str, str] = {
 
 def list_run_ids() -> list[str]:
     """
-    List run IDs from output/runs/ (timestamp dirs), newest first.
+    List run IDs from output/runs/ that have ads_library.json (timestamp dirs), newest first.
     Does not include "latest"; caller prepends it for selector.
+    Runs without ads_library.json are excluded so the dropdown only shows usable runs.
 
     Returns:
         Sorted list of run_id strings (e.g. 20260312_210000).
     """
     if not RUNS_DIR.is_dir():
         return []
-    ids = [d.name for d in RUNS_DIR.iterdir() if d.is_dir() and d.name]
+    ids = [
+        d.name
+        for d in RUNS_DIR.iterdir()
+        if d.is_dir() and d.name and (d / "ads_library.json").is_file()
+    ]
     ids.sort(reverse=True)
     return ids
 
@@ -106,6 +111,14 @@ def load_ads_library_result(path: Path | None = None) -> dict[str, Any]:
     """
     p = path if path is not None else ADS_LIBRARY_PATH
     if not p.exists():
+        # For a specific run, missing file means no data for that run (clear error).
+        # For "Latest" (path None), empty is normal before first pipeline run.
+        if path is not None:
+            return {
+                "success": False,
+                "data": {},
+                "error": "No data for this run (ads_library.json not found). Run the pipeline to generate it.",
+            }
         return {"success": True, "data": {}, "error": None}
     try:
         with open(p, encoding="utf-8") as f:
@@ -292,7 +305,10 @@ def main() -> None:
     run_options = ["Latest"] + run_ids
     if "selected_run" not in st.session_state:
         st.session_state["selected_run"] = "Latest"
-    run_index = run_options.index(st.session_state["selected_run"]) if st.session_state["selected_run"] in run_options else 0
+    if st.session_state["selected_run"] not in run_options:
+        st.session_state["selected_run"] = run_options[0]
+        st.rerun()
+    run_index = run_options.index(st.session_state["selected_run"])
 
     # Resolve paths for selected run
     if st.session_state["selected_run"] == "Latest" or not st.session_state["selected_run"]:
@@ -496,6 +512,18 @@ def main() -> None:
         if not healed:
             st.info("All ads passed on first attempt — no healing needed.")
         else:
+            # Lookup published ad by (brief_id, variation) for fallback when log has no primary_text
+            ad_by_brief_var: dict[tuple[str, int], dict[str, Any]] = {}
+            for a in published:
+                b = str(a.get("brief_id", ""))
+                v = a.get("variation_index")
+                if v is not None:
+                    try:
+                        v = int(v)
+                    except (TypeError, ValueError):
+                        continue
+                    ad_by_brief_var[(b, v)] = a
+
             for bid, var, r1, r2 in healed:
                 s1 = float(r1["average_score"]) if pd.notna(r1.get("average_score")) else 0.0
                 s2 = float(r2["average_score"]) if pd.notna(r2.get("average_score")) else 0.0
@@ -517,6 +545,8 @@ def main() -> None:
                                 pt1 = "—"
                             else:
                                 pt1 = str(pt1).strip() or "—"
+                        if pt1 == "—":
+                            pt1 = "Initial draft copy was not recorded for this run. Re-run the pipeline to log per-cycle copy (primary_text) in the iteration log."
                         st.info(pt1)
                         st.metric("Avg Score", round(s1, 1) if s1 else "—")
                         w1 = r1.get("weakest_dimension")
@@ -532,6 +562,19 @@ def main() -> None:
                                 pt2 = "—"
                             else:
                                 pt2 = str(pt2).strip() or "—"
+                        if pt2 == "—":
+                            try:
+                                v_int = int(var) if not isinstance(var, int) else var
+                            except (TypeError, ValueError):
+                                v_int = -1
+                            ad_entry = ad_by_brief_var.get((str(bid), v_int))
+                            if ad_entry:
+                                ad_body = ad_entry.get("ad") or {}
+                                fallback = ad_body.get("primary_text")
+                                if fallback is not None and str(fallback).strip():
+                                    pt2 = str(fallback).strip()
+                            if pt2 == "—":
+                                pt2 = "Healed draft copy was not recorded for this run. The final ad is in the Browse ads section below."
                         st.success(pt2)
                         lift = round(s2 - s1, 1)
                         delta_str = f"+{lift}" if lift > 0 else (f"{lift}" if lift < 0 else None)
