@@ -237,8 +237,16 @@ class AdDrafter:
             total_variations=total_variations,
         )
 
-        generation_config = {
+        """generation_config = {
             "temperature": 0,
+            "candidate_count": 1,
+            "response_mime_type": "application/json",
+        }"""
+        # Vary temperature per variation to force creative diversity
+        base_temp = 0.9
+        temp_offset = (variation_index or 0) * 0.05
+        generation_config = {
+            "temperature": min(base_temp + temp_offset, 1.0),
             "candidate_count": 1,
             "response_mime_type": "application/json",
         }

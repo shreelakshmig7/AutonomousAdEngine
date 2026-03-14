@@ -143,13 +143,53 @@ def build_drafter_prompt(
     guidelines_str = json.dumps(brand_guidelines, indent=2) if brand_guidelines else "{}"
     brief_str = brief.model_dump_json(indent=2)
 
-    variation_instruction = ""
+    """variation_instruction = ""
     if variation_index is not None and total_variations is not None and total_variations > 1:
         n = variation_index + 1
         variation_instruction = (
             f"\n\nVARIATION DIVERSITY: This is variation {n} of {total_variations} for this brief. "
             "Generate a DISTINCT headline and primary text — use a different hook angle, framing, or benefit so this ad is clearly different from other variations (e.g. different question, stat, or story lead). Do not repeat the same headline or opening line across variations."
-        )
+        )"""
+    VARIATION_PERSONAS = [
+        "a stressed parent of a junior who just got a disappointing PSAT score",
+        "a high-achieving student stuck at 1200 who can't figure out why",
+        "a parent whose kid has test anxiety and freezes on exam day",
+        "a student with a 3.9 GPA whose SAT score doesn't reflect their ability",
+        "a family who tried a big prep course and saw zero improvement",
+    ]
+
+    VARIATION_HOOKS_FORCED = [
+        "Open with a specific, uncomfortable scenario the reader will recognize instantly. No generic questions.",
+        "Open with a single shocking stat or number that reframes how they see the problem. No inspirational language.",
+        "Open with a 2-sentence micro-story about a student — name them, give a specific situation. Make it feel real.",
+        "Open with a bold, counterintuitive claim that challenges what they believe about SAT prep.",
+        "Open with pure empathy — name the exact emotional state the parent/student is in right now. No solutions yet.",
+    ]
+
+    VARIATION_IMAGE_STYLES = [
+        "UGC-style close-up photo of a crumpled SAT practice test on a kitchen table, a red pen circling a score of 1180, coffee mug blurred in background, microwave clock showing 11:47pm. Raw, late-night energy. No text overlays.",
+        "UGC-style photo of a teenage boy staring at a laptop screen, jaw dropped, fist raised — score notification visible on screen showing 1390. Mom visible in doorway covering her mouth in surprise. Candid, genuine reaction. No text overlays.",
+        "UGC-style photo of a high school girl and her tutor at a kitchen table, tutor pointing at a specific math problem, student having a visible aha moment — leaning forward, eyes wide. Warm evening light. Feels like a friend filmed it. No text overlays.",
+        "UGC-style vertical phone photo of a college acceptance letter held up next to an SAT score report, both in frame, held by a teenager's hands, slight camera shake like it was taken in excitement. Natural light. No text overlays.",
+        "UGC-style photo of an exhausted parent at a laptop at midnight, searching on screen, empty coffee cup beside them, reading glasses on. Relatable, honest, no glamour. No text overlays.",
+    ]
+    if variation_index is not None and total_variations is not None and total_variations > 1:
+        n = variation_index + 1
+        persona = VARIATION_PERSONAS[(variation_index) % len(VARIATION_PERSONAS)]
+        hook_directive = VARIATION_HOOKS_FORCED[(variation_index) % len(VARIATION_HOOKS_FORCED)]
+        image_style = VARIATION_IMAGE_STYLES[(variation_index) % len(VARIATION_IMAGE_STYLES)]
+        variation_instruction = f"""
+
+        VARIATION {n} OF {total_variations} — MANDATORY CREATIVE CONSTRAINTS:
+
+        TARGET READER: Write exclusively for {persona}. Every word should feel written for THEM specifically — not a generic SAT parent.
+
+        HOOK DIRECTIVE (follow exactly): {hook_directive}
+
+        IMAGE STYLE (use exactly this, do not substitute): {image_style}
+        Describe this exact image in your image_prompt field — adapt the copy/stats to match your ad, but keep the visual style and layout as specified.
+
+        HEADLINE RULE: Do NOT use "Personalized Prep", "Boost SAT Scores", "200+ Point Gains", or any phrase used in other variations. Write a completely fresh headline that reflects your hook and persona."""
 
     tone_section = ""
     if getattr(brief, "tone_override", None):
@@ -180,7 +220,7 @@ Lead with outcomes, not features. Confident but not arrogant. Expert but not eli
 
 AD ANATOMY — generate ALL five components:
 1. primary_text: Main copy. Scroll-stopping hook in FIRST LINE. Use one of: {", ".join(HOOK_TYPES)} hook.
-2. headline: {HEADLINE_MIN_WORDS}-{HEADLINE_MAX_WORDS} words max. Benefit-driven.
+2. headline: EXACTLY {HEADLINE_MIN_WORDS}-{HEADLINE_MAX_WORDS} words. Count the words. Minimum {HEADLINE_MIN_WORDS}, maximum {HEADLINE_MAX_WORDS}. A 4-word headline will be rejected. Benefit-driven.
 3. description: One sentence max. Secondary reinforcement.
 4. cta_button: One of {CTA_OPTIONS}. Match to goal (awareness vs conversion).
 5. image_prompt: Describe ONE of these ad image styles (match to your headline/stat):
@@ -193,6 +233,7 @@ RULE 1 — HOOK POSITION (first {HOOK_MAX_CHARS} characters):
 The hook must be complete within the first {HOOK_MAX_CHARS} characters of primary_text.
 A question mark, period, or exclamation point must appear before character {HOOK_MAX_CHARS}.
 Everything after character {HOOK_MAX_CHARS} may be hidden behind "See More" on Facebook.
+ONE sentence only. No semicolons. No commas extending the hook. End with punctuation before char {HOOK_MAX_CHARS}.
 
 RULE 2 — APPROVED METRICS ONLY (do not invent statistics):
 You may ONLY use these statistics. Do not invent any others:
@@ -209,11 +250,14 @@ Fear hooks are allowed. Shame and catastrophizing are never allowed.
 Forbidden words in fear hooks: ruined, failed, doomed, too late, worthless, behind, failure.
 Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. The ad must never end on fear.
 
-RULE 5 — IMAGE PROMPT (ad creative styles):
-image_prompt must describe ONE of: Infographic (split-panel, key question/stat in center), Before/after (person with two score reports), or Text hero (bold headline + stat lines + CTA on minimal background).
-You MAY include the exact headline, key stat (e.g. "200+ points"), or CTA line to be displayed in the image so the generator can match the reference ad look.
-Do NOT use vague injection phrases: "a sign that says", "text reading", "words that say". Do use: "center banner with the text:", "headline:", "display the stat:", "score report showing 1170 and 1410".
-Style: polished ad creative; infographic = clean illustration; before/after = natural photo; text hero = minimal background, bold type.
+RULE 5 — IMAGE PROMPT:
+The image style for THIS variation is specified in the VARIATION section above. Use it exactly.
+image_prompt must be a UGC-style real-person scene (authentic photo feel, no infographics, no text overlays, no illustrations).
+NEVER request text, words, signs, banners, or logos rendered inside the image.
+NEVER use the word "reading" as a label in the image prompt.
+Describe real people in real moments — specific age, setting, expression, lighting.
+BAD: "Infographic showing score improvement"
+GOOD: "UGC-style photo of a teenage girl at a desk, smiling at a laptop, parent visible in doorway. Warm natural light. No text. image_prompt must be under 450 characters total. Count before outputting. Be specific but concise."
 
 RULE 6 — FORBIDDEN WORDS:
 Never use: {forbidden_block}.
