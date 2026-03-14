@@ -350,7 +350,7 @@ def run_brief(
                     single_rationale=rationale,
                 )
             try:
-                raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0, "response_mime_type": "application/json"})
+                raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.7, "response_mime_type": "application/json"})
                 cleaned = drafter._clean_json_response(raw)
                 parsed = json.loads(cleaned)
                 # Support wrapper {"optimized_ad": {...}, "changes_made": [...]} or legacy plain AdCopy

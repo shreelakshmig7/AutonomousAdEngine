@@ -129,7 +129,7 @@ class AdDrafter:
         genai = _get_genai()
         config = generation_config or {}
         config_obj = genai.GenerationConfig(
-            temperature=config.get("temperature", 0),
+            temperature=config.get("temperature", 0.7),
             candidate_count=config.get("candidate_count", 1),
             response_mime_type=config.get("response_mime_type", "application/json"),
         )
@@ -237,11 +237,6 @@ class AdDrafter:
             total_variations=total_variations,
         )
 
-        """generation_config = {
-            "temperature": 0,
-            "candidate_count": 1,
-            "response_mime_type": "application/json",
-        }"""
         # Vary temperature per variation to force creative diversity
         base_temp = 0.9
         temp_offset = (variation_index or 0) * 0.05
