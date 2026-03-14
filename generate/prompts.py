@@ -175,21 +175,42 @@ def build_drafter_prompt(
     ]
     if variation_index is not None and total_variations is not None and total_variations > 1:
         n = variation_index + 1
-        persona = VARIATION_PERSONAS[(variation_index) % len(VARIATION_PERSONAS)]
-        hook_directive = VARIATION_HOOKS_FORCED[(variation_index) % len(VARIATION_HOOKS_FORCED)]
-        image_style = VARIATION_IMAGE_STYLES[(variation_index) % len(VARIATION_IMAGE_STYLES)]
+
+        hook_directives = [
+            "Open with a specific uncomfortable scenario the reader will recognize instantly. No generic questions.",
+            "Open with a single shocking stat or number that reframes how they see the problem.",
+            "Open with a 2-sentence micro-story. Name a specific person, give a specific situation. Make it feel real.",
+            "Open with a bold counterintuitive claim that challenges what they believe about SAT prep.",
+            "Open with pure empathy — name the exact emotional state the reader is in right now. No solutions yet.",
+        ]
+
+        image_directives = [
+            "UGC-style close-up photo: a crumpled practice test on a kitchen table, red pen circling a low score, microwave clock showing late at night. Raw, honest. No text overlays.",
+            "UGC-style candid photo: a teenager's genuine reaction — jaw dropped, fist raised — looking at a laptop screen. Parent visible in background reacting. No text overlays.",
+            "UGC-style photo: a student and tutor at a kitchen table, tutor pointing at a specific problem, student having a visible aha moment. Warm evening light. No text overlays.",
+            "UGC-style vertical phone photo: slightly shaky, taken in excitement. Teenager holding up something that shows success — acceptance letter, score report, phone notification. No text overlays.",
+            "UGC-style late-night photo: exhausted parent at a laptop, empty coffee cup, reading glasses on. Relatable, honest, no glamour. No text overlays.",
+        ]
+
+        hook_directive = hook_directives[variation_index % len(hook_directives)]
+        image_directive = image_directives[variation_index % len(image_directives)]
+
         variation_instruction = f"""
 
-        VARIATION {n} OF {total_variations} — MANDATORY CREATIVE CONSTRAINTS:
+VARIATION {n} OF {total_variations} — MANDATORY CREATIVE CONSTRAINTS:
 
-        TARGET READER: Write exclusively for {persona}. Every word should feel written for THEM specifically — not a generic SAT parent.
+TARGET READER: You are writing exclusively for this specific audience: {brief.audience}
+Every word must feel written for THEM — their exact situation, income level, geography, emotional state.
+Do not write generic SAT parent copy. Write for THIS person.
 
-        HOOK DIRECTIVE (follow exactly): {hook_directive}
+HOOK DIRECTIVE (follow exactly for this variation): {hook_directive}
 
-        IMAGE STYLE (use exactly this, do not substitute): {image_style}
-        Describe this exact image in your image_prompt field — adapt the copy/stats to match your ad, but keep the visual style and layout as specified.
+IMAGE DIRECTIVE (follow exactly for this variation): {image_directive}
+Adapt the scene to match YOUR specific audience and hook — same visual style, but the people, setting,
+and emotional moment should reflect {brief.audience}.
 
-        HEADLINE RULE: Do NOT use "Personalized Prep", "Boost SAT Scores", "200+ Point Gains", or any phrase used in other variations. Write a completely fresh headline that reflects your hook and persona."""
+HEADLINE RULE: Do NOT use "Personalized Prep", "Boost SAT Scores", "200+ Point Gains", or any phrase
+used in other variations. Write a completely fresh headline that reflects your hook and this specific audience."""
 
     tone_section = ""
     if getattr(brief, "tone_override", None):
