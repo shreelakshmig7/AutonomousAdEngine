@@ -33,22 +33,6 @@ except ImportError:
     go = None  # type: ignore[assignment]
     _PLOTLY_AVAILABLE = False
 
-# Streamlit Cloud: set env before any code that reads API keys (subprocess inherits)
-if hasattr(st, "secrets"):
-    try:
-        os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
-        os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
-    except (KeyError, TypeError):
-        pass
-
-if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY"):
-    try:
-        from dotenv import load_dotenv
-
-        load_dotenv()
-    except ImportError:
-        pass
-
 # Paths relative to repo root
 REPO_ROOT: Path = Path(__file__).resolve().parent
 ADS_LIBRARY_PATH: Path = REPO_ROOT / "output" / "ads_library.json"
@@ -232,8 +216,9 @@ def render_sidebar_api_status() -> None:
 
 def run_pipeline_stream_ui() -> None:
     """
-    Run pipeline and stream last 30 lines into placeholder; then rerun.
-    Must be called from main flow (not inside sidebar) so log appears in main.
+    Run pipeline and stream last 30 lines into placeholder.
+    No auto-rerun after completion; user clicks "View dashboard" to avoid
+    SessionInfo-before-init errors when rerun fires right after long run.
     """
     if not MAIN_SCRIPT.exists():
         st.error("main.py not found at project root.")
@@ -245,7 +230,7 @@ def run_pipeline_stream_ui() -> None:
         if line.startswith("ERROR:"):
             st.error(line.strip())
             st.session_state["run_pipeline_requested"] = False
-            return
+            break
         if line.startswith("EXIT_CODE:"):
             code_str = line.split(":", 1)[1].strip()
             try:
@@ -260,7 +245,7 @@ def run_pipeline_stream_ui() -> None:
         log_lines.append(line)
         output_box.code("".join(log_lines[-30:]), language=None)
     st.session_state["run_pipeline_requested"] = False
-    st.rerun()
+    st.button("View dashboard", type="primary")
 
 
 def load_iteration_log_df(path: Path | None = None) -> pd.DataFrame | None:
@@ -288,6 +273,21 @@ def main() -> None:
         page_title="Varsity Ad Engine",
         layout="wide",
     )
+
+    # Load secrets into env only inside a script run (avoids SessionInfo use before init).
+    if hasattr(st, "secrets"):
+        try:
+            os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
+            os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
+        except (KeyError, TypeError):
+            pass
+    if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            from dotenv import load_dotenv
+
+            load_dotenv()
+        except ImportError:
+            pass
 
     # Hide footer and bottom-right "Manage app" bar (Streamlit / Community Cloud).
     st.markdown(
