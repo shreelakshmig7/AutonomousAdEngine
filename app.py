@@ -244,7 +244,7 @@ def run_pipeline_stream_ui() -> None:
     for line in stream_pipeline():
         if line.startswith("ERROR:"):
             st.error(line.strip())
-            st.session_state.pop("run_pipeline_requested", None)
+            st.session_state["run_pipeline_requested"] = False
             return
         if line.startswith("EXIT_CODE:"):
             code_str = line.split(":", 1)[1].strip()
@@ -259,7 +259,7 @@ def run_pipeline_stream_ui() -> None:
             break
         log_lines.append(line)
         output_box.code("".join(log_lines[-30:]), language=None)
-    st.session_state.pop("run_pipeline_requested", None)
+    st.session_state["run_pipeline_requested"] = False
     st.rerun()
 
 
