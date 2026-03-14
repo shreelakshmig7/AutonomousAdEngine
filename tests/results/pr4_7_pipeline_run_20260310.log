@@ -1,0 +1,132 @@
+/Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+Drafting brief_001 variation 0
+/Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+  warnings.warn(
+/Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/shreelakshmigopinatharao/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+brief_001 v0: published (cycle 1)
+Drafting brief_001 variation 1
+brief_001 v1: published (cycle 1)
+Drafting brief_001 variation 2
+brief_001 v2: published (cycle 1)
+Drafting brief_001 variation 3
+brief_001 v3: published (cycle 1)
+Drafting brief_001 variation 4
+brief_001 v4: published (cycle 1)
+Drafting brief_002 variation 0
+brief_002 v0: published (cycle 1)
+Drafting brief_002 variation 1
+brief_002 v1: published (cycle 1)
+Drafting brief_002 variation 2
+brief_002 v2: published (cycle 1)
+Drafting brief_002 variation 3
+brief_002 v3: published (cycle 1)
+Drafting brief_002 variation 4
+brief_002 v4: published (cycle 1)
+Drafting brief_003 variation 0
+brief_003 v0: published (cycle 1)
+Drafting brief_003 variation 1
+brief_003 v1: published (cycle 1)
+Drafting brief_003 variation 2
+brief_003 v2: published (cycle 1)
+Drafting brief_003 variation 3
+brief_003 v3: published (cycle 1)
+Drafting brief_003 variation 4
+brief_003 v4: published (cycle 1)
+Drafting brief_004 variation 0
+brief_004 v0: published (cycle 1)
+Drafting brief_004 variation 1
+brief_004 v1: published (cycle 2)
+Drafting brief_004 variation 2
+brief_004 v2: published (cycle 1)
+Drafting brief_004 variation 3
+brief_004 v3: published (cycle 2)
+Drafting brief_004 variation 4
+brief_004 v4: published (cycle 2)
+Drafting brief_005 variation 0
+brief_005 v0: unresolvable (cycle 1)
+Drafting brief_005 variation 1
+brief_005 v1: unresolvable (cycle 1)
+Drafting brief_005 variation 2
+brief_005 v2: unresolvable (cycle 1)
+Drafting brief_005 variation 3
+brief_005 v3: unresolvable (cycle 1)
+Drafting brief_005 variation 4
+brief_005 v4: unresolvable (cycle 1)
+Drafting brief_006 variation 0
+brief_006 v0: unresolvable (cycle 1)
+Drafting brief_006 variation 1
+brief_006 v1: unresolvable (cycle 1)
+Drafting brief_006 variation 2
+brief_006 v2: unresolvable (cycle 1)
+Drafting brief_006 variation 3
+brief_006 v3: unresolvable (cycle 1)
+Drafting brief_006 variation 4
+brief_006 v4: unresolvable (cycle 1)
+Drafting brief_007 variation 0
+brief_007 v0: unresolvable (cycle 1)
+Drafting brief_007 variation 1
+brief_007 v1: unresolvable (cycle 1)
+Drafting brief_007 variation 2
+brief_007 v2: unresolvable (cycle 1)
+Drafting brief_007 variation 3
+brief_007 v3: unresolvable (cycle 1)
+Drafting brief_007 variation 4
+brief_007 v4: unresolvable (cycle 1)
+Drafting brief_008 variation 0
+brief_008 v0: unresolvable (cycle 1)
+Drafting brief_008 variation 1
+brief_008 v1: unresolvable (cycle 1)
+Drafting brief_008 variation 2
+brief_008 v2: unresolvable (cycle 1)
+Drafting brief_008 variation 3
+brief_008 v3: unresolvable (cycle 1)
+Drafting brief_008 variation 4
+brief_008 v4: unresolvable (cycle 1)
+Drafting brief_009 variation 0
+brief_009 v0: unresolvable (cycle 1)
+Drafting brief_009 variation 1
+brief_009 v1: unresolvable (cycle 1)
+Drafting brief_009 variation 2
+brief_009 v2: unresolvable (cycle 1)
+Drafting brief_009 variation 3
+brief_009 v3: unresolvable (cycle 1)
+Drafting brief_009 variation 4
+brief_009 v4: unresolvable (cycle 1)
+Drafting brief_010 variation 0
+brief_010 v0: unresolvable (cycle 1)
+Drafting brief_010 variation 1
+brief_010 v1: unresolvable (cycle 1)
+Drafting brief_010 variation 2
+brief_010 v2: unresolvable (cycle 1)
+Drafting brief_010 variation 3
+brief_010 v3: unresolvable (cycle 1)
+Drafting brief_010 variation 4
+brief_010 v4: unresolvable (cycle 1)
+Drafting brief_011 variation 0
+brief_011 v0: unresolvable (cycle 1)
+Drafting brief_011 variation 1
+brief_011 v1: unresolvable (cycle 1)
+Drafting brief_011 variation 2
+brief_011 v2: unresolvable (cycle 1)
+Drafting brief_011 variation 3
+brief_011 v3: unresolvable (cycle 1)
+Drafting brief_011 variation 4
+brief_011 v4: unresolvable (cycle 1)
+Drafting brief_012 variation 0
+brief_012 v0: unresolvable (cycle 1)
+Drafting brief_012 variation 1
+brief_012 v1: unresolvable (cycle 1)
+Drafting brief_012 variation 2
+brief_012 v2: unresolvable (cycle 1)
+Drafting brief_012 variation 3
+brief_012 v3: unresolvable (cycle 1)
+Drafting brief_012 variation 4
+brief_012 v4: unresolvable (cycle 1)
+Warning: Only 20 ads published. Target is 50.
+
+Complete. Published: 20, Unresolvable: 40
+Avg score: 7.96, Tokens: 36000, Cost: $0.103613

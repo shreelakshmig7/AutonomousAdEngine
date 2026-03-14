@@ -301,6 +301,10 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
+    # Ensure session state keys exist before use (avoids KeyError if state is reset or not yet ready).
+    if "run_pipeline_requested" not in st.session_state:
+        st.session_state["run_pipeline_requested"] = False
+
     run_ids = list_run_ids()
     run_options = ["Latest"] + run_ids
     if "selected_run" not in st.session_state:
@@ -618,6 +622,8 @@ def main() -> None:
                 st.write(primary_text)
             else:
                 read_more_key = f"read_more_{bid}_{var}"
+                if read_more_key not in st.session_state:
+                    st.session_state[read_more_key] = False
                 expanded = st.session_state.get(read_more_key, False)
                 if expanded:
                     st.write(primary_text)
