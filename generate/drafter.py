@@ -325,6 +325,8 @@ class AdDrafter:
                 "tokens_used": 0,
                 "model_used": None,
                 "error": f"Schema validation failed: {e}",
+                "raw_draft": parsed,
+                "validation_errors": e.errors(),
             }
         except json.JSONDecodeError as e:
             return {

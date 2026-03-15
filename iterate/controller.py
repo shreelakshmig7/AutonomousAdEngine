@@ -17,7 +17,23 @@ Key constants / functions:
 from __future__ import annotations
 
 import json
+import time
 from typing import Any
+
+from pydantic import ValidationError as PydanticValidationError
+
+# #region agent log
+_DEBUG_LOG_PATH = "/Users/shreelakshmigopinatharao/AutonomousAdEngine/.cursor/debug-3c2b3e.log"
+def _debug_log(message: str, data: dict, hypothesis_id: str = ""):
+    try:
+        payload = {"sessionId": "3c2b3e", "location": "controller.py", "message": message, "data": data, "timestamp": int(time.time() * 1000)}
+        if hypothesis_id:
+            payload["hypothesisId"] = hypothesis_id
+        with open(_DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(payload, default=str) + "\n")
+    except Exception:
+        pass
+# #endregion
 
 from evaluate.rubrics import (
     AdBrief,
@@ -25,6 +41,7 @@ from evaluate.rubrics import (
     DIMENSION_DISPLAY_NAMES,
     DIMENSIONS,
     EvaluationReport,
+    GOLD_ANCHOR,
     MAX_CYCLES,
     QUALITY_THRESHOLD,
     STRONG_DIMENSION_THRESHOLD,
@@ -56,6 +73,30 @@ def _is_schema_validation_draft_error(error: str | None) -> bool:
         return False
     err_lower = error.lower()
     return "schema validation failed" in err_lower or "json parse failed" in err_lower
+
+
+def _minimal_ad_from_raw(raw_draft: dict, validation_errors: list) -> AdCopy | None:
+    """
+    Build a valid AdCopy from raw_draft by replacing failed fields with GOLD_ANCHOR values.
+    Used so we can pass a current_ad into the regen path with the validation error as rationale.
+    """
+    if not raw_draft or not isinstance(raw_draft, dict):
+        return None
+    minimal = dict(GOLD_ANCHOR)
+    minimal.update({k: v for k, v in raw_draft.items() if k in minimal})
+    failed_fields = set()
+    for err in validation_errors or []:
+        loc = err.get("loc") or ()
+        if loc and isinstance(loc, (list, tuple)) and len(loc) > 0:
+            field = loc[0]
+            if field in GOLD_ANCHOR:
+                failed_fields.add(field)
+    for field in failed_fields:
+        minimal[field] = GOLD_ANCHOR[field]
+    try:
+        return AdCopy.model_validate(minimal)
+    except Exception:
+        return None
 
 
 REASONABLE_RATIONALE_MAX_CHARS_MULTI: int = 120
@@ -323,8 +364,21 @@ def run_brief(
                     err = "Draft failed (primary and fallback exhausted or validation failed)."
                 # Schema/validation failure: treat as failed cycle and continue so next iteration can retry or regen fix
                 if _is_schema_validation_draft_error(err):
+                    raw_draft = draft_result.get("raw_draft")
+                    validation_errors = draft_result.get("validation_errors") or []
+                    minimal_ad = _minimal_ad_from_raw(raw_draft, validation_errors) if raw_draft else None
+                    # #region agent log
+                    _debug_log("draft_schema_fail", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle, "has_raw_draft": raw_draft is not None, "validation_errors_count": len(validation_errors), "minimal_ad_set": minimal_ad is not None, "error_snippet": (err or "")[:180]}, "H1_H3_H4")
+                    # #endregion
+                    if minimal_ad is not None:
+                        current_ad = minimal_ad
+                        scan_fail_rationale = err
+                        current_report = None
                     continue
                 # API or other unrecoverable failure: return immediately
+                # #region agent log
+                _debug_log("unresolvable", {"path": "draft_api", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (err or "")[:180]}, "H6")
+                # #endregion
                 mu = draft_result.get("model_used")
                 if mu is not None and not isinstance(mu, str):
                     mu = None
@@ -381,7 +435,49 @@ def run_brief(
                     last_changes_made = []
                 total_tokens += 500  # approximate regen call
                 total_cost += _estimate_cost(500, drafter._model_name)
+            except PydanticValidationError as ve:
+                # #region agent log
+                _debug_log("regen_validation_fail", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle, "error_snippet": str(ve)[:180]}, "H2")
+                # #endregion
+                iteration_log.append({
+                    "cycle": cycle,
+                    "regen_validation_failed": True,
+                    "error": str(ve),
+                    "primary_text": getattr(current_ad, "primary_text", "") or "",
+                    "headline": getattr(current_ad, "headline", "") or "",
+                    "clarity": None,
+                    "value_proposition": None,
+                    "call_to_action": None,
+                    "brand_voice": None,
+                    "emotional_resonance": None,
+                    "average_score": None,
+                    "weakest_dimension": None,
+                    "status": "regen_validation_failed",
+                })
+                if cycle >= MAX_CYCLES:
+                    # #region agent log
+                    _debug_log("unresolvable", {"path": "regen_validation_max", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": str(ve)[:180]}, "H2")
+                    # #endregion
+                    return {
+                        "brief_id": brief.id,
+                        "variation_index": variation_index,
+                        "status": "unresolvable",
+                        "cycles_used": cycle,
+                        "final_ad": None,
+                        "final_score": None,
+                        "final_report": None,
+                        "iteration_log": iteration_log,
+                        "changes_made": last_changes_made,
+                        "model_used": model_used,
+                        "tokens_used": total_tokens,
+                        "estimated_cost_usd": total_cost,
+                        "error": str(ve),
+                    }
+                continue
             except Exception as e:
+                # #region agent log
+                _debug_log("unresolvable", {"path": "regen_exception", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": str(e)[:180]}, "H6")
+                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -399,6 +495,9 @@ def run_brief(
                 }
 
         if current_ad is None:
+            # #region agent log
+            _debug_log("break_no_ad", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle}, "H1")
+            # #endregion
             break
 
         scan_result = scan_output_safety(current_ad, forbidden_phrases=forbidden_phrases)
@@ -421,6 +520,9 @@ def run_brief(
                 "status": "scan_failed",
             })
             if cycle >= MAX_CYCLES:
+                # #region agent log
+                _debug_log("unresolvable", {"path": "scan_max", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (scan_result.get("error") or "Safety violations")[:180]}, "H5")
+                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -442,6 +544,9 @@ def run_brief(
 
         judge_result = judge.evaluate_ad(current_ad)
         if not judge_result.get("success"):
+            # #region agent log
+            _debug_log("unresolvable", {"path": "judge_fail", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (judge_result.get("error") or "Judge failed")[:180]}, "H6")
+            # #endregion
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -464,6 +569,9 @@ def run_brief(
             try:
                 report = EvaluationReport.model_validate(report)
             except Exception:
+                # #region agent log
+                _debug_log("unresolvable", {"path": "judge_report_invalid", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
+                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -480,6 +588,9 @@ def run_brief(
                     "error": "Judge returned data that is not a valid EvaluationReport",
                 }
         if report is None:
+            # #region agent log
+            _debug_log("unresolvable", {"path": "judge_report_none", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
+            # #endregion
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -540,6 +651,9 @@ def run_brief(
             }
 
         if cycle >= MAX_CYCLES:
+            # #region agent log
+            _debug_log("unresolvable", {"path": "max_cycles_never_passed", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
+            # #endregion
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -556,6 +670,9 @@ def run_brief(
                 "error": None,
             }
 
+    # #region agent log
+    _debug_log("unresolvable", {"path": "max_cycles_no_ad", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H1")
+    # #endregion
     return {
         "brief_id": brief.id,
         "variation_index": variation_index,
