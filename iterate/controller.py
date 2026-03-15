@@ -48,6 +48,16 @@ DIMENSION_TO_GUIDELINE_KEY: dict[str, list[str]] = {
 
 REASONABLE_RATIONALE_MAX_CHARS: int = 200
 # When multiple weak dimensions, cap rationale length so prompt stays bounded
+
+
+def _is_schema_validation_draft_error(error: str | None) -> bool:
+    """True if draft failed due to schema/validation (recoverable by retry or regen)."""
+    if not error:
+        return False
+    err_lower = error.lower()
+    return "schema validation failed" in err_lower or "json parse failed" in err_lower
+
+
 REASONABLE_RATIONALE_MAX_CHARS_MULTI: int = 120
 
 
@@ -138,7 +148,10 @@ def build_regeneration_prompt(
             strong_names = [DIMENSION_DISPLAY_NAMES.get(d, d) for d in strong_dims]
             preserve_line = f"Do not change the following (they scored 8 or higher): {', '.join(strong_names)}."
         required_section = "\n".join(f"• {f}" for f in required_fixes)
-        return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+        return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
+CRITICAL: headline must be exactly 5-8 words. Count the words.
+
+Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
 Inputs:
 1) The Original Ad Copy (below).
@@ -169,7 +182,10 @@ Return valid JSON only, with this exact structure:
     keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
     guideline_slice = _get_guideline_slice(brand_guidelines, keys)
     display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
-    return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+    return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
+CRITICAL: headline must be exactly 5-8 words. Count the words.
+
+Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
 Inputs:
 1) The Original Ad Copy (below).
@@ -302,10 +318,13 @@ def run_brief(
                 total_variations=total_variations,
             )
             if not draft_result.get("success"):
-                # Never swallow draft failure: explicit error; model_used must be str or None (no NaN)
                 err = draft_result.get("error")
                 if not err:
                     err = "Draft failed (primary and fallback exhausted or validation failed)."
+                # Schema/validation failure: treat as failed cycle and continue so next iteration can retry or regen fix
+                if _is_schema_validation_draft_error(err):
+                    continue
+                # API or other unrecoverable failure: return immediately
                 mu = draft_result.get("model_used")
                 if mu is not None and not isinstance(mu, str):
                     mu = None
@@ -350,7 +369,7 @@ def run_brief(
                     single_rationale=rationale,
                 )
             try:
-                raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.7, "response_mime_type": "application/json"})
+                raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.5, "response_mime_type": "application/json"})
                 cleaned = drafter._clean_json_response(raw)
                 parsed = json.loads(cleaned)
                 # Support wrapper {"optimized_ad": {...}, "changes_made": [...]} or legacy plain AdCopy

@@ -1,115 +1,106 @@
 {
   "_meta": {
-    "version": "1.0",
-    "data_type": "synthetic",
-    "swap_instructions": "Enrich with live Meta Ad Library data when available. Zero code changes required.",
-    "last_updated": "2026-03-09"
+    "version": "2.0",
+    "data_type": "competitive_context",
+    "source": "Nerdy official competitive positioning + Meta Ad Library patterns",
+    "last_updated": "2026-03-14"
   },
-  "research_source": "Meta Ad Library — active US ads, SAT prep category",
   "varsity_tutors_position": {
-    "defensible_white_space": "1-on-1 personalization + top 5% vetted tutors + 3.4M learner ratings",
+    "core_offer": "Monthly 1-on-1 SAT tutoring membership — not a course, not a group class, not a self-study app",
+    "defensible_white_space": "1-on-1 personalization + top 5% vetted tutors + 3.4M learner ratings + 24-hour matching",
     "key_differentiators": [
-      "Matched with a tutor in 24 hours based on exact weak areas",
-      "Top 5% vetted tutors — not a marketplace of anyone who applies",
+      "Matched with a tutor in 24 hours based on exact weak areas — not random assignment",
+      "Top 5% vetted tutors — scored high on their own SAT, attended top 100 university, passed rigorous background and teaching checks",
       "3.4 million learner session ratings",
-      "1-on-1 personalized matching — not a one-size-fits-all course",
-      "200+ point average score improvement"
+      "100 points per month at 2 sessions per week plus 20 minutes daily practice",
+      "10x the score improvement of self-study",
+      "2.6x the score improvement of group classes, local tutors, and learning centers",
+      "Digital SAT interface training — the SAT is taken on a laptop, we train on a laptop",
+      "Built-in tools training — over 60% of test takers run out of time; our tutors teach the built-in calculator and formulas that can solve questions in 15 seconds instead of 75",
+      "Weekly progress reports — parents see score trajectory every week not just at the end",
+      "Perfect tutor match guarantee — rematched immediately if not the right fit"
     ],
     "positioning_rule": "Every ad must lean into personal matching outcomes. Never use generic 'we have tutors' copy."
   },
   "competitors": [
     {
       "name": "Princeton Review",
-      "owns": "Score guarantees and credibility through statistics",
-      "dominant_hook": "Stat — students score 200+ points higher",
-      "top_cta": "Start free practice test",
-      "emotional_angle": "Parent fear converted to measurable relief through specific numbers",
-      "recurring_patterns": [
-        "Specific score improvement numbers in headline",
-        "Test date urgency ('SAT is X weeks away')",
-        "Score-back guarantee framing",
-        "Expert-authority positioning"
-      ],
-      "what_to_learn": "Use specific score numbers. Create time-pressure urgency. Make relief feel measurable.",
-      "what_to_avoid": "Do not copy their guarantee framing — Varsity Tutors does not offer score guarantees"
+      "price": "$1,500-$2,500 for group classes; $199-$252/hr for 1-on-1",
+      "weakness": "Group class pace — your child moves at the class's speed not their own",
+      "our_counter": "For what Princeton Review charges for group classes we deliver 1-on-1. Their 1-on-1 is $199-$252/hr extra on top.",
+      "hook_to_steal": "Specific score numbers in headline, test date urgency",
+      "what_to_avoid": "Do not copy their guarantee framing — we do not offer score guarantees"
     },
     {
       "name": "Khan Academy",
-      "owns": "Free access and zero-pressure approachability",
-      "dominant_hook": "Empathy — free, official, no stress",
-      "top_cta": "Practice for free",
-      "emotional_angle": "Accessibility and zero pressure — College Board trusted, no commitment",
-      "recurring_patterns": [
-        "Free-first funnel — remove all financial friction",
-        "Official College Board partnership mentioned",
-        "Low-stakes, approachable language",
-        "Short, friendly copy — never overwhelming"
-      ],
-      "what_to_learn": "Low-friction first step. Approachable tone. Never make the student feel judged.",
-      "what_to_avoid": "Do not use 'free' as primary differentiator — Varsity Tutors competes on quality, not price"
+      "price": "Free",
+      "weakness": "No accountability, no adaptation, no one explaining what the student gets wrong",
+      "our_counter": "Khan Academy raised her score 10 points. That was the problem. Free SAT tutoring is great — until you get your score back.",
+      "hook_to_steal": "Low-friction first step, approachable tone",
+      "what_to_avoid": "Do not compete on price — we compete on results"
     },
     {
       "name": "Kaplan",
-      "owns": "Legacy trust and institutional authority",
-      "dominant_hook": "Authority — trusted by millions since 1938",
-      "top_cta": "Get free practice test",
-      "emotional_angle": "Legacy trust and score-back guarantee — institutional credibility",
-      "recurring_patterns": [
-        "Heritage and longevity signals ('since 1938', 'millions of students')",
-        "Score improvement guarantee with specific terms",
-        "Structured, formal tone — expert positioning",
-        "Multi-format options prominently featured"
-      ],
-      "what_to_learn": "Credibility signals work. Guarantees reduce purchase anxiety. Structure builds trust.",
-      "what_to_avoid": "Do not mimic institutional/formal tone — Varsity Tutors voice is empowering, not corporate"
+      "price": "$1,500-$2,500 for group classes; $199-$252/hr for 1-on-1",
+      "weakness": "Institutional and corporate tone, group format",
+      "our_counter": "Same price range as Kaplan group classes — we do 1-on-1",
+      "hook_to_steal": "Credibility signals, structured trust-building",
+      "what_to_avoid": "Do not mimic formal institutional tone"
     },
     {
-      "name": "Chegg",
-      "owns": "Affordability and low-commitment entry",
-      "dominant_hook": "Value — expert tutors at affordable rates",
-      "top_cta": "Try for free",
-      "emotional_angle": "Budget-conscious families, no commitment, easy exit",
-      "recurring_patterns": [
-        "Free trial as primary offer — remove all commitment friction",
-        "Price anchoring and value comparisons",
-        "On-demand availability messaging",
-        "Broad subject coverage highlighted"
-      ],
-      "what_to_learn": "Free first step dramatically lowers conversion friction. 'Try' beats 'Buy'.",
-      "what_to_avoid": "Do not position on price — Varsity Tutors is premium 1-on-1, not commodity tutoring"
+      "name": "Local tutors and learning centers (Sylvan, Kumon, Mathnasium)",
+      "price": "$80-$200/hr with no platform, no plan, no practice tests",
+      "weakness": "No diagnostic, no plan built for the child, no progress tracking, in-person only",
+      "our_counter": "Local tutors charge $80-$200/hr with no platform and no plan. We include diagnostics, a study plan, practice tests, and weekly progress reports.",
+      "hook_to_steal": "In-person credibility — flip it: the SAT is digital, train digital",
+      "what_to_avoid": "Do not attack in-person tutoring emotionally — flip it logically"
+    },
+    {
+      "name": "Self-study (apps, books, prep books)",
+      "price": "$0-$99/month",
+      "weakness": "No accountability, no one identifying what the student gets wrong, score barely moves",
+      "our_counter": "10x the score improvement of self-study. Watching videos on Khan isn't the same as learning to test well on the SAT.",
+      "hook_to_steal": "Frustration validation — 'if you've been studying but the score hasn't moved'",
+      "what_to_avoid": "Do not position on price"
     }
   ],
-  "industry_benchmarks": {
-    "source": "Meta IQ 2025, LeadEnforce education reports, edtech creative research",
-    "findings": [
-      "Specific metrics outperform vague claims by ~34% — always use numbers over adjectives",
-      "Social proof (ratings, reviews, student counts) consistently outperforms plain brand claims",
-      "Free first step outperforms paid commitment as CTA by 2.3x",
-      "UGC-style creative outperforms polished studio creative for awareness campaigns",
-      "Short-form video earns 1.7x higher CTR than static images in education",
-      "Lookalike audiences produce 27% lower CPA on average (Meta 2024)"
-    ]
-  },
+  "meta_ad_patterns_that_work": [
+    "Specific score gaps in headline: '3.8 GPA. 1260 SAT. Something's off.'",
+    "Real calendar urgency: 'Your SAT is in 6 weeks. Here's what's still possible.'",
+    "Mechanism specificity: '100 points per month at 2 sessions/week' beats '200+ points'",
+    "Conditional claims: 'If your child is between 1100-1300 they can gain 200 points in 8 weeks'",
+    "Competitor reframe: 'For what Princeton Review charges for group classes we deliver 1-on-1'",
+    "Digital SAT angle: 'The SAT is digital now. Why prep on paper?'",
+    "Built-in tools angle: 'Over 60% of test takers run out of time. Our tutors fix that.'",
+    "Hook then 2-3 line body then micro-commitment CTA — tight structure wins"
+  ],
   "approved_hooks_by_type": {
     "question": [
-      "Is your child's SAT score holding them back from their dream school?",
-      "What if your student could improve their SAT score by 200+ points?"
+      "3.8 GPA. 1260 SAT. Something's off.",
+      "If she's capable of a 1450, why is she stuck in the 1200s?",
+      "Smart kids underestimate the SAT. Is yours prepared?",
+      "Is your child's SAT score keeping up with their GPA?"
     ],
     "stat": [
-      "Students who prep with a 1-on-1 tutor score 200+ points higher on average.",
-      "3.4 million learners have trusted Varsity Tutors to improve their scores."
+      "100 points per month. 2 sessions per week. That's the math.",
+      "10x the score improvement of Khan Academy. Same time. Same effort.",
+      "3.4 million sessions. Top 5% tutors. 24-hour matching.",
+      "Over 60% of SAT test takers run out of time. Ours don't."
     ],
     "story": [
-      "My daughter went from a 1050 to a 1400 in 8 weeks with Varsity Tutors.",
-      "He'd taken the SAT twice. Then he found a tutor matched to his exact weak areas."
+      "He scored 1180 twice. Then we found the 3 question types he kept missing.",
+      "She had a 3.9 GPA and a 1240 SAT. Eight weeks later: 1430.",
+      "They tried Khan Academy. The score went up 10 points. Then they called us."
     ],
     "fear": [
-      "The SAT is 3 months away. Most students who don't prep wish they had.",
-      "Is your student ready for the SAT — or just hoping for the best?"
+      "Your SAT is in 6 weeks. Here's what's still possible.",
+      "Same score twice? That's fixable — if you start now.",
+      "Not the score you expected? Here's why it happened."
     ],
     "empathy": [
-      "SAT prep doesn't have to feel overwhelming. We make it personal.",
-      "Your student works hard. They deserve prep that works as hard as they do."
+      "Khan Academy raised her score 10 points. That was the problem.",
+      "You've tried everything. The score barely moved. We hear you.",
+      "Tutoring didn't work last time? Here's what we do differently."
     ]
   }
 }

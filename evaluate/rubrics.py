@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 QUALITY_THRESHOLD: float = 7.0
 # Dimensions scoring >= this are preserved in iteration (no edits)
 STRONG_DIMENSION_THRESHOLD: float = 8.0
-MAX_CYCLES: int = 3
+MAX_CYCLES: int = 5
 EXCELLENT_THRESHOLD: float = 7.5
 DIMENSIONS: list[str] = [
     "clarity",
@@ -80,6 +80,7 @@ CTA_OPTIONS: list[str] = [
     "Sign Up",
     "Start Free Assessment",
     "Get Started",
+    "Book Diagnostic",
 ]
 
 # -----------------------------------------------------------------------------
@@ -155,7 +156,7 @@ class AdCopy(BaseModel):
         min_length=10,
         description="One sentence max. Secondary reinforcement.",
     )
-    cta_button: Literal["Learn More", "Sign Up", "Start Free Assessment", "Get Started"] = Field(...)
+    cta_button: Literal["Learn More", "Sign Up", "Start Free Assessment", "Get Started", "Book Diagnostic"] = Field(...)
     image_prompt: str = Field(
         ...,
         min_length=20,

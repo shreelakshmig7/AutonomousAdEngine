@@ -69,6 +69,9 @@ FORBIDDEN_WORDS_IN_PROMPT: list[str] = [
     "click here",
     "limited time offer",
     "act now",
+    "unlock",
+    "maximize",
+    "generic prep",
 ]
 
 
@@ -233,6 +236,16 @@ The Meta ad platform truncates primary_text at 125 characters visible without
 If your draft exceeds 500 characters: cut the weakest sentence, not the hook.
 Do not summarize — cut. The hook and the CTA must survive any cuts."""
 
+    story_hook_section = ""
+    if getattr(brief, "hook_type", None) == "story":
+        story_hook_section = """
+STORY HOOK RULE: A story hook must be ONE sentence under 100 chars.
+GOOD: "She had a 3.9 GPA and a 1240 SAT. Eight weeks later: 1430." ✓
+BAD: "Jackson's parents knew his strong grades should translate..." ✗
+"""
+        if getattr(brief, "id", "") == "brief_010":
+            story_hook_section += "For brief_010 (early researcher 10th grade parent): keep the story to ONE sentence under 100 chars. No long lead-in.\n"
+
     return f"""You are an elite direct-response copywriter for Varsity Tutors (a Nerdy business).
 Generate high-converting Facebook and Instagram ad copy.{variation_instruction}
 
@@ -253,9 +266,19 @@ AD ANATOMY — generate ALL five components:
 RULE 1 — HOOK POSITION (first {HOOK_MAX_CHARS} characters):
 The hook must be complete within the first {HOOK_MAX_CHARS} characters of primary_text.
 A question mark, period, or exclamation point must appear before character {HOOK_MAX_CHARS}.
-Everything after character {HOOK_MAX_CHARS} may be hidden behind "See More" on Facebook.
-ONE sentence only. No semicolons. No commas extending the hook. End with punctuation before char {HOOK_MAX_CHARS}.
+ONE sentence only. No semicolons. No commas extending the hook past {HOOK_MAX_CHARS} chars.
 
+HOOK EXAMPLES BY TYPE (all under {HOOK_MAX_CHARS} chars):
+- Fear: "Your SAT is in 6 weeks. Here's what's still possible." ✓
+- Stat: "100 points per month. 2 sessions per week. That's the math." ✓
+- Story: "She had a 3.9 GPA and a 1240 SAT. Eight weeks later: 1430." ✓
+- Question: "3.8 GPA. 1260 SAT. Something's off." ✓
+- Empathy: "Khan Academy raised her score 10 points. That was the problem." ✓
+
+BAD (too long, no punctuation before char {HOOK_MAX_CHARS}):
+- "Jackson's parents knew his strong grades should translate to college options like Clemson, but SAT prep..." ✗
+- "Did you know a 200+ point SAT score jump is often the difference maker for top college admissions..." ✗
+{story_hook_section}
 RULE 2 — APPROVED METRICS ONLY (do not invent statistics):
 You may ONLY use these statistics. Do not invent any others:
 {differentiators_block}
@@ -273,12 +296,19 @@ Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. The ad
 
 RULE 5 — IMAGE PROMPT:
 The image style for THIS variation is specified in the VARIATION section above. Use it exactly.
-image_prompt must be a UGC-style real-person scene (authentic photo feel, no infographics, no text overlays, no illustrations).
-NEVER request text, words, signs, banners, or logos rendered inside the image.
+image_prompt must be a UGC-style real-person scene — authentic photo feel, no infographics, no text overlays.
+NEVER request text, words, signs, banners, logo, or logos rendered inside the image.
 NEVER use the word "reading" as a label in the image prompt.
-Describe real people in real moments — specific age, setting, expression, lighting.
-BAD: "Infographic showing score improvement"
-GOOD: "UGC-style photo of a teenage girl at a desk, smiling at a laptop, parent visible in doorway. Warm natural light. No text. image_prompt must be under 450 characters total. Count before outputting. Be specific but concise."
+image_prompt must be under 450 characters total.
+
+SPECIFICITY RULES — what makes a great image prompt:
+- Name a specific emotion visible on the person's face
+- Name the exact time of day and lighting quality (not just "natural light")
+- Include one specific detail that makes it feel real and not staged
+- The scene must tell the emotional story WITHOUT any words in the image
+
+GOOD: "UGC-style photo of a teenage girl slumped at a desk at 11pm, pencil dropped, SAT booklet open to a page of wrong answers circled in red. Lamp light, tired eyes, one hand on her forehead. Feels like her mom filmed it from the doorway."
+BAD: "UGC-style photo on a clean well-lit kitchen table in a typical home. A student studying."
 
 RULE 6 — FORBIDDEN WORDS:
 Never use: {forbidden_block}.

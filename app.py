@@ -637,7 +637,21 @@ def main() -> None:
                         st.rerun()
             image_url = a.get("image_url")
             if image_url:
-                img_path = REPO_ROOT / str(image_url)
+                # Normalize path (forward slashes; handle relative to repo root)
+                url_str = str(image_url).replace("\\", "/")
+                img_path = (Path(url_str) if Path(url_str).is_absolute() else REPO_ROOT / url_str)
+                if not img_path.is_file():
+                    # Fallback: when viewing a specific run, try run dir / images / brief_var.png
+                    selected_run = st.session_state.get("selected_run")
+                    if selected_run and selected_run != "Latest":
+                        fallback = RUNS_DIR / selected_run / "images" / f"{bid}_v{var}.png"
+                        if fallback.is_file():
+                            img_path = fallback
+                if not img_path.is_file():
+                    # Last resort: resolve relative to cwd (e.g. Streamlit run from different cwd)
+                    try_cwd = Path.cwd() / url_str
+                    if try_cwd.is_file():
+                        img_path = try_cwd
                 if img_path.is_file():
                     st.image(str(img_path), width=AD_PREVIEW_IMAGE_WIDTH, use_container_width=False)
                 else:

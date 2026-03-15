@@ -1,33 +1,41 @@
 {
   "_meta": {
-    "version": "1.0",
+    "version": "2.0",
     "data_type": "brand_guidelines",
-    "swap_instructions": "Update GOLD_ANCHOR in rubrics.py when real top-performing ads arrive from Slack.",
-    "data_integrity_note": "ONLY use metrics listed in approved_differentiators.metrics. Do NOT invent statistics, guarantees, or discounts.",
-    "last_updated": "2026-03-09"
+    "source": "Nerdy/Varsity Tutors official messaging guidance + supplementary cohort doc",
+    "last_updated": "2026-03-14"
   },
   "brand": {
     "name": "Varsity Tutors",
     "parent_company": "Nerdy",
-    "product_focus": "SAT 1-on-1 tutoring and test prep",
+    "product_focus": "SAT 1-on-1 tutoring",
     "platform": "Facebook and Instagram paid social ads"
   },
   "voice": {
     "tone_descriptors": [
-      "Empowering — we believe every student can improve",
+      "Empowering — we believe every child can improve",
       "Knowledgeable — we speak with expertise, not arrogance",
-      "Approachable — we are warm and human, never corporate",
-      "Results-focused — we lead with outcomes, never features"
+      "Approachable — warm and human, never corporate",
+      "Results-focused — lead with outcomes, never features"
+    ],
+    "language_rules": [
+      "Say 'your child' NOT 'your student' — parents think of them as their children",
+      "Say 'SAT tutoring' NOT 'SAT prep' — tutoring is the product",
+      "Say 'raise your child's score' NOT 'unlock potential' or 'maximize score potential'",
+      "Say 'tutoring' NOT 'support', 'prep', 'tailored support', or 'custom strategies'",
+      "Use plain direct speech — parents don't talk in marketing language",
+      "Never use: 'growth areas', 'concrete score gains', 'dream college within reach', 'personalized/expert/data-driven' as empty adjectives"
     ],
     "writing_principles": [
-      "Lead with outcomes, not features — say what the student gains, not what we offer",
-      "Use specific numbers over vague adjectives — '200+ points' not 'better scores'",
+      "Lead with outcomes not features — say what the child gains not what we offer",
+      "Specific numbers beat vague adjectives — '100 points per month at 2 sessions/week' not 'better scores'",
+      "Conditional claims are more believable — '200 points in 8 weeks if your child is between 1100-1300' not just '200 points'",
       "Speak to the parent's anxiety AND the student's ambition — both are in the room",
       "Confident but not arrogant — expert but not elitist",
       "One clear message per ad — never compete with yourself",
-      "Synthesize product details into natural copy — the product field is a fact sheet, not a script. Extract ONE primary benefit most relevant to this audience. Translate metrics into the audience's language.",
-      "Numbers survive verbatim — '200+ points', '3.4M ratings', '24 hours', '5%'. Everything else gets rewritten.",
-      "Write TO the audience, never ABOUT them — the audience field tells you who you are writing for, not content to reference directly in the ad."
+      "Show the mechanism — describe specifically HOW we help, not just that we do",
+      "Numbers survive verbatim — '200+ points', '3.4M ratings', '24 hours', 'top 5%', '100 points per month', '2 sessions per week'. Everything else gets rewritten.",
+      "Write TO the audience never ABOUT them"
     ],
     "forbidden_words_and_phrases": [
       "world-class",
@@ -40,7 +48,23 @@
       "sign up today",
       "click here",
       "limited time offer",
-      "act now"
+      "act now",
+      "unlock",
+      "maximize",
+      "generic prep",
+      "spots filling fast",
+      "limited enrollment",
+      "secure their spot",
+      "don't miss out",
+      "unlock potential",
+      "maximize score potential",
+      "tailored support",
+      "custom strategies",
+      "growth areas",
+      "concrete score gains",
+      "dream college within reach",
+      "personalized learning journey",
+      "your student"
     ]
   },
   "approved_differentiators": {
@@ -48,128 +72,146 @@
       "Top 5% tutors — rigorously vetted, not an open marketplace",
       "3.4 million learner session ratings",
       "Matched with a tutor in 24 hours based on exact weak areas",
-      "1-on-1 personalized matching — not a one-size-fits-all course",
+      "1-on-1 tutoring — not a one-size-fits-all course",
       "200+ point average SAT score improvement",
-      "Free diagnostic assessment to start"
+      "Free diagnostic assessment to start",
+      "100 points per month at 2 sessions per week plus 20 minutes daily practice",
+      "10x the score improvement of self-study",
+      "2.6x the score improvement of group classes and local tutoring centers"
+    ],
+    "competitive_comparisons_allowed": [
+      "Princeton Review and Kaplan charge $1,500-$2,500 for group classes — we do 1-on-1",
+      "Princeton Review and Kaplan charge $199-$252/hr for 1-on-1 — we start at $349/month",
+      "Khan Academy raised her score 10 points — that was the problem",
+      "10x the score improvement of self-study",
+      "2.6x the score improvement of in-person learning centers and group courses"
     ],
     "prohibited_claims": [
       "Do NOT invent statistics not listed above",
       "Do NOT promise score guarantees or refunds",
-      "Do NOT use percentage claims not listed above (e.g. '90% of students...')",
+      "Do NOT use percentage claims not listed above",
       "Do NOT fabricate discounts or limited-time offers",
-      "Do NOT mention competitor names in ad copy"
+      "Do NOT claim 200 points for students already above 1400 — not believable",
+      "Do NOT use fake urgency — use real urgency: test dates, weeks remaining, application deadlines"
+    ]
+  },
+  "urgency_guidelines": {
+    "real_urgency_only": [
+      "Test dates and how many weeks remain",
+      "College application deadlines",
+      "Number of sessions possible before test day",
+      "How many points are still possible in the time remaining"
+    ],
+    "fake_urgency_forbidden": [
+      "spots filling fast",
+      "limited enrollment",
+      "offer expires",
+      "act now"
+    ]
+  },
+  "persona_hooks": {
+    "proactive_suburban_optimizer": [
+      "3.8 GPA. 1260 SAT. Something's off.",
+      "Straight A's. Disappointing SAT score. Sound familiar?",
+      "If she's capable of a 1450, why is she stuck in the 1200s?",
+      "Smart kids underestimate the SAT. That's why scores stall.",
+      "Most mid-1200s students are 3-4 fixes away from a 1400+."
+    ],
+    "burned_returner": [
+      "Tutoring didn't work last time? That's why you're here.",
+      "You already spent the money. The score didn't move. We hear you.",
+      "Bad tutor experience? Here's what we do differently.",
+      "Paid for tutoring and got the same score? That's not your child's fault."
+    ],
+    "immigrant_family_navigator": [
+      "The SAT process is confusing. We walk you through all of it.",
+      "Not sure where your child stands on the SAT? That's the first thing we figure out.",
+      "Your child deserves the same shot as kids whose parents grew up with this system."
+    ],
+    "khan_academy_failures": [
+      "Khan Academy raised her score 10 points. That was the problem.",
+      "Free SAT tutoring is great — until you get your score back.",
+      "If you've been studying but your score hasn't moved — read this."
+    ],
+    "online_skeptic": [
+      "The SAT is digital now. Why prep on paper?",
+      "You wouldn't practice football on a baseball field.",
+      "Your child will take the SAT on a laptop. That's how we train."
+    ],
+    "urgency_bad_score": [
+      "Not the score you expected?",
+      "Same score twice? That's fixable.",
+      "Your SAT is in 6 weeks. Here's what's still possible."
+    ],
+    "test_anxiety": [
+      "She knows the material. She freezes on the test.",
+      "Good grades, bad test scores. That's not a knowledge problem.",
+      "The SAT shouldn't feel like a surprise. By test day your child has already done this six times."
+    ],
+    "athlete_families": [
+      "The coach wants him. The admissions office needs an SAT score.",
+      "Recruiting windows don't care about SAT score excuses.",
+      "He's putting in the work on the field. Is his SAT score keeping up?"
+    ],
+    "neurodivergent": [
+      "Standard SAT tutoring doesn't work for every child. We know that.",
+      "ADHD doesn't mean they can't score high. It means they need the right tutor.",
+      "Your child isn't broken. They just learn differently."
     ]
   },
   "hook_guidelines": {
-    "general_rule": "The hook must appear and be complete within the first 100 characters of primary_text. This is the Meta truncation threshold — everything after is hidden behind 'See More'.",
-    "question_hooks": {
-      "allowed": [
-        "Questions that surface a real anxiety the parent or student is already feeling",
-        "Questions about outcomes: score, college, readiness",
-        "Questions that position Varsity Tutors as the obvious answer"
-      ],
-      "forbidden": [
-        "Questions that feel accusatory or make the parent feel guilty",
-        "Rhetorical questions with no clear answer path"
-      ]
-    },
-    "stat_hooks": {
-      "allowed": [
-        "Any metric from approved_differentiators.metrics",
-        "Industry benchmark stats from competitive_context.json"
-      ],
-      "forbidden": [
-        "Any statistic not in the approved list",
-        "Invented percentages or study citations"
-      ]
-    },
-    "story_hooks": {
-      "allowed": [
-        "Third-person student transformation stories (no real names — fictional composite)",
-        "Parent perspective stories about their child's improvement",
-        "Score improvement arcs: starting score → ending score → timeframe"
-      ],
-      "forbidden": [
-        "Real student names or identifiable details (PII)",
-        "Stories with fabricated score guarantees implied"
-      ]
-    },
+    "general_rule": "Hook must be complete within first 100 characters. One sentence only. End with punctuation before char 100.",
     "fear_hooks": {
-      "_edge_case": "Edge Case 5 — Fear hooks must NEVER cross into shame or catastrophizing",
       "allowed": [
-        "Anxiety of the unknown: 'Is your student ready?'",
-        "Time pressure: 'The SAT is 3 months away'",
-        "Missed opportunity framing: 'Most students who don't prep wish they had'",
-        "Competitive pressure: 'Other students are already preparing'"
+        "Time pressure using real deadlines — test dates, weeks remaining",
+        "Missed opportunity framing",
+        "Score gap framing — current score vs target school requirement"
       ],
       "forbidden": [
-        "NEVER shame the parent: 'If you don't act now, you've failed your child'",
-        "NEVER catastrophize: 'Your child's future is ruined'",
-        "NEVER use these words in fear hooks: ruined, failed, doomed, too late, worthless, behind, failure",
-        "NEVER imply the student is incapable or not smart enough"
+        "NEVER shame the parent",
+        "NEVER catastrophize",
+        "NEVER use: ruined, failed, doomed, too late, worthless, behind, failure",
+        "NEVER imply the child is not smart enough"
       ],
-      "required_pivot": "Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. The ad cannot end on fear."
+      "required_pivot": "Every fear hook MUST pivot to relief or empowerment within 1-2 sentences. Ad cannot end on fear."
     },
     "empathy_hooks": {
       "allowed": [
-        "Acknowledging the stress of SAT prep without judgment",
-        "Validating that one-size-fits-all prep doesn't work for everyone",
-        "Affirming the student's effort and intelligence"
+        "Naming the exact emotional state the parent is in right now",
+        "Validating that one-size-fits-all tutoring doesn't work",
+        "Affirming the child's effort and intelligence"
       ],
       "forbidden": [
-        "Pity framing — we empower, we do not feel sorry",
-        "Implying the student has been failed by others (lawsuit risk)"
+        "Pity framing",
+        "Implying the child has been failed by others"
       ]
     }
   },
   "cta_guidelines": {
     "awareness_goal": "Learn More",
-    "conversion_goal": ["Start Free Assessment", "Sign Up", "Get Started"],
+    "conversion_goal": ["Start Free Assessment", "Book Diagnostic", "Get Started"],
     "preferred_conversion_cta": "Start Free Assessment",
     "rules": [
-      "Match CTA to funnel stage — awareness ads use soft CTAs, conversion ads use action CTAs",
+      "Match CTA to funnel stage",
       "Low-friction first step always outperforms high-commitment asks",
-      "Never use: 'Click Here', 'Buy Now', 'Purchase', 'Subscribe'"
+      "Never use: 'Click Here', 'Buy Now', 'Purchase', 'Subscribe', 'Sign Up Today'"
     ]
   },
   "image_prompt_guidelines": {
-    "_edge_case": "Edge Case 6 — Image models cannot render typography accurately",
-    "style": "UGC-style (user-generated content) — authentic, real-person look. NOT polished studio photography.",
-    "allowed_subjects": [
-      "Parent and teen at kitchen table, teen at laptop",
-      "Student at desk studying, looking focused or relieved",
-      "Smiling student with laptop showing score results",
-      "Parent and child having a positive conversation about school",
-      "Student in a video call with a tutor, both engaged"
+    "style": "UGC-style — authentic real-person look, NOT polished studio photography",
+    "principle": "The image must tell the emotional story in one frame. Specificity creates recognition.",
+    "good_examples": [
+      "Close-up of a crumpled SAT practice test on a kitchen table, red pen circling a score of 1180, microwave clock showing 11:47pm — raw late-night energy",
+      "Teenage boy jaw-dropped at laptop screen showing score notification, mom visible in doorway covering mouth in surprise",
+      "Exhausted parent at laptop at midnight, empty coffee cup, reading glasses on — honest and relatable",
+      "Student and tutor at kitchen table, tutor pointing at specific problem, student having visible aha moment"
     ],
-    "required_elements": [
-      "Authentic, natural lighting — warm, not studio-lit",
-      "Real-looking people — not stock photo perfection",
-      "Emotion visible — relief, pride, focus, confidence"
-    ],
-    "forbidden_in_image_prompts": [
+    "forbidden": [
       "NEVER request text, words, signs, or logos rendered inside the image",
-      "NEVER use phrases like: 'a sign that says', 'text reading', 'words that say', 'banner saying'",
-      "NEVER request brand logos or product names written in the image",
-      "NEVER request polished studio photography or commercial-looking setups",
-      "NEVER include competitor brand elements"
+      "NEVER use phrases like: 'a sign that says', 'text reading', 'words that say', 'banner saying', 'logo'",
+      "NEVER request polished studio photography",
+      "NEVER generic stock photo scenes — be emotionally specific",
+      "No text overlays of any kind"
     ]
-  },
-  "meta_ad_structure": {
-    "primary_text": {
-      "max_visible_chars": 125,
-      "hook_must_complete_by_char": 100,
-      "min_recommended_length": 80,
-      "max_recommended_length": 500,
-      "rule": "Hook must be complete within first 100 characters. Value proposition in first sentence. Minimum 80 chars to avoid stub output."
-    },
-    "headline": {
-      "min_words": 5,
-      "max_words": 8,
-      "rule": "Benefit-driven. Often truncated on mobile — front-load the outcome."
-    },
-    "description": {
-      "rule": "One sentence max. Secondary reinforcement only. Do not rely on it — often hidden on mobile."
-    }
   }
 }
