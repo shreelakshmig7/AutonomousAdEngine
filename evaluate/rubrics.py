@@ -30,7 +30,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 QUALITY_THRESHOLD: float = 7.0
 # Dimensions scoring >= this are preserved in iteration (no edits)
 STRONG_DIMENSION_THRESHOLD: float = 8.0
-MAX_CYCLES: int = 5
+MAX_CYCLES: int = 3
 EXCELLENT_THRESHOLD: float = 7.5
 DIMENSIONS: list[str] = [
     "clarity",
