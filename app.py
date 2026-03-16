@@ -16,7 +16,10 @@ import json
 import os
 import subprocess
 import sys
+import threading
+import time
 from pathlib import Path
+from queue import Empty, Queue
 from typing import Any
 
 import pandas as pd
@@ -195,11 +198,27 @@ def _start_pipeline_process() -> subprocess.Popen | None:
         return None
 
 
+def _pipeline_reader_thread(process: subprocess.Popen, line_queue: Queue) -> None:
+    """
+    Background thread: read stdout line-by-line and put into queue.
+    When EOF, wait for process and put (None, returncode) as sentinel.
+    """
+    try:
+        if process.stdout:
+            for line in iter(process.stdout.readline, ""):
+                line_queue.put(line)
+        process.wait()
+    except Exception:
+        pass
+    finally:
+        line_queue.put((None, process.returncode if process.returncode is not None else -1))
+
+
 def run_pipeline_stream_ui() -> None:
     """
     Run pipeline and stream last 30 lines into placeholder.
-    Persists the subprocess in session state so Streamlit reruns do not start
-    a new pipeline (which caused the "pipeline running in loop" issue).
+    Uses a background thread + queue so the UI never blocks on readline();
+    main script drains the queue and reruns to refresh (fixes "no logs" issue).
     """
     if not MAIN_SCRIPT.exists():
         st.error("main.py not found at project root.")
@@ -210,14 +229,16 @@ def run_pipeline_stream_ui() -> None:
         st.session_state["run_pipeline_requested"] = False
         return
 
-    # Persist process and log lines so reruns continue the same run instead of starting another
     if "pipeline_process" not in st.session_state:
         st.session_state["pipeline_process"] = None
     if "pipeline_log_lines" not in st.session_state:
         st.session_state["pipeline_log_lines"] = []
+    if "pipeline_queue" not in st.session_state:
+        st.session_state["pipeline_queue"] = None
 
     proc = st.session_state["pipeline_process"]
-    log_lines = st.session_state["pipeline_log_lines"]
+    log_lines: list[str] = list(st.session_state["pipeline_log_lines"])
+    line_queue = st.session_state["pipeline_queue"]
 
     # Start a new run only when requested and no run is in progress
     if proc is None and st.session_state.get("run_pipeline_requested"):
@@ -226,59 +247,92 @@ def run_pipeline_stream_ui() -> None:
             st.error("Failed to start pipeline (main.py not found or API keys missing).")
             st.session_state["run_pipeline_requested"] = False
             return
+        line_queue = Queue()
+        reader = threading.Thread(
+            target=_pipeline_reader_thread,
+            args=(proc, line_queue),
+            daemon=True,
+        )
+        reader.start()
         st.session_state["pipeline_process"] = proc
         st.session_state["pipeline_log_lines"] = []
+        st.session_state["pipeline_queue"] = line_queue
         log_lines = []
         st.session_state["run_pipeline_requested"] = False
 
     st.subheader("Pipeline output")
     output_box = st.empty()
 
-    # If we have a running process, read one line and then rerun to keep streaming
-    if proc is not None:
-        if proc.stdout is None:
-            st.session_state["pipeline_process"] = None
-            st.error("Pipeline stdout not available.")
-            return
-        line = proc.stdout.readline()
-        if line:
-            if line.startswith("ERROR:"):
-                st.error(line.strip())
+    if proc is not None and line_queue is not None:
+        # Drain queue without blocking (fixes "no logs": we never block on readline in main thread)
+        while True:
+            try:
+                item = line_queue.get_nowait()
+            except Empty:
+                break
+            if isinstance(item, tuple) and item[0] is None:
+                _, exit_code = item
                 st.session_state["pipeline_process"] = None
                 st.session_state["pipeline_log_lines"] = []
-                return
-            if line.startswith("EXIT_CODE:"):
-                code_str = line.split(":", 1)[1].strip()
-                try:
-                    code = int(code_str)
-                except ValueError:
-                    code = -1
-                st.session_state["pipeline_process"] = None
-                st.session_state["pipeline_log_lines"] = []
-                if code == 0:
+                st.session_state["pipeline_queue"] = None
+                if exit_code == 0:
                     st.success("Pipeline complete!")
                 else:
-                    st.error(f"Pipeline failed with exit code {code}")
+                    st.error(f"Pipeline failed with exit code {exit_code}")
+                output_box.code("".join(log_lines[-30:]), language=None)
                 st.button("View dashboard", type="primary")
                 return
-            log_lines.append(line)
-            st.session_state["pipeline_log_lines"] = log_lines
-        else:
-            # EOF - check if process exited
-            ret = proc.poll()
-            if ret is not None:
-                st.session_state["pipeline_process"] = None
-                st.session_state["pipeline_log_lines"] = []
-                if ret == 0:
-                    st.success("Pipeline complete!")
-                else:
-                    st.error(f"Pipeline failed with exit code {ret}")
-                st.button("View dashboard", type="primary")
-                return
-        output_box.code("".join(log_lines[-30:]), language=None)
-        st.rerun()
+            if isinstance(item, str):
+                if item.startswith("ERROR:"):
+                    st.error(item.strip())
+                    st.session_state["pipeline_process"] = None
+                    st.session_state["pipeline_log_lines"] = []
+                    st.session_state["pipeline_queue"] = None
+                    return
+                if item.startswith("EXIT_CODE:"):
+                    code_str = item.split(":", 1)[1].strip()
+                    try:
+                        code = int(code_str)
+                    except ValueError:
+                        code = -1
+                    st.session_state["pipeline_process"] = None
+                    st.session_state["pipeline_log_lines"] = []
+                    st.session_state["pipeline_queue"] = None
+                    if code == 0:
+                        st.success("Pipeline complete!")
+                    else:
+                        st.error(f"Pipeline failed with exit code {code}")
+                    output_box.code("".join(log_lines[-30:]), language=None)
+                    st.button("View dashboard", type="primary")
+                    return
+                log_lines.append(item)
+        st.session_state["pipeline_log_lines"] = log_lines
 
-    # No running process and no logs: show message only (do not rerun to avoid infinite loop)
+        output_box.code("".join(log_lines[-30:]), language=None)
+        if proc.poll() is None:
+            time.sleep(0.25)
+            st.rerun()
+        else:
+            # Process exited; drain queue for exit sentinel so we show correct exit code
+            exit_code = proc.returncode if proc.returncode is not None else -1
+            while True:
+                try:
+                    item = line_queue.get_nowait()
+                    if isinstance(item, tuple) and item[0] is None:
+                        _, exit_code = item
+                        break
+                except Empty:
+                    break
+            st.session_state["pipeline_process"] = None
+            st.session_state["pipeline_log_lines"] = []
+            st.session_state["pipeline_queue"] = None
+            if exit_code == 0:
+                st.success("Pipeline complete!")
+            else:
+                st.error(f"Pipeline failed with exit code {exit_code}")
+            st.button("View dashboard", type="primary")
+        return
+
     if not log_lines:
         st.caption("Starting pipeline…")
         return
