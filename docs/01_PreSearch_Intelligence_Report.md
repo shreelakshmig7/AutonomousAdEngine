@@ -20,7 +20,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Ad Volume | 50+ ads minimum | Hard requirement for delivery scope |
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
 | Human-in-the-Loop | Minimal — fully autonomous self-healing | System detects and fixes its own failures |
-| Iteration Cap | Max 3 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
+| Iteration Cap | Max 5 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
 | PII Policy | Zero PII in any generated content | Hard constraint from project specification |
 | Reproducibility | Deterministic seeds on all generation calls | Required for testing and submission verification |
 
@@ -94,38 +94,36 @@ All model choices were researched against cost, reliability, and project require
 
 | Role | Model | Justification | Est. Cost / 50 Ads |
 | --- | --- | --- | --- |
-| Drafter | Gemini 1.5 Flash | Fastest Gemini model. Free tier available. Distilled from 1.5 Pro — quality at speed. Built for structured JSON output. | ~$0.00 free tier |
-| Judge | Gemini 1.5 Pro | Most capable evaluator in stack. 2M token context. Reliable structured scoring. Validated as LLM judge in benchmarks. | ~$0.02 paid tier |
-| Images (v2) | Imagen / Nano Banana | Project Starter Kit recommended stack. Brand-consistent creative generation for v2 scope. | ~$0.04 per image |
-| Fallback | Gemini 2.5 Flash or Pro | Same `google-generativeai` SDK. Same API key. Zero new credentials. Auto-activates via tenacity on rate limit. | Pay-as-you-go |
+| Drafter | Gemini 2.5 Flash | Fast structured JSON output. Primary text + image_prompt generation. Override via DRAFTER_MODEL in .env. | ~$0.00 free tier |
+| Judge | Claude Sonnet 4.5 (Anthropic) | Reliable 5-dimension scoring and rationale. Override via JUDGE_MODEL in .env. | Pay-as-you-go |
+| Images (v2) | Gemini 2.5 Flash Image | Native image generation from image_prompt. Override via IMAGE_GEN_MODEL in .env. | ~$0.04 per image |
+| Fallback Drafter | Claude Haiku 4.5 | Activates when Gemini rate-limits. Override via FALLBACK_DRAFTER_MODEL in .env. | Pay-as-you-go |
 
-> **Why One Ecosystem — All Gemini**
+> **Model choices**
 >
-> - **Single API key:** No juggling OpenAI + Anthropic + Google credentials during a Thursday deadline sprint
-> - **Single SDK:** `google-generativeai` handles Flash, Pro, Imagen, and fallback in one import
-> - **Clean decision log story:** Flash for speed, Pro for quality, 2.5 as fallback — tight and defensible
-> - **Cost simplicity:** One billing account, one dashboard, transparent per-token cost tracking
+> - **Drafter + Images:** Google (Gemini 2.5 Flash, Gemini 2.5 Flash Image) — single API key for generation.
+> - **Judge:** Anthropic (Claude Sonnet 4.5) — strong evaluator; JUDGE_MODEL in .env.
+> - **Fallback drafter:** Claude Haiku 4.5 on rate limit — FALLBACK_DRAFTER_MODEL in .env.
 >
-> This decision is documented in full in `docs/DECISION_LOG.md`
+> Decision details in `docs/DECISION_LOG.md`.
 
 ### 4.2 Full Pricing Comparison — All Options Considered
 
 | Provider | Model | Input per 1M | Output per 1M | Free Tier? | Status |
 | --- | --- | --- | --- | --- | --- |
-| Google | Gemini 1.5 Flash | $0.075 | $0.30 | Yes | **SELECTED — Drafter** |
-| Google | Gemini 1.5 Pro | $1.25 | $5.00 | Yes (limited) | **SELECTED — Judge** |
-| Google | Gemini 2.5 Flash | $0.30 | $2.50 | Yes | **SELECTED — Fallback** |
+| Google | Gemini 2.5 Flash | $0.30 | $2.50 | Yes | **SELECTED — Drafter** |
+| Google | Gemini 2.5 Flash Image | — | — | Yes | **SELECTED — Images** |
+| Anthropic | Claude Sonnet 4.5 | $3.00 | $15.00 | No | **SELECTED — Judge** |
+| Anthropic | Claude Haiku 4.5 | $1.00 | $5.00 | No | **SELECTED — Fallback Drafter** |
 | Google | Gemini 2.5 Pro | $1.25 | $10.00 | No | Available fallback judge |
 | OpenAI | GPT-4o-mini | $0.15 | $0.60 | No | Rejected — different provider |
 | OpenAI | GPT-4o | $2.50 | $10.00 | No | Rejected — different provider |
-| Anthropic | Claude Haiku 4.5 | $1.00 | $5.00 | No | Rejected — different provider |
-| Anthropic | Claude Sonnet 4.5 | $3.00 | $15.00 | No | Rejected — different provider |
 
 > **Total Project Cost Estimate**
 >
 > - 50 ads × ~2,400 tokens each = ~120,000 total tokens across all API calls
-> - Gemini Flash drafting: **FREE** on free tier — $0.00
-> - Gemini Pro judging: ~$0.02 total for 50 ads on paid tier
+> - Gemini 2.5 Flash drafting: **FREE** on free tier — $0.00
+> - Claude Sonnet 4.5 judging: pay-as-you-go for 50 ads
 > - Image generation v2: ~$2.00 for 50 images at $0.04 each
 > - **TOTAL ESTIMATED PROJECT COST: Under $3.00 for the entire build**
 >
@@ -133,14 +131,14 @@ All model choices were researched against cost, reliability, and project require
 
 ### 4.3 LLM-as-Judge Reliability Research
 
-Judge Reliability Harness 2025 benchmarks validate Gemini 1.5 Pro as primary judge:
+Judge Reliability: Claude Sonnet 4.5 used as primary judge (Anthropic).
 
-| Model | Reliability Score | Structured Output | Role in Stack |
-| --- | --- | --- | --- |
-| GPT-4o | 90.6% | Excellent | Not used — different provider ecosystem |
-| Gemini 2.5 Pro | 87.5% | Excellent | Available as upgraded fallback judge |
-| Gemini 1.5 Pro | ~85% | Very Good | **PRIMARY JUDGE — main evaluator** |
-| Gemini 1.5 Flash | ~75% | Good | **PRIMARY DRAFTER — generation only** |
+| Model | Role in Stack |
+| --- | --- |
+| Gemini 2.5 Flash | **PRIMARY DRAFTER** — ad copy + image_prompt generation |
+| Gemini 2.5 Flash Image | **IMAGES** — companion ad creative from image_prompt |
+| Claude Sonnet 4.5 | **PRIMARY JUDGE** — 5-dimension scoring + rationale |
+| Claude Haiku 4.5 | **FALLBACK DRAFTER** — on Gemini rate limit |
 
 ---
 
@@ -150,20 +148,20 @@ Judge Reliability Harness 2025 benchmarks validate Gemini 1.5 Pro as primary jud
 
 - Domain locked: Facebook & Instagram paid social ads only
 - Brand locked: Varsity Tutors SAT prep, empowering voice, results-focused
-- Scale defined: 50+ ads, 7.0/10 threshold, max 3 iteration cycles
+- Scale defined: 50+ ads, 7.0/10 threshold, max 5 iteration cycles
 - Human-in-loop minimized: fully autonomous with unresolvable fallback path
 
 ### Phase 2: Architecture
 
 - Agent framework: Custom Python pipeline — full control, maximum explainability
-- LLM selection: Gemini Flash drafter + Gemini Pro judge — single ecosystem
+- LLM selection: Gemini 2.5 Flash drafter + Claude Sonnet 4.5 judge; Gemini 2.5 Flash Image for v2; Claude Haiku fallback for drafter
 - Tools: `google-generativeai`, `pydantic`, `pandas`, `matplotlib`, `seaborn`, `tenacity`, `rich`, `pytest`, `pytest-mock`
 - Observability: 5-dimension scoring + `iteration_log.csv` + `quality_trends.png` chart
 
 ### Phase 3: Risks Mitigated
 
 - Rate limits: tenacity exponential backoff + Gemini 2.5 fallback on same API key
-- Quality plateau: 3-cycle cap then unresolvable flag then auto-continue
+- Quality plateau: 5-cycle cap then unresolvable flag then auto-continue
 - PII risk: zero real user data — all content is generated from briefs
 - Reproducibility: deterministic seeds on all generation calls
 
@@ -177,7 +175,7 @@ Judge Reliability Harness 2025 benchmarks validate Gemini 1.5 Pro as primary jud
 
 ### Phase 5: Edge Cases Pre-Resolved
 
-- **Image prompting:** Drafter outputs a 5th JSON field `image_prompt` — specific UGC-style visual instructions fed directly to Imagen, not a generic description
+- **Image prompting:** Drafter outputs a 5th JSON field `image_prompt` — specific UGC-style visual instructions fed directly to Gemini 2.5 Flash Image, not a generic description
 - **Context window in loop:** `controller.py` feeds back only the latest failed ad copy + weakest dimension rationale — no full history, keeps regeneration under 1,000 tokens per cycle
 - **Calibration anchors:** Gold ad (8–10) and poor ad (1–4) examples hardcoded directly in `rubrics.py` — permanent reference point so judge scoring stays consistent across all 50+ ads
 
