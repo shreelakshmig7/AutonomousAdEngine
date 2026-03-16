@@ -462,7 +462,7 @@ def main() -> None:
     st.title("Ad Generation Dashboard")
     st.caption("Varsity Tutors • SAT Prep Campaign")
 
-    if st.session_state.get("run_pipeline_requested"):
+    if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
         run_pipeline_stream_ui()
         return
 
