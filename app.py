@@ -17,7 +17,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 import pandas as pd
 import streamlit as st
@@ -160,47 +160,6 @@ def _dimension_numeric(scores: dict[str, Any], key: str) -> float | None:
     return None
 
 
-def stream_pipeline() -> Iterator[str]:
-    """
-    Run main.py as subprocess and yield each stdout/stderr line as it arrives.
-
-    Yields:
-        Lines from process, then "EXIT_CODE:<int>".
-    """
-    if not MAIN_SCRIPT.exists():
-        yield "ERROR: main.py not found at project root\n"
-        return
-    env = os.environ.copy()
-    if not env.get("GOOGLE_API_KEY") or not env.get("ANTHROPIC_API_KEY"):
-        yield "ERROR: API keys not set\n"
-        return
-    # Subprocess only: suppress all warnings so streamed log shows only pipeline progress
-    env["PYTHONWARNINGS"] = "ignore"
-    try:
-        process = subprocess.Popen(
-            [sys.executable, str(MAIN_SCRIPT)],
-            cwd=str(REPO_ROOT),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
-            env=env,
-        )
-    except OSError as e:
-        yield f"ERROR: Failed to start pipeline: {e}\n"
-        return
-    if process.stdout is None:
-        yield "ERROR: Pipeline stdout not available\n"
-        return
-    try:
-        for line in iter(process.stdout.readline, ""):
-            yield line
-    finally:
-        process.stdout.close()
-        process.wait()
-    yield f"EXIT_CODE:{process.returncode if process.returncode is not None else -1}"
-
-
 def render_sidebar_api_status() -> None:
     """Show Gemini / Claude connection status from env."""
     st.subheader("API status")
@@ -214,37 +173,117 @@ def render_sidebar_api_status() -> None:
     )
 
 
+def _start_pipeline_process() -> subprocess.Popen | None:
+    """Start main.py subprocess; return Popen or None on failure."""
+    if not MAIN_SCRIPT.exists():
+        return None
+    env = os.environ.copy()
+    if not env.get("GOOGLE_API_KEY") or not env.get("ANTHROPIC_API_KEY"):
+        return None
+    env["PYTHONWARNINGS"] = "ignore"
+    try:
+        return subprocess.Popen(
+            [sys.executable, str(MAIN_SCRIPT)],
+            cwd=str(REPO_ROOT),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            env=env,
+        )
+    except OSError:
+        return None
+
+
 def run_pipeline_stream_ui() -> None:
     """
     Run pipeline and stream last 30 lines into placeholder.
-    No auto-rerun after completion; user clicks "View dashboard" to avoid
-    SessionInfo-before-init errors when rerun fires right after long run.
+    Persists the subprocess in session state so Streamlit reruns do not start
+    a new pipeline (which caused the "pipeline running in loop" issue).
     """
     if not MAIN_SCRIPT.exists():
         st.error("main.py not found at project root.")
+        st.session_state["run_pipeline_requested"] = False
         return
+    if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY"):
+        st.error("API keys not set. Set GOOGLE_API_KEY and ANTHROPIC_API_KEY in Secrets or .env.")
+        st.session_state["run_pipeline_requested"] = False
+        return
+
+    # Persist process and log lines so reruns continue the same run instead of starting another
+    if "pipeline_process" not in st.session_state:
+        st.session_state["pipeline_process"] = None
+    if "pipeline_log_lines" not in st.session_state:
+        st.session_state["pipeline_log_lines"] = []
+
+    proc = st.session_state["pipeline_process"]
+    log_lines = st.session_state["pipeline_log_lines"]
+
+    # Start a new run only when requested and no run is in progress
+    if proc is None and st.session_state.get("run_pipeline_requested"):
+        proc = _start_pipeline_process()
+        if proc is None:
+            st.error("Failed to start pipeline (main.py not found or API keys missing).")
+            st.session_state["run_pipeline_requested"] = False
+            return
+        st.session_state["pipeline_process"] = proc
+        st.session_state["pipeline_log_lines"] = []
+        log_lines = []
+        st.session_state["run_pipeline_requested"] = False
+
     st.subheader("Pipeline output")
     output_box = st.empty()
-    log_lines: list[str] = []
-    for line in stream_pipeline():
-        if line.startswith("ERROR:"):
-            st.error(line.strip())
-            st.session_state["run_pipeline_requested"] = False
-            break
-        if line.startswith("EXIT_CODE:"):
-            code_str = line.split(":", 1)[1].strip()
-            try:
-                code = int(code_str)
-            except ValueError:
-                code = -1
-            if code == 0:
-                st.success("Pipeline complete!")
-            else:
-                st.error(f"Pipeline failed with exit code {code}")
-            break
-        log_lines.append(line)
+
+    # If we have a running process, read one line and then rerun to keep streaming
+    if proc is not None:
+        if proc.stdout is None:
+            st.session_state["pipeline_process"] = None
+            st.error("Pipeline stdout not available.")
+            return
+        line = proc.stdout.readline()
+        if line:
+            if line.startswith("ERROR:"):
+                st.error(line.strip())
+                st.session_state["pipeline_process"] = None
+                st.session_state["pipeline_log_lines"] = []
+                return
+            if line.startswith("EXIT_CODE:"):
+                code_str = line.split(":", 1)[1].strip()
+                try:
+                    code = int(code_str)
+                except ValueError:
+                    code = -1
+                st.session_state["pipeline_process"] = None
+                st.session_state["pipeline_log_lines"] = []
+                if code == 0:
+                    st.success("Pipeline complete!")
+                else:
+                    st.error(f"Pipeline failed with exit code {code}")
+                st.button("View dashboard", type="primary")
+                return
+            log_lines.append(line)
+            st.session_state["pipeline_log_lines"] = log_lines
+        else:
+            # EOF - check if process exited
+            ret = proc.poll()
+            if ret is not None:
+                st.session_state["pipeline_process"] = None
+                st.session_state["pipeline_log_lines"] = []
+                if ret == 0:
+                    st.success("Pipeline complete!")
+                else:
+                    st.error(f"Pipeline failed with exit code {ret}")
+                st.button("View dashboard", type="primary")
+                return
         output_box.code("".join(log_lines[-30:]), language=None)
-    st.session_state["run_pipeline_requested"] = False
+        st.rerun()
+
+    # No running process and no logs: show message only (do not rerun to avoid infinite loop)
+    if not log_lines:
+        st.caption("Starting pipeline…")
+        return
+
+    output_box.code("".join(log_lines[-30:]), language=None)
     st.button("View dashboard", type="primary")
 
 
