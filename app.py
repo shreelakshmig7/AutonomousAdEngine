@@ -310,7 +310,7 @@ def run_pipeline_stream_ui() -> None:
 
         output_box.code("".join(log_lines[-30:]), language=None)
         if proc.poll() is None:
-            time.sleep(0.25)
+            time.sleep(1.0)  # Throttle reruns to avoid "SessionInfo before it was initialized" on Cloud
             st.rerun()
         else:
             # Process exited; drain queue for exit sentinel so we show correct exit code
