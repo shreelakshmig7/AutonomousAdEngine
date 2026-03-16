@@ -255,7 +255,7 @@ High. Deployment decision fully locked with zero open questions.
 **Why this is architecturally stronger than the original plan:**  
 Original plan had Flash and Pro from the same provider — the judge could be influenced by the same biases as the drafter. Cross-provider evaluation is more independent by design.
 
-**Bonus:** Demonstrates genuine multi-model, multi-provider orchestration — a stronger story for the Gauntlet evaluation criteria.
+Demonstrates genuine multi-model, multi-provider orchestration.
 
 **Re-calibration required before PR3.**  
 Target: Gold ≥ 8.0, Poor ≤ 4.0 with Claude as judge.
@@ -537,7 +537,7 @@ Running **brief_005 v0** directly **after quota reset** returned:
 
 ---
 
-## Decision: Performance-per-Token Tracking (PRD Bonus)
+## Decision: Performance-per-Token Tracking
 
 **Date:** 2026-03-16  
 **Files affected:** `main.py`, `iterate/controller.py`, `output/iteration_log.csv`, `output/ads_library.json`
@@ -557,7 +557,7 @@ Running **brief_005 v0** directly **after quota reset** returned:
 
 ### Why
 
-The PRD awards a bonus for performance-per-token and asks for ROI to be documented in the decision log. Tracking cost and tokens per run and per ad allows honest reporting of efficiency and supports the "minimal human intervention" and "measurable quality improvement" goals.
+The PRD calls for performance-per-token tracking and ROI to be documented in the decision log. Tracking cost and tokens per run and per ad allows honest reporting of efficiency and supports the "minimal human intervention" and "measurable quality improvement" goals.
 
 ### Confidence
 

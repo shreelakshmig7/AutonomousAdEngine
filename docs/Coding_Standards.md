@@ -231,7 +231,7 @@ DIMENSIONS: list = [
     "emotional_resonance",
 ]
 
-# Minimum scores for "Excellent" grade bracket documentation
+# Minimum scores for "Excellent" quality bracket documentation
 EXCELLENT_THRESHOLD: float = 7.5
 ```
 

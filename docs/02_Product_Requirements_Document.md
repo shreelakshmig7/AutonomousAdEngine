@@ -16,18 +16,18 @@
 
 ---
 
-## 2. Key Features & Evaluation Impact
+## 2. Key Features
 
-| Feature | Description | Evaluation Impact |
-| --- | --- | --- |
-| Multi-Model Pipeline | Gemini Flash drafts. Gemini Pro judges. Different capability tiers for different jobs. | Bonus: Multi-model orchestration (+3) |
-| 5-Dimension Evaluator | Every ad scored 1–10 on Clarity, Value Prop, CTA, Brand Voice, Emotional Resonance with written rationale. | 25% of grade — Quality Measurement |
-| Self-Healing Loop | Identifies weakest dimension. Regenerates targeting only that weakness. Max 3 cycles. | 20% of grade — Iteration & Improvement |
-| Competitive Intelligence | Princeton Review, Khan Academy, Kaplan, Chegg patterns injected into every generation prompt. | Bonus: Competitive Intelligence (+10) |
-| Quality Trend Chart | Matplotlib chart showing average score rising across 3+ iteration cycles. | Bonus: Quality trend visualization (+2) |
-| v2 Image Generation | Companion ad creative per passing ad via Imagen / Nano Banana. | Scope v2 — key differentiator |
-| Performance-per-Token | Cost per publishable ad tracked. ROI documented in decision log. | Bonus: Perf-per-token tracking (+2) |
-| Failure Handling | After 3 cycles: `status = unresolvable`, logged, auto-continue. No human needed. | 20% of grade — System Design |
+| Feature | Description |
+| --- | --- |
+| Multi-Model Pipeline | Gemini Flash drafts. Gemini Pro judges. Different capability tiers for different jobs. |
+| 5-Dimension Evaluator | Every ad scored 1–10 on Clarity, Value Prop, CTA, Brand Voice, Emotional Resonance with written rationale. |
+| Self-Healing Loop | Identifies weakest dimension. Regenerates targeting only that weakness. Max 3 cycles. |
+| Competitive Intelligence | Princeton Review, Khan Academy, Kaplan, Chegg patterns injected into every generation prompt. |
+| Quality Trend Chart | Matplotlib chart showing average score rising across 3+ iteration cycles. |
+| v2 Image Generation | Companion ad creative per passing ad via Imagen / Nano Banana. |
+| Performance-per-Token | Cost per publishable ad tracked. ROI documented in decision log. |
+| Failure Handling | After 3 cycles: `status = unresolvable`, logged, auto-continue. No human needed. |
 
 ---
 
@@ -71,7 +71,7 @@ OUTPUT: ads_library.json + iteration_log.csv + quality_trends.png
 > **Quality Threshold Enforcement**
 >
 > - Publishable threshold: **7.0 / 10** average across all 5 dimensions
-> - Target for Excellent grade bracket: **7.5+** average across all 50+ ads
+> - Target for excellent quality: **7.5+** average across all 50+ ads
 > - Every ad must have machine-generated rationale for each score — 100% explainability
 > - `passes_threshold` boolean + `weakest_dimension` field returned by judge drives feedback loop automatically
 
@@ -116,7 +116,7 @@ cta_button:   Learn More
 | Cycle 3 | Second targeted regeneration if still below 7.0 | `cycle: 3, weakest: emotional_resonance, improved: +0.8` |
 | Unresolvable | After 3 cycles: flag + log + auto-continue | `status: unresolvable, reason: failed 3 cycles, brief_id: XXX` |
 
-Max 3 cycles before giving up. This prevents infinite loops while allowing enough attempts to demonstrate measurable improvement. The `unresolvable` status provides honest documentation of system limitations — which the rubric rewards.
+Max 3 cycles before giving up. This prevents infinite loops while allowing enough attempts to demonstrate measurable improvement. The `unresolvable` status provides honest documentation of system limitations.
 
 ### Context Window Management in the Loop
 
@@ -266,7 +266,7 @@ pydantic>=2.0.0                 # Enforce strict JSON schemas from LLM output
 pandas>=2.0.0                   # Evaluation reports + CSV exports
 
 # Visualization
-matplotlib>=3.7.0               # Quality trend charts (bonus points)
+matplotlib>=3.7.0               # Quality trend charts
 seaborn>=0.12.0                 # Polished chart styling
 
 # Resilience
@@ -362,27 +362,17 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ---
 
-## 11. Grade Targets & Scoring Strategy
+## 11. Success Criteria
 
-| Evaluation Area | Weight | Our Target | How We Hit It |
-| --- | --- | --- | --- |
-| Quality Measurement & Evaluation | 25% | 23–25 pts | 5 dimensions + rationale + calibration + confidence + threshold |
-| System Design & Architecture | 20% | 18–20 pts | Modular folders, failure detection, 12 tests, deterministic seeds |
-| Iteration & Improvement | 20% | 18–20 pts | 3+ cycles, score gains documented, weakest-dimension targeting |
-| Speed of Optimization | 15% | 14–15 pts | Batch generation, minimal human input, smart Flash vs Pro usage |
-| Documentation & Thinking | 20% | 18–20 pts | Decision log with WHY, honest failures, competitive intelligence |
-| Bonus Points | up to +10 | ~+10 target | Competitive intel (+10), multi-model (+3), trend chart (+2), perf-token (+2) |
+| Area | Target | How We Achieve It |
+| --- | --- | --- |
+| Quality Measurement & Evaluation | Strong, consistent scoring | 5 dimensions + rationale + calibration + confidence + threshold |
+| System Design & Architecture | Robust, testable pipeline | Modular folders, failure detection, 12 tests, deterministic seeds |
+| Iteration & Improvement | Measurable improvement in copy | 3+ cycles, score gains documented, weakest-dimension targeting |
+| Speed of Optimization | Efficient batch runs | Batch generation, minimal human input, smart Flash vs Pro usage |
+| Documentation & Thinking | Clear rationale for decisions | Decision log with WHY, honest failures, competitive intelligence |
 
-> **Automatic Deductions — Must Avoid**
->
-> | Risk | Penalty |
-> | --- | --- |
-> | No working demo | -10 pts |
-> | Cannot run with provided instructions | -10 pts |
-> | Fewer than 50 ads generated | -5 pts |
-> | No evaluation scores on ads | **-15 pts ← BIGGEST RISK** |
-> | No iteration or improvement attempted | -10 pts |
-> | No decision log | -10 pts |
+**Risks to avoid:** No working demo; unclear run instructions; fewer than 50 ads; missing evaluation scores on ads; no iteration or improvement path; no decision log. These undermine delivery and review.
 
 ---
 
@@ -400,7 +390,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ## 13. Decision Log Outline
 
-The decision log is **20% of the grade**. It must show YOUR thinking — not just what was built. Key decisions to document:
+The decision log is a core deliverable. It must show clear thinking — not just what was built. Key decisions to document:
 
 - Why Gemini Flash for drafting and Gemini Pro for judging — speed vs quality tradeoff
 - Why 5 dimensions and not more or fewer — decomposition rationale
@@ -411,15 +401,7 @@ The decision log is **20% of the grade**. It must show YOUR thinking — not jus
 - Performance-per-token findings — average cycles to 7.0+, cost per publishable ad
 - Limitations — what the system cannot do, edge cases, known weaknesses
 
-> **Decision Log Golden Rule**
->
-> The decision log separates candidates who **THINK** from candidates who **PROMPT**.
->
-> Every major choice needs a **WHY**, not just a WHAT.
->
-> Honest failures are worth more than polished successes with no explanation.
->
-> Write it as you build — not all at the end.
+Every major choice needs a **WHY**, not just a WHAT. Honest failures and limitations are documented alongside successes. Write the log as you build — not only at the end.
 
 ---
 

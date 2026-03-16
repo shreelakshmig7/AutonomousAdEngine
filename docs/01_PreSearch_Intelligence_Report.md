@@ -17,7 +17,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Domain | Facebook & Instagram paid ads only | One channel family, done well — per project spec |
 | Brand | Varsity Tutors (Nerdy) | SAT prep focus, empowering voice, results-oriented |
 | Primary Audience | Parents of 11th/12th graders + SAT students | Highest intent, highest anxiety, highest lifetime value |
-| Ad Volume | 50+ ads minimum | Hard requirement — missing triggers automatic -5 pt deduction |
+| Ad Volume | 50+ ads minimum | Hard requirement for delivery scope |
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
 | Human-in-the-Loop | Minimal — fully autonomous self-healing | System detects and fixes its own failures |
 | Iteration Cap | Max 3 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
