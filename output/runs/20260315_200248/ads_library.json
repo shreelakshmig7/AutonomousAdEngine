@@ -1,0 +1,2672 @@
+{
+  "ads": [
+    {
+      "brief_id": "brief_001",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Another late night. Another practice test score that just won't budge. Your child's strong GPA should open doors, but that SAT score is holding them back. We get it. Varsity Tutors matches your child with a top 5% expert tutor in 24 hours, focusing on their exact weak areas. We've seen an average of 200+ point improvement with our 1-on-1 tutoring. Stop the cycle of frustration. Start with a free diagnostic assessment.",
+        "headline": "Close That SAT Score Gap for Good.",
+        "description": "See how personalized 1-on-1 tutoring changes everything for your child's college dreams.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo of a crumpled SAT practice test on a kitchen table, a red pen circling a 1240 score. The microwave clock reads 11:42 PM. A parent's hand, showing quiet frustration, is visible, next to a half-empty sweet tea glass. The scene feels authentically late-night in a Southeast home."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Opens with vivid scenario, quickly identifies problem and solution path."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching highly differentiated."
+        },
+        "call_to_action": {
+          "score": 9.5,
+          "rationale": "Free diagnostic assessment is specific, low-barrier, and urgent with action-oriented framing."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic tone with concrete VT differentiators hits brand while staying parent-focused."
+        },
+        "emotional_resonance": {
+          "score": 9.0,
+          "rationale": "Late nights and frustration cycle creates strong parent pain point connection."
+        },
+        "average_score": 8.8,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_001_v0.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test takers run out of time. Your child doesn't have to. Their good GPA shows capability, but the SAT is different. We match your child with a top 5% tutor in 24 hours. They learn strategies to conquer time limits and raise scores by 100 points per month. Start with a free diagnostic assessment.",
+        "headline": "Your Child's GPA Deserves a Better SAT.",
+        "description": "Get the SAT score that truly reflects their academic capability.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo: A high school junior in a casual living room in the Southeast, late afternoon sunlight. They sit at a kitchen island, jaw dropped, fist raised in frustration at a laptop screen showing a timed SAT practice test where they've clearly run out of time on a section. Parent slightly blurred in the background, a concerned expression, looking over their shoulder."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opening stat and problem are clear, though multiple claims require focus."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcome of 100 points per month with top 5% matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, clear, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Parent-focused empathy with data-driven confidence distinctly matches Varsity Tutors tone."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "GPA-SAT disconnect taps real parental frustration about capability versus test performance."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_001_v1.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Jackson had a 3.9 GPA, but his 1210 SAT score didn't reflect it. That gap felt frustrating, holding him back from colleges like UGA or Clemson. We understand. A free diagnostic quickly found his specific weak areas. With dedicated guidance, his score gained 100 points in a month. Many students see similar improvements. Stop hoping and start improving.",
+        "headline": "GPA Soars, SAT Stalls? Fix That Gap.",
+        "description": "Pinpoint exactly why an SAT score isn't matching grades with a free diagnostic.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Teen at desk with laptop, relieved smile, warm natural light, authentic UGC style."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Story format immediately establishes problem and solution within three seconds."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 100-point gain in one month, though less compelling than gold's 200+."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Free assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic tone with data-driven solution matches Varsity Tutors' personalized approach."
+        },
+        "emotional_resonance": {
+          "score": 8.9,
+          "rationale": "Named student, specific colleges, and frustration gap creates genuine parental motivation."
+        },
+        "average_score": 8.38,
+        "passes_threshold": true,
+        "weakest_dimension": "value_proposition",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Reworded primary_text to remove boastful claims and generic phrasing, replacing 'top 5% tutor' and 'just like ours do for students across the Southeast' with more empathetic and less salesy language."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed forbidden phrase 'your child's' from description by rephrasing to 'an SAT score'."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_001_v2.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Your child's 4.0 GPA could be masking their biggest SAT blind spots. Traditional studying often fails to boost scores for UF or Clemson if their SAT doesn't match their grades. We offer a new strategy: get matched with a top 5% tutor in 24 hours, focused on their exact weak areas. Parents receive weekly progress reports. On average, our students see 200+ point SAT score improvement. Start with a free diagnostic today.",
+        "headline": "High GPA, Low SAT? Stop Wasting Time.",
+        "description": "Our free diagnostic reveals exact SAT weak areas, hidden by great grades.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo, slightly shaky. A teenage girl, 17, in a bright, casual kitchen in Georgia or Florida, beaming with a mix of relief and pure joy, holding up her phone showing an official SAT score notification with a high score (e.g., 1410). Her other hand is covering her mouth in happy disbelief. Afternoon light floods the room, making the scene feel authentic and warm. Her parents' reaction is implied."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly dense with multiple ideas competing for attention."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific problem, solution, and 200+ point outcome with targeted school examples."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic is specific, actionable, and clearly presented with urgency."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Strong VT voice with data-driven approach and parent-focused messaging throughout."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "High GPA/low SAT discrepancy taps into genuine parental frustration and fear."
+        },
+        "average_score": 8.44,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_001_v3.png"
+    },
+    {
+      "brief_id": "brief_001",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "You see their strong grades, then the SAT score, and it just doesn't quite add up. We understand that frustration. Your child isn't broken; the test is just different. Our 1-on-1 tutoring precisely targets weak areas identified by a free diagnostic assessment. Matched with a top 5% tutor in 24 hours, your child learns to master the Digital SAT. Parents report a 200+ point average score improvement. Stop wondering, start seeing results.",
+        "headline": "SAT Score Not Reflecting Grades? We Fix It.",
+        "description": "Finally, a tutoring approach that respects your child's intelligence and gets real results.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of an exhausted parent at their kitchen table at 11:30 PM, soft lamplight. Reading glasses are on, an empty coffee mug nearby. Their face shows quiet concern scrolling a college admissions site, with a worn SAT practice book slightly visible on the table. The scene feels distinctly like a lived-in Southeast home, highlighting late-night worry."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically from problem to solution with clear structure."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific outcome (200+ points), differentiation (top 5%, diagnostic), and speed (24 hours)."
+        },
+        "call_to_action": {
+          "score": 9.5,
+          "rationale": "Specific, low-friction, and consistent across all ad components with urgency."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic and parent-focused with VT's data-driven credibility markers present."
+        },
+        "emotional_resonance": {
+          "score": 9.2,
+          "rationale": "Addresses parent frustration authentically while affirming child's intelligence and capability."
+        },
+        "average_score": 8.84,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_001_v4.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 0,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Stuck after weeks of group prep with scores that don't move? Students need more than a group class. Varsity Tutors matches them with a top 5% SAT expert in 24 hours, focused entirely on their specific challenges. Unlike costly group programs, we deliver true 1-on-1 instruction. Expect a 200+ point average SAT score improvement, with clear progress tracking every week. Stop hoping, start achieving.",
+        "headline": "Frustrated with Group Prep? Get 200+ Points.",
+        "description": "Discover focused 1-on-1 tutoring for significant score improvements.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Teen at desk with laptop, relieved smile, warm natural light, authentic UGC style."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows logically from problem to solution with immediate comprehension."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Specific 200+ point improvement, top 5% experts, weekly tracking differentiate clearly."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free assessment is specific and removes friction for immediate action."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Confident, results-focused tone with VT's quality matching positioning shines through."
+        },
+        "emotional_resonance": {
+          "score": 9.2,
+          "rationale": "Captures frustration with stagnant scores and transforms into achievable hope."
+        },
+        "average_score": 8.64,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 2500,
+      "estimated_cost_usd": 0.004575000000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed competitor mentions and rephrased to maintain a positive, distinct brand message."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_002_v0.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 1,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Are SAT scores holding them back? Imagine gaining 200+ points in just 8 weeks! Our top 5% tutors provide focused 1-on-1 instruction, a clear path beyond group classes. Every week counts towards their target score. Ensure they're prepared for the next test. Start with a free diagnostic assessment.",
+        "headline": "Achieve 200+ Point SAT Score Improvement.",
+        "description": "Beyond group classes: 1-on-1 tutoring for serious score improvement and clear progress reports.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo: A teenage girl in a stylish, well-lit suburban kitchen, jaw dropped, fist raised in excited disbelief, looking at an SAT score notification on a sleek laptop. Her parent, in smart casual attire, visible in the background reacting with delighted surprise. Late afternoon sunlight, a vase of fresh flowers on the counter. Pure joy and relief."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly dense with multiple ideas packed together."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcome with timeframe and clear differentiator from group classes."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Specific free diagnostic assessment with clear urgency around test timing."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Solid VT voice with top 5% tutors but lacks distinctive personality."
+        },
+        "emotional_resonance": {
+          "score": 7.6,
+          "rationale": "Imagine gaining points creates aspiration but feels slightly formulaic."
+        },
+        "average_score": 7.98,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 6000,
+      "estimated_cost_usd": 0.013612500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Simplified metrics in primary_text, focusing on the 200+ point gain in 8 weeks."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Enhanced emotional appeal in primary_text with urgency and aspirational framing."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_002_v1.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 2,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Worried about college admissions? Students improve SAT scores by 200+ points on average with Varsity Tutors experts! Our experts, all in the top 5%, provide focused guidance where students need it most. Over 3.4 million learner sessions rated. Start free.",
+        "headline": "Boost SAT Scores, Ease College Worries",
+        "description": "Access a top 5% tutor, matched to student focus areas in 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: A high school student (Northeast, suburban) sits at a large, well-lit kitchen island with a tutor. The tutor points to a specific math problem on a laptop screen, explaining. The student's face shifts from slight concentration to a clear, visible 'aha!' moment of understanding. Warm evening light filters in through a window. A half-empty glass of iced tea sits next to the laptop."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific score improvement and expert positioning."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Concrete 200+ point improvement with top 5% expert matching delivers specificity."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Includes signature proof points but headline slightly softens the competitive edge."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Opens with worry hook but doesn't sustain emotional depth throughout."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 4000,
+      "estimated_cost_usd": 0.009075000000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Emotion",
+          "action": "Addressed parent anxiety with a question hook and emotional headline."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_002_v2.png"
+    },
+    {
+      "brief_id": "brief_002",
+      "variation_index": 3,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Students gain an average of 200+ SAT points with our focused 1-on-1 tutoring. Don't let a score gap threaten competitive university admissions; our top 5% tutors provide individualized focus, matched in 24 hours to exact weak areas.",
+        "headline": "Real Gains Require Real 1-on-1 Attention",
+        "description": "Forget standard programs; get focused tutoring proven to raise scores.",
+        "cta_button": "Book Diagnostic",
+        "image_prompt": "UGC-style vertical phone photo. A teenage girl with a classic Northeastern preppy style, mid-scream of pure joy and disbelief, holding up her MacBook screen showing a high SAT score report. Her mom, slightly out of frame but beaming, has a hand on her shoulder. Late afternoon sun streams into a sunlit, tastefully decorated living room with classic, understated furniture. Image is slightly shaky, reflecting the excitement of the moment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message clear but slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcome with differentiation and credible matching promise delivers strong value."
+        },
+        "call_to_action": {
+          "score": 7.2,
+          "rationale": "Book Diagnostic is specific but lacks urgency or incentive like free."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Captures performance focus but less warm than best VT brand voice."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Score gap threatening admissions taps real parent anxiety effectively."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "call_to_action",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 6000,
+      "estimated_cost_usd": 0.013612500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Broadened the reference to target schools from 'Elite Northeast schools' to 'competitive university admissions' in the primary text."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Introduced parent worry/student aspiration by using 'score gap framing' in the primary text to highlight potential missed opportunities."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_002_v3.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 0,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Staring at that practice test, seeing the same score *again*? You're not alone. You\u2019re motivated, but grinding hours with no real movement is frustrating. Imagine knowing exactly what to focus on. Our experienced tutors guide students like you past those plateaus, with an average 200+ point SAT score improvement. Get matched in 24 hours based on what you need to improve. Start with a free diagnostic assessment and discover how to make progress.",
+        "headline": "Break Through Your SAT Score Plateau.",
+        "description": "Pinpoint your specific challenges and achieve better scores.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo from a slightly high angle: a crumpled SAT practice test on a worn kitchen table. Red pen has angrily circled an 1120 score. A glowing microwave clock in the background shows 11:58 PM. A half-empty can of Faygo Redpop or Vernors sits nearby. The lighting is dim, only from the overhead kitchen light. Focus on the raw frustration of the test."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opening scenario is vivid and clear, though slightly longer than ideal."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point improvement with personalized matching and plateau-breaking focus."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment is specific, concrete, and clearly actionable."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empathetic tone fits VT but lacks distinctive personality markers."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "Plateau frustration is deeply relatable and motivating for stuck students."
+        },
+        "average_score": 8.1,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 4000,
+      "estimated_cost_usd": 0.009075000000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Value Prop",
+          "action": "Added 200+ point average SAT score improvement statistic to quantify outcome."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_003_v0.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 1,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Struggling with SAT timing, even when you know the answers? Students gain proven strategies and calculator tools to solve questions faster. Receive personalized 1-on-1 guidance within 24 hours, targeting specific challenges. Many students achieve 200+ point SAT score improvements in just 8 weeks, making timing a strength. Prepare smarter. Get a free diagnostic to map your success.",
+        "headline": "Crush SAT Timing. Master the Test.",
+        "description": "Get a free diagnostic to discover effective time management.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Teen at desk with laptop, relieved smile, warm natural light, authentic UGC style."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Specific problem and solution clear, though slightly dense with multiple claims."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Concrete outcome of 200+ points in 8 weeks with timing focus."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic with clear purpose and actionable next step."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "On-brand with personalization and results focus, lacks distinctive VT energy."
+        },
+        "emotional_resonance": {
+          "score": 7.4,
+          "rationale": "Addresses real frustration of knowing answers but running out of time."
+        },
+        "average_score": 7.84,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 6000,
+      "estimated_cost_usd": 0.013612500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text to focus on student outcomes and reduce concept density."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Added a timeframe to the score improvement claim in primary_text for enhanced specificity."
+        },
+        {
+          "dimension": "Primary Text Hook",
+          "action": "Restructured primary_text to ensure the opening hook is a single sentence under 100 characters."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_003_v1.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Are you studying hard but seeing no improvement in your scores? It's not about trying harder, it's about prepping smarter. Get matched with a top 5% tutor in 24 hours who knows exactly what *you* need. Stop guessing. Start seeing real results with a free diagnostic. Students like you see a 200+ point average SAT score improvement.",
+        "headline": "Prep Smart, Not Just Harder.",
+        "description": "Get matched with a top 5% tutor focused on your exact weak spots.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a high school junior (17F) and her tutor at a well-worn kitchen table in a Midwest home. Warm, cozy evening light from a nearby lamp. The tutor points at a specific geometry problem in a practice book. The student looks at the problem, then up at the tutor, her face lighting up with a clear 'aha!' moment of understanding. A half-eaten snack and a slightly messy backpack are nearby, making it feel authentic."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Opening question hooks instantly, flow is logical and easy to follow."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% match, and personalized weak spot focus."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic is specific, urgent, and low-friction with clear action."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Distinctly VT with expertise positioning, data-driven personalization, and empowering tone."
+        },
+        "emotional_resonance": {
+          "score": 8.8,
+          "rationale": "Addresses frustration of effort without results, offers hope and validation."
+        },
+        "average_score": 8.66,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "primary_text",
+          "action": "Rewrote opening to be a question hook, ending before character 100."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed CTA to 'Start Free Assessment' to match the free diagnostic offer in the text and address generic button feedback."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_003_v2.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Are you working hard, but still not seeing the score improvements you deserve? Stop guessing. Our 1-on-1 tutoring matches you with a top 5% tutor in 24 hours, focusing on *your* exact weak areas. Students see 200+ point average SAT score improvement. Get a clear path to the score you deserve. It starts with a free assessment.",
+        "headline": "Achieve Your Best SAT Score Yet.",
+        "description": "Get matched with a top 5% tutor tailored to you.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo: A high school junior/senior, smiling triumphantly, holding up her phone screen showing an impressive SAT score notification. Slightly shaky camera, taken by a friend or parent in excitement. Golden hour sunlight streams into a cozy, slightly cluttered Midwest bedroom, perhaps with a Big Ten university pennant visible in the blurred background. She's wearing a comfortable hoodie. Pure, unscripted joy."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message flows clearly with strong structure and immediate comprehension."
+        },
+        "value_proposition": {
+          "score": 8.8,
+          "rationale": "Specific 200+ point improvement, top 5% tutor matching, addresses exact weak areas."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-friction, and directly tied to personalized path."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly Varsity Tutors with personalization emphasis and quality matching positioning."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "Taps into frustration of hard work without results and deserving success."
+        },
+        "average_score": 8.6,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed competitor mention from primary text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Rewrote primary text hook to be a question and avoid competitor mention, ensuring it ends with appropriate punctuation before character 100."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Rewrote headline to avoid forbidden phrase 'Real Score Gains' and ensure it is exactly 5-8 words."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_003_v3.png"
+    },
+    {
+      "brief_id": "brief_003",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "You're putting in the hours, grinding on practice tests, but the score feels stuck. We get it. All that effort, but is it the *right* effort? Our Top 5% tutors find your exact weak spots in 24 hours. They adapt to *your* learning style, turning your grind into real 200+ point gains. Over 3.4 million sessions prove it. Start with a free diagnostic.",
+        "headline": "Your Effort Deserves Real Score Growth.",
+        "description": "Stop guessing. Get your personalized path to 200+ points.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a teenage boy (17-18 years old) at a cluttered desk at 1:15 AM, laptop open to an online SAT practice test, head propped on one hand, tired eyes staring blankly at the screen. An empty Red Bull can sits nearby. Dim desk lamp light, casting long shadows. Midwest student's bedroom vibe, slightly overwhelmed but clearly hardworking."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message about stuck scores and personalized solution, though slightly wordy."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain, top 5% tutors, personalized weak spot identification."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Free diagnostic assessment is specific, actionable, and reduces barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Conversational tone fits VT but italics and 'grind' feel slightly off-brand."
+        },
+        "emotional_resonance": {
+          "score": 8.9,
+          "rationale": "Acknowledges frustration of effort without results, validates student's hard work perfectly."
+        },
+        "average_score": 8.22,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_003_v4.png"
+    },
+    {
+      "brief_id": "brief_004",
+      "variation_index": 3,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Worried about SAT scores? Your child could gain 200+ points in 8 weeks, opening college doors easily. Our 1-on-1 experts, rigorously vetted from the top 5%, deliver focused Digital SAT mastery. Get matched with a dedicated tutor in 24 hours for proven score gains.",
+        "headline": "Achieve 200+ SAT Points, Open College Doors.",
+        "description": "Discover how targeted 1-on-1 SAT guidance leads to higher scores and scholarship chances. Benefit from 3.4 million learner session ratings.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo: In a modest Texas or Arizona kitchen, late afternoon sunlight streaming in, a 10th or 11th grade Latina teenager holds up her phone to the camera, beaming with pure excitement and relief. On the screen is a college acceptance notification. Her mom, slightly out of focus in the background, has a hand over her mouth, eyes wide with proud joy. The photo is slightly shaky, capturing the authentic, emotional moment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Core message clear but slight density in primary text slows parsing."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ points in 8 weeks with top 5% matching is compelling."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Start Free Assessment is specific, urgent, and low-barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Uses key VT markers like top 5%, social proof, and quality matching."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Opens with worry and college doors but feels slightly formulaic overall."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 7500,
+      "estimated_cost_usd": 0.0181125,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text for improved readability and adherence to brand rules (outcomes, specific numbers, conditional claims)."
+        },
+        {
+          "dimension": "Primary Text (Critical Constraint)",
+          "action": "Ensured hook is one sentence, ends with punctuation, and is under 100 characters."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_004_v3.png"
+    },
+    {
+      "brief_id": "brief_004",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Students gain 200+ SAT points in 8 weeks with our vetted tutors, making success achievable. The SAT can feel daunting, but our top 5% tutors and structured plan provide clear guidance. Stop guessing; get support designed for success. Start with a free diagnostic to see their path forward.",
+        "headline": "Real SAT Progress Without The Worry.",
+        "description": "Get clear steps with expert, vetted tutors.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo, late evening, dim kitchen light. An exhausted parent (40s-50s) at a well-worn kitchen table, wearing reading glasses, looking at a laptop screen. An empty coffee mug and a crumpled paper sit nearby. Visible worry and deep thought on their face, illuminated by the screen glow. The scene is honest and shows quiet contemplation."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly wordy with overlapping phrases about support and structure."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point gain in 8 weeks with top 5% tutors is compelling."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Free diagnostic assessment is specific, actionable, and creates a clear next step."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Supportive tone fits VT but lacks distinctive personality found in gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Addresses worry and daunting feelings but doesn't connect to dream school motivation."
+        },
+        "average_score": 7.9,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text hook to be a single, outcome-focused sentence under 100 characters, removing initial questions."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Replaced forbidden phrase 'your child' with 'their' in primary_text."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Incorporated specific timeframe 'in 8 weeks' for score improvement in primary_text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_004_v4.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 1,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Imagine your child gaining 200+ points, securing a path to top university admissions. Our 1-on-1 guidance from top 5% tutors clarifies exactly where scores can improve for those aiming for UCs & privates. Get matched with a tutor in 24 hours, starting a clear path forward.",
+        "headline": "Targeting 1450+? Here's the Strategy.",
+        "description": "Top 5% tutors deliver 200+ point gains, not just hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Teen at desk with laptop, relieved smile, warm natural light, authentic UGC style."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message flows well but slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain, top 5% tutors, and targeted school outcomes clearly stated."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific and 24-hour matching creates urgency effectively."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Matches VT's quality positioning with data-driven, outcome-focused messaging."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Dream school aspiration and clear path forward tap parent motivation authentically."
+        },
+        "average_score": 8.32,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 6500,
+      "estimated_cost_usd": 0.013650000000000002,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote the opening sentence to be less dense and more outcome-focused."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed geographic name-dropping ('Bay Area and LA parents')."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Rephrased tactical elements to better address parent anxieties about college admissions and provide a clearer path."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_005_v1.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 2,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Students gain 200+ points on the SAT in just 8 weeks with our proven plan. Our precise strategy focuses on substantial score improvements, not just endless practice. Expert tutors guide students individually, with matches made in 24 hours. Stop guessing. Start excelling for top UC and private schools.",
+        "headline": "1290 to 1450+: A Student's UC Advantage.",
+        "description": "Discover the exact method for significant SAT score improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: A 12th-grade student and a tutor at a spacious, modern kitchen island in a Bay Area home. Warm evening light streams in. The tutor points to a specific digital SAT problem on a laptop screen. The student has a visible 'aha!' moment of clarity, smiling slightly as a complex concept clicks. A half-finished sparkling water is nearby."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though '8 weeks' and 'proven plan' add slight clutter."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific score jump with timeframe and concrete UC advantage differentiation."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and actionable, matching gold standard."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Stop guessing phrase fits VT but less distinctive than gold example."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "UC dream school angle resonates but less parent-focused than gold."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 6000,
+      "estimated_cost_usd": 0.013612500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text to remove opening question, lead with outcome, and improve sentence flow for better comprehension. Ensured first sentence is concise and ends with punctuation before character 100."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_005_v2.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 3,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Your child\u2019s 1200-1350 SAT score isn't about what they don't know. It\u2019s about uncovering the exact few questions they consistently miss and building a precise strategy for a 1450+. We match your child with a top 5% tutor, often in 24 hours, for the targeted 1-on-1 plan needed for top UC and private schools. Stop guessing; start building a 200+ point path.",
+        "headline": "Target 1450+? Find Their SAT Breakthrough.",
+        "description": "Precision 1-on-1 tutoring spots the exact issues others miss for top UC/private targets.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo, slightly shaky. A 17-year-old (wearing a light hoodie) in a modern, sunlit kitchen is excitedly showing their parent a laptop screen displaying a 1480 SAT score notification. The parent, partially visible, has a hand covering their mouth in surprised joy. Authentic, spontaneous moment of shared relief and success."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Specific score ranges are clear, though sentence structure is slightly dense."
+        },
+        "value_proposition": {
+          "score": 9.1,
+          "rationale": "Hyper-specific outcome with score targets, timeframe, and differentiated precision approach."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free assessment is specific and low-friction with clear next step."
+        },
+        "brand_voice": {
+          "score": 8.7,
+          "rationale": "Distinctive VT voice with top 5% matching and outcome-driven precision language."
+        },
+        "emotional_resonance": {
+          "score": 8.4,
+          "rationale": "Addresses parent aspiration for top schools with breakthrough insight framing."
+        },
+        "average_score": 8.5,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_005_v3.png"
+    },
+    {
+      "brief_id": "brief_005",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "You've tried everything for that 1450+. The score still feels stuck. We hear you. Top UCs and privates demand more than just hours. Your child, currently 1200-1350, needs a precise plan, not generic lessons. We deliver a strategic path. Our 1-on-1 tutoring matches your child with a top 5% tutor in 24 hours, focusing on their exact weak areas. It's how students gain 200+ points. Get the plan that finally breaks through. Start with a free diagnostic assessment.",
+        "headline": "Elite Strategy For Their 1450+ SAT.",
+        "description": "Finally achieve the 1450+ for their dream schools.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of an exhausted parent (40s-50s) at a sleek, minimalist home office desk at 1:30 AM. Their high-end laptop is open to an SAT score report with 1200-1350 range. An expensive, half-empty coffee mug sits beside reading glasses on a pile of college brochures. A look of weary determination is on their face."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear target score and current range, though slightly dense opening."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain, top 5% tutors, exact weak areas addressed."
+        },
+        "call_to_action": {
+          "score": 8.7,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-barrier."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic tone with data-driven specificity feels distinctly Varsity Tutors."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Opens with frustration recognition, taps into dream school aspirations effectively."
+        },
+        "average_score": 8.26,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_005_v4.png"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Your child's SAT is in 8 weeks. That practice score isn't changing on its own. They're capable of more. A free diagnostic assessment quickly pinpoints exactly what's holding them back, so their 1-on-1 tutor can target weak areas. Matched with a Top 5% tutor in 24 hours. Our students average 200+ points on the SAT. Even 100 points per month is possible with 2 sessions per week. Get a plan built just for your child, not a generic course.",
+        "headline": "SAT Score Stuck? Get Real Results Now.",
+        "description": "Identify weak areas in 24 hours with a Top 5% tutor.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo on a kitchen table at 11:30 PM. A crumpled SAT practice test, red pen circling a disappointing score (e.g., 1190). An empty coffee mug sits beside it. A parent's tired hand rests gently on the test, showing concern and exhaustion. Overhead kitchen light."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly dense with multiple data points."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcomes with 200+ points average and timeframes included."
+        },
+        "call_to_action": {
+          "score": 8.9,
+          "rationale": "Free assessment is specific, urgent timeframe creates immediate action."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Confident, parent-focused tone with VT's data-driven differentiation."
+        },
+        "emotional_resonance": {
+          "score": 8.4,
+          "rationale": "Urgency and belief in child's potential resonate with parent motivation."
+        },
+        "average_score": 8.36,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published"
+    },
+    {
+      "brief_id": "brief_006",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test takers run out of time. Ours don't. Your child's score isn't just about what they know, but how they test. With their SAT test date approaching, there's still time to address critical areas like time management. Our top 5% tutors provide 1-on-1 focus, matching your child in 24 hours after a free diagnostic. See real score improvements.",
+        "headline": "Fix SAT Timing. Raise Your Score.",
+        "description": "Personalized 1-on-1 tutoring targets weak areas quickly for real score gains.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo: A teenage girl with jaw dropped and one fist raised in exasperation, looking intensely at a laptop screen showing a timed SAT section score. Her parent is slightly out of focus in the background, hand over mouth with a look of concern. Soft late afternoon light through a window, a discarded snack wrapper on the desk. Real, unstaged emotion."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.3,
+          "rationale": "Opening stat immediately establishes problem; solution path clear within seconds."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Addresses specific SAT timing problem but lacks concrete point improvement metric."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment with 24-hour matching creates urgency and removes friction."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Top 5% tutors, personalized matching, and diagnostic perfectly align with VT."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Time pressure angle connects to parent anxiety but less powerful than dream school hook."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_006_v1.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Liam studied with online resources for months. His score stayed stuck at 1210. He almost gave up. Sound familiar? You\u2019re putting in the work, but free prep often has a ceiling. Connect with a top 5% tutor in 24 hours who dives into your specific weak areas. That's how students average 200+ points. Stop guessing. Start seeing real numbers.",
+        "headline": "Elevate Your Score Beyond Free Prep.",
+        "description": "Actual score improvements, beyond free resources.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: A 16-year-old student (lightly tired, then eyes widening with understanding) and a professional tutor at a suburban kitchen table. Warm evening light streams in. The tutor points at a specific digital SAT math problem on a laptop screen. The student has a clear 'aha!' moment, a small smile forming. An empty mug sits nearby. Feels real, not staged."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Story format quickly establishes problem then pivots to solution with specific numbers."
+        },
+        "value_proposition": {
+          "score": 9.0,
+          "rationale": "Concrete 200+ point improvement tied to top 5% tutor matching differentiates from free resources."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and low-friction, though urgency could be stronger."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Conversational and motivational tone aligns with VT but less distinctly branded than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 9.5,
+          "rationale": "Liam's frustration story creates immediate identification and hope for breakthrough results."
+        },
+        "average_score": 8.5,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed competitor mentions and rephrased to avoid forbidden phrases while maintaining the original intent."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_007_v2.png"
+    },
+    {
+      "brief_id": "brief_007",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Hours spent studying, yet your SAT score barely budges? We understand. You're smart, self-motivated, and prefer evidence. Free resources often have limits. We connect you with a top 5% tutor in 24 hours. They pinpoint exactly what's holding your score back. Our students average 200+ point SAT score improvement through focused, individual guidance. Begin with a free diagnostic assessment.",
+        "headline": "Break Through Your Score Plateau. See Results.",
+        "description": "Stop guessing and start seeing measurable score improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a teenage student (16-17) at a laptop at 1 AM in their bedroom, exhausted. Screen shows a practice SAT score (e.g., 1190). Empty energy drink can, crumpled notes beside them. Soft glow from the laptop, a look of tired frustration on their face. Shot from a slightly elevated angle, like a parent peeking in."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opening hook is clear, though primary text is slightly dense overall."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, and pinpointed weak areas."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and removes barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Evidence-based tone fits VT but slightly less distinctive than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Score plateau frustration directly addressed with empathy and self-motivated student recognition."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed competitor mention and rephrased the opening to meet critical hook constraints."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Rephrased service description to avoid forbidden terms like 'we have tutors' and 'personalization', focusing on individual guidance and results."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_007_v4.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 0,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Is your child's SAT score holding back their dream college application? Our expert matching connects students with top tutors, helping them gain 200+ points in just 8 weeks.",
+        "headline": "Finally, SAT Scores Show Real Progress",
+        "description": "Get matched with a top 5% tutor and raise scores fast.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo: a crumpled SAT practice test on a modern kitchen island in a Pacific Northwest home, a red pen circling a dishearteningly low score. The microwave clock in the background reads 11:58 PM. A half-empty artisan coffee mug sits nearby. Gloomy, frustrated mood visible through the scene's quiet details."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific outcome and timeframe stated upfront."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Specific 200+ point gain with 8-week timeframe, but missing differentiation details."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-friction, and directly actionable."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Uses VT language like expert matching and top tutors but less distinctive."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Opens with dream college pain point but lacks urgency or deeper motivation."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 7500,
+      "estimated_cost_usd": 0.0181125,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Replaced generic 'digital prep' with 'expert matching connects students with top tutors' to highlight premium differentiator."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Changed hook to 'Is your child's SAT score holding back their dream college application?' to add parental concern and dream school aspiration."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_008_v0.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test-takers run out of time. Your child won't. The SAT is digital now. Your child trains exactly like they'll test, learning built-in tools to manage every second. We match them in 24 hours with a top 5% tutor based on their exact weak areas. See real score trajectory with weekly reports. Stop guessing, start gaining.",
+        "headline": "Master The Digital SAT, Beat The Clock.",
+        "description": "Prep on a laptop for the laptop test.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo of a teenager (around 16-17) in a bright, modern living room in Seattle or Denver. They're looking at a laptop screen, jaw dropped in genuine surprise, one fist raised in triumph. Their parent (40s-50s) is visible in the background, smiling warmly, holding a mug of tea, looking over with an expression of proud relief. Late afternoon light filtering through a large window. A cozy throw blanket is draped over the sofa."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opens with sharp stat, flows logically though slightly dense with multiple concepts."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific problem solved with digital SAT timing plus top 5% matching differentiation."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Clear free assessment with urgency implied by score trajectory and weekly reports."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Stop guessing start gaining reflects VT's confident, results-focused expert positioning well."
+        },
+        "emotional_resonance": {
+          "score": 7.6,
+          "rationale": "Timing anxiety is real but somewhat rational, less emotional than dream school."
+        },
+        "average_score": 8.04,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_008_v1.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Struggling with SAT timing, like 60% of test takers? Our top 5% tutors teach built-in digital SAT tools to prevent time running out. Each student receives 1-on-1 training focused on individual challenges. Students often gain 200+ points in 8 weeks with consistent sessions. Get a free diagnostic assessment to discover a path to higher scores.",
+        "headline": "Digital SAT: No More Wasted Time.",
+        "description": "Our expert 1-on-1 tutoring identifies precise weak areas for real score gains.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: A teenage boy, maybe 16, at a modern kitchen island in a well-kept Denver home, warm evening light from a nearby window illuminating the scene. His 30s-ish female tutor is leaning in, pointing at a problem on his laptop screen with a pen. The boy's eyes are wide, a subtle 'aha!' expression dawning on his face. Half-empty water bottle, a local Seattle or Portland coffee mug in background. Feels authentic."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Main message about timing struggles clear, though slightly dense with details."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcome of 200+ points in 8 weeks with unique timing focus."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and creates immediate next step."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Top 5% tutors, precise matching, and data-driven approach distinctly Varsity Tutors."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Addresses real timing anxiety but could deepen dream school motivation."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text to lead with a direct, outcome-focused question, incorporate specific numbers and conditional claims, and remove the slow story opener."
+        },
+        {
+          "dimension": "Primary Text",
+          "action": "Removed forbidden phrases such as 'your child' and similar concepts."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_008_v2.png"
+    },
+    {
+      "brief_id": "brief_008",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Still struggling with SAT prep? We get it. Our 1-on-1 online tutoring matches your child with a top 5% tutor in 24 hrs for digital SAT success. This personalized approach helps students gain an average of 200+ points. Ready for real results?",
+        "headline": "SAT Prep Frustration? Achieve 200+ Points.",
+        "description": "Get matched with a top 5% SAT tutor today for proven score improvement.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: exhausted parent (40s, Pacific Northwest aesthetic) at a kitchen island laptop around 11:30 pm, dim light. Empty ceramic coffee mug, reading glasses perched on head, expression of weary determination. Overlooking a subtle mountain town or city skyline out window. Feels raw and honest."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific outcome and timeline stated upfront."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point improvement, top 5% matching, and 24-hour timeline differentiate strongly."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and low-friction with urgency implied."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "We get it shows empathy but slightly less distinctive than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Opens with frustration acknowledgment and promises real results, addressing parent pain points."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote headline to clearly state SAT prep and focus on a specific outcome (200+ points)."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_008_v4.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 0,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Seeing your child's SAT score fall short, despite their effort, can be disheartening. Self-study often misses the real issues. Our top 5% tutors pinpoint exact weak areas, providing 1-on-1 help. Students in this score range consistently see 200+ point gains. High scores are achievable.",
+        "headline": "Concerned by Your Child's SAT? We Can Help.",
+        "description": "Get matched with a top 5% tutor in 24 hours who knows how to fix your exact weak spots.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo: crumpled SAT practice test on a worn kitchen table, faint gravy stain. A red pen circles '980' with a defeated sigh. Microwave clock glows 11:58 PM. Student's hand, resting on forehead, conveys exhaustion and discouragement. Natural late-night kitchen light."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but requires slight mental effort to process all elements."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific 200+ point improvement with top 5% tutors and personalized approach."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, clear, and removes friction for parents."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empathetic parent-focused tone aligns with VT but slightly less distinctive."
+        },
+        "emotional_resonance": {
+          "score": 8.5,
+          "rationale": "Opens with parent's emotional pain point then offers hope and solution."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Rewrote primary_text to be parent-focused and confident."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Rewrote headline to be parent-focused and confident."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_009_v0.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Feeling defeated by your SAT score, even after dedicated study? It's not your fault self-study stalls. Our top 5% tutors identify precisely what's holding your score back, matched in 24 hours. They explain *why* you got it wrong and how to fix it, targeting 200+ point gains. Start with a free diagnostic.",
+        "headline": "Your Higher SAT Score Is Waiting.",
+        "description": "A proven path to gain the points you know you're capable of.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo. A discouraged teenage boy, looks like he's from the Midwest/South, sitting at a worn wooden kitchen table. A friendly, knowledgeable tutor points at a math problem in an SAT practice book. The boy's face shifts from confusion to a genuine 'aha!' moment. Warm, golden evening light streams in from a nearby window. A half-empty glass of sweet tea on the table."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear though slightly dense with multiple concepts in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain with diagnostic approach and top 5% matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, clear, and removes risk barrier effectively."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Empathetic opening and expertise positioning align well with Varsity Tutors tone."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Addresses defeat and frustration while offering hope and capability validation strongly."
+        },
+        "average_score": 8.32,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Replaced the anecdotal opener in primary_text with a direct, empathetic, and premium hook, ensuring it meets critical length and punctuation requirements."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_009_v2.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Frustrated with your SAT score not improving despite endless studying? We know you're capable of more! Our free diagnostic pinpoints your exact weak areas, matching you with a 1-on-1 expert in 24 hours. Stop studying harder and start scoring higher. Many students gain 200+ points in just 8 weeks with our focused 1-on-1 approach. It's time to change how you prep for real results.",
+        "headline": "Stop Harder Studying, Start Higher Scoring.",
+        "description": "A free diagnostic shows exactly what's holding your score back.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo, slightly shaky. A teenager, likely from the Midwest or South, holding up their phone screen towards the camera, showing a new, higher SAT score notification. Their face is full of genuine surprise and ecstatic relief, eyes wide, big smile. The photo feels like it was quickly snapped by a parent in a slightly cluttered, warm-lit kitchen right after the score came in."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message flows well though slightly dense with multiple concepts packed in."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ points in 8 weeks outcome with diagnostic-driven personalized matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, actionable, and aligned with diagnostic messaging throughout."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empowering and outcome-focused but lacks distinctive Varsity Tutors expert-matching authority tone."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Frustration hook with empowerment message taps into real student motivation effectively."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text opening to be a single, empathetic, outcome-focused sentence within 100 characters, addressing the 'opening metaphor' feedback."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Integrated specific numbers and a conditional claim for score gains in the primary_text, following brand rules."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Rephrased primary_text to lead with outcomes and benefits, rather than just features."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_009_v3.png"
+    },
+    {
+      "brief_id": "brief_009",
+      "variation_index": 4,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Frustrated by stagnant scores despite studying hard? You're not alone. Our expert guidance helps students achieve an average 100+ point SAT score increase in just 8 weeks, with consistent 2-session weekly support. Many students achieve 200+ point gains by targeting their exact challenges. Discover how focused practice leads to real results.",
+        "headline": "Break Through Your SAT Score Ceiling.",
+        "description": "Get matched with a top 5% tutor to target your exact needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a teenage student, midwestern appearance, slumped over a laptop at 1 AM. Screen shows an SAT practice test with a low score highlighted. Empty soda can and crumpled scratch paper are scattered on the desk. Dim lamp light illuminates their tired, frustrated face, one hand gripping their hair. Feels raw, honest, and unposed."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly dense with multiple score claims in primary text."
+        },
+        "value_proposition": {
+          "score": 7.2,
+          "rationale": "Specific outcomes given but mixing 100+ and 200+ points creates slight confusion."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Strong specific action with free assessment creating low barrier to entry."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Matches VT tone with top 5% tutor mention and personalized approach."
+        },
+        "emotional_resonance": {
+          "score": 8.0,
+          "rationale": "Opens with relatable frustration and addresses exact student pain point effectively."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "value_proposition",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 9500,
+      "estimated_cost_usd": 0.02265,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Clarified score claims in primary text by distinctly presenting average gains and higher potential gains."
+        },
+        {
+          "dimension": "Primary Text",
+          "action": "Rephrased the opening sentence to enhance empathy and align with clarity improvements, while ensuring critical hook requirements are met."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_009_v4.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 1,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Is a top college within reach? Our rigorously vetted, top 5% tutors deliver 200+ average SAT point gains. We match learners in 24 hours with 1-on-1 experts based on exact weak areas. A free diagnostic assessment reveals their best starting point.",
+        "headline": "Achieve Dream College SAT Scores with Experts.",
+        "description": "Discover how our top 5% tutors personalize 1-on-1 prep for competitive college applications.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo: A high school student in a comfortable home, maybe a kitchen island or living room, excitedly looks at a laptop screen, jaw dropped and one fist raised. Their parent, in the background, covers their mouth in a moment of surprised joy. Late afternoon natural light, a half-eaten snack on the table next to the laptop suggests a real-life study break moment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Core message clear but slightly dense with multiple claims in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point gain, top 5% tutors, 24-hour matching, and diagnostic assessment."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-friction, and directly aligned with value proposition."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "On-brand but 'rigorously vetted' feels slightly formal compared to gold standard warmth."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Dream college hook connects to parent aspirations but less personal than gold."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 9500,
+      "estimated_cost_usd": 0.02265,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Value Prop",
+          "action": "Emphasized top 5% tutors, 1-on-1 matching based on weak areas, and 200+ point gains."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Used 'rigorously vetted' and 'experts' to convey quality and expertise."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Introduced 'top college' and 'dream college' urgency, connecting to parental concern."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_010_v1.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 2,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Boost your 10th grader's SAT score by 200+ points on average with a top 5% tutor! Our free diagnostic reveals exact strengths and weaknesses, creating a personalized roadmap for success. Start now for real confidence and no surprises on test day.",
+        "headline": "Early Start, Stronger SAT Outcome.",
+        "description": "Give your 10th grader the advantage of 1-on-1 tutoring, proven to deliver 200+ point SAT score improvements. Get matched with a top 5% tutor in 24 hours!",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a 10th-grade student and his tutor at a warm kitchen table in a comfortable home in Atlanta. It's early evening, soft golden light, creating a relaxed atmosphere. The tutor points at a math problem in an SAT practice book, and the student has a visible 'aha!' moment, his eyes widening slightly with understanding. A glass of sweet tea sits nearby."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific grade level and score improvement promise."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific 200+ point gain, top 5% tutor, free diagnostic, and personalized roadmap."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Clear free assessment CTA with urgency created by early start messaging."
+        },
+        "brand_voice": {
+          "score": 8.3,
+          "rationale": "Strong VT voice with expertise claims, data points, and personalization focus."
+        },
+        "emotional_resonance": {
+          "score": 7.8,
+          "rationale": "Appeals to parent desire for advantage but confidence angle feels slightly generic."
+        },
+        "average_score": 8.46,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 5500,
+      "estimated_cost_usd": 0.013575,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "CTA",
+          "action": "Changed 'Learn More' to 'Start Free Assessment' to address generic feedback and align with the free diagnostic offer in the primary text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_010_v2.png"
+    },
+    {
+      "brief_id": "brief_010",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Imagine your child gaining 200+ SAT points with a top 5% tutor! Our free diagnostic identifies exact weak areas, matching them with an expert in 24 hours. Many students see 100 points per month, building confidence for college.",
+        "headline": "Plan Your Child's SAT Journey With Confidence",
+        "description": "Get a clear roadmap for your 10th grader's college prep.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a parent, late 40s-early 50s, visibly tired but focused, sitting at a kitchen table at 11:30 PM. Laptop open to a college planning website. Empty, slightly chipped ceramic coffee mug nearby. Reading glasses perched on nose. Soft, warm lamp light. A high school football schedule magnet is on the fridge in the blurred background. She looks determined but a bit overwhelmed."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear promise and process, though slightly crowded with multiple claims."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcomes with 200+ points, 100/month, and 24-hour expert matching."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Specific free assessment with clear next step and urgency implied."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Headline feels generic; body copy captures VT's matching differentiation well."
+        },
+        "emotional_resonance": {
+          "score": 7.6,
+          "rationale": "Confidence and imagine language connect emotionally but lacks parent anxiety hook."
+        },
+        "average_score": 7.88,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text to lead with outcomes, be more direct, and incorporate specific numbers, ensuring the hook ends with punctuation before character 100."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Incorporated specific value propositions: '200+ point average SAT score improvement', 'top 5% tutors', 'matched in 24 hours', and 'free diagnostic'."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed from 'Learn More' to 'Start Free Assessment' to be more specific and action-oriented, aligning with the ad content and judge feedback."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_010_v4.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "That 1420 felt like a win, until you saw the T20 average. Breaking into the 1500s requires precision, not just more practice. Our elite 1-on-1 tutors, all top 5% vetted, identify the exact few concepts holding your child back. Matched in 24 hours, they craft a strategy to gain those crucial points that make all the difference for top admissions. Start with a free diagnostic assessment.",
+        "headline": "Beyond 1450: Your Child's Critical Edge.",
+        "description": "Targeted SAT tutoring for the 1500+ score your child needs.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo, close-up on a high-end kitchen island at 11:30 PM. A crumpled SAT practice test, open to a section with several missed questions circled in red. A premium fountain pen rests beside it. Microwave clock in the background shows the late hour. The scene captures quiet frustration and high-stakes exhaustion after a demanding study session."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear targeting of high-scoring students but T20 jargon may confuse some parents."
+        },
+        "value_proposition": {
+          "score": 8.9,
+          "rationale": "Highly specific outcome targeting 1500+ with precision concept identification and elite matching."
+        },
+        "call_to_action": {
+          "score": 9.2,
+          "rationale": "Specific free diagnostic assessment with clear 24-hour matching creates urgency and clarity."
+        },
+        "brand_voice": {
+          "score": 8.5,
+          "rationale": "Distinctly VT with top 5% vetted, precision matching, and data-driven positioning."
+        },
+        "emotional_resonance": {
+          "score": 9.0,
+          "rationale": "Taps into ambition gap between good and elite scores for competitive families."
+        },
+        "average_score": 8.68,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_011_v0.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test takers run out of time. Ours don't. For students aiming for 1500+, every point demands precision. Our top 5% tutors understand the nuanced strategies to master the digital SAT's toughest questions and optimize pacing. Matched with an expert in 24 hours, your child gets the specific, high-level guidance needed to secure those critical final points for T20 admissions. Start with a free diagnostic.",
+        "headline": "Secure Your T20 SAT Score Edge.",
+        "description": "Elite 1-on-1 tutoring for those crucial final points.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo of a teenager in a chic, sunlit living room in California, late afternoon. Their jaw is dropped in genuine shock, a fist raised triumphantly at a laptop screen displaying a high SAT score. A parent, dressed in premium casual wear, stands slightly behind them, hands covering their mouth in delighted surprise. The background features subtle, high-end decor, no text visible."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear target audience and promise, though pacing optimization concept requires brief processing."
+        },
+        "value_proposition": {
+          "score": 8.4,
+          "rationale": "Highly specific outcome with 1500+ target, T20 admissions, and top 5% tutors."
+        },
+        "call_to_action": {
+          "score": 9.1,
+          "rationale": "Specific free diagnostic with 24-hour matching creates clear next step and urgency."
+        },
+        "brand_voice": {
+          "score": 8.6,
+          "rationale": "Distinctly VT with top 5% tutors, quality matching, and results-focused positioning."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Taps into high-stakes T20 admissions anxiety and parent aspiration effectively."
+        },
+        "average_score": 8.44,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_011_v1.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 3,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "That last 50 points isn't about effort; it's about strategy! For students already scoring 1350-1450, every point matters for T20 admissions. You're past \"learn the content.\" It's about finding precise gaps and mastering test mechanics. Top 5% tutors identify critical areas. Get 1-on-1 tutoring, matched in 24 hours based on exact weak points. This isn't typical preparation; it's surgical. Transform a 1450 into 1500+, securing their admissions edge.",
+        "headline": "The Strategy For A 1500+ SAT",
+        "description": "Elite 1-on-1 tutoring for T20 applicants targeting 1500+ scores.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo: A teenager, 17, beaming with pure excitement, holds up a phone screen showing a 'Congratulations, Accepted!' notification from a top-tier university. The photo is slightly shaky, as if taken by a parent in the moment of discovery in a bright, modern kitchen in California, morning light streaming in. The parent's hand is visible, slightly out of frame, capturing the joyous, unexpected moment."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear niche targeting but slightly dense with T20 jargon and mechanics language."
+        },
+        "value_proposition": {
+          "score": 9.2,
+          "rationale": "Highly specific outcome with 1450 to 1500+ transformation for precise audience."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Specific assessment with clear relevance to surgical approach mentioned in copy."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly VT with top 5% tutors, matching, and precision focus."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "Taps into high-achiever frustration and T20 admissions stakes effectively."
+        },
+        "average_score": 8.44,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Replaced forbidden phrase 'generic prep' with 'typical preparation' in primary_text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Adjusted phrasing related to tutors to avoid forbidden 'we have tutors' implication in primary_text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_011_v3.png"
+    },
+    {
+      "brief_id": "brief_011",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "You've invested so much, and that crucial 1500+ still feels just out of reach. For students targeting top-tier schools, those final 50-100 points on the SAT are everything. Our top 5% tutors specialize in elevating scores from the 1350-1450 range into true T20 contention. Your child is matched with an expert in 24 hours, focusing precisely on their unique areas for gain. Discover the precise edge they need.",
+        "headline": "Elevate Scores Beyond the Plateau.",
+        "description": "Specialized tutoring for the critical 1500+ SAT score.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: exhausted parent (40s-50s) at a sleek laptop on a kitchen island at 1 AM. Empty ceramic coffee cup, reading glasses pushed up on forehead. Gloomy lamp light illuminates their face, showing clear frustration and fatigue. A high-end fountain pen rests on an open college admissions guide nearby. Raw, honest emotion, captured as if from the doorway."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear target audience and goal, though slightly dense on first read."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Highly specific niche: elevating 1350-1450 scores to 1500+ for T20 schools."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Specific free assessment with clear urgency around competitive advantage."
+        },
+        "brand_voice": {
+          "score": 8.2,
+          "rationale": "Premium positioning with top 5% tutors and precise matching aligns well."
+        },
+        "emotional_resonance": {
+          "score": 9.2,
+          "rationale": "Captures frustration of plateau and high stakes for top-tier admissions beautifully."
+        },
+        "average_score": 8.54,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_011_v4.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test takers run out of time. Ours don't. Your child is smart. But the SAT isn't just about knowing answers; it's about strategy. Our 1-on-1 online tutoring helps them master the digital test. No local options? No problem. You get top 5% tutors matched in 24 hours. See 200+ point average score improvements. A free diagnostic assessment shows where to start.",
+        "headline": "Your Child Won't Run Out of Time.",
+        "description": "Get matched with a vetted, expert tutor in just 24 hours.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo of a teenage girl, maybe 16, sitting at a kitchen table in a modest but tidy home, looking at a laptop screen with genuine shock and joy, jaw dropped and a small fist raised in triumph. Late afternoon sunlight streams in. Her mom, in the background folding laundry, is looking over her shoulder with an equally surprised and proud expression. The scene feels authentic, unposed, and joyful."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Hook is clear but middle section gets slightly dense with multiple concepts."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcome with 200+ points, strategic advantage, and top 5% tutors clearly stated."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-friction, and clear starting point with urgency implied."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly VT with parent empathy, quality matching, and concrete results messaging."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Addresses real parent anxiety about time pressure and validates child's intelligence effectively."
+        },
+        "average_score": 8.32,
+        "passes_threshold": true,
+        "weakest_dimension": "clarity",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_012_v1.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 2,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Achieve 200+ SAT points in just 8 weeks with a top 5% expert, boosting your college applications! Our 1-on-1 online tutoring connects you with a vetted expert based on specific needs within 24 hours. Get focused SAT prep from anywhere. A free diagnostic reveals your path to higher scores.",
+        "headline": "Top SAT Scores, Expert Online Guidance.",
+        "description": "Access a top 5% tutor, matched in 24 hours, online.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo: A high school student (around 16-17) and an online tutor on a laptop screen, both at a clean, contemporary desk in a well-lit, comfortable home study. Warm evening light streams from a window. The student, engaged and focused, has a visible moment of 'aha!' understanding, eyes widening, as the tutor points to a specific math problem on the shared screen."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Message is clear but slightly dense with multiple claims competing for attention."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement in 8 weeks with top 5% expert is concrete."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment with specific next step creates clear urgency and action."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Conveys quality and matching concept but lacks distinctive Varsity Tutors personality."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Mentions college applications benefit but doesn't deeply tap into student or parent motivations."
+        },
+        "average_score": 7.9,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 9500,
+      "estimated_cost_usd": 0.02265,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Simplified primary_text for directness and focus on outcomes."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed vague phrases and forbidden terms from primary_text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_012_v2.png"
+    },
+    {
+      "brief_id": "brief_012",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Up late helping again? We get it. Finding quality SAT tutoring feels tough. We connect students with top 5% tutors, matched to their exact needs in just 24 hours, averaging 200+ point SAT score improvements. No more guesswork or long drives. Varsity Tutors, with 3.4 million learner ratings, offers a straightforward path to higher scores. Start with a free diagnostic.",
+        "headline": "Student Effort Deserves Real Results.",
+        "description": "Find expert 1-on-1 SAT tutoring, built for student success. See 200+ point average score improvements. Start with a free diagnostic.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a parent, mid-40s, slumped slightly at a sturdy kitchen table in a modest home at 11:30pm, laptop open to a practice test. Empty, chipped coffee mug beside them, reading glasses pushed up on forehead. Weary but determined expression under soft lamp light. Feels honest, not staged, reflecting a quiet, late-night effort."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Opens with relatable scenario, flows well, though slightly dense with details."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement, top 5% tutors, 24-hour matching all clear."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free diagnostic is specific and actionable, reduces commitment friction effectively."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Empathetic opening is good but slightly generic compared to gold standard."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Up late helping captures parent sacrifice and frustration authentically and powerfully."
+        },
+        "average_score": 7.96,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "primary_text",
+          "action": "Rephrased to include 200+ point average SAT score improvement, free diagnostic, and removed forbidden phrase 'your child'."
+        },
+        {
+          "dimension": "headline",
+          "action": "Rephrased to remove forbidden phrase 'Your Child's' while maintaining word count."
+        },
+        {
+          "dimension": "description",
+          "action": "Rephrased to include 200+ point average score improvements, free diagnostic, and removed forbidden phrase 'your child'."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Added specific outcome (200+ point average SAT score improvement) and a free diagnostic offer."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_012_v4.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 0,
+      "cycle": 4,
+      "ad": {
+        "primary_text": "Struggling to hit your target SAT score? Many students gain 200+ points on average with expert 1-on-1 tutoring. Get matched with a top 5% SAT coach in 24 hours, ready to pinpoint your specific needs. Start with a free diagnostic to see how much you can improve.",
+        "headline": "Boost Your SAT Score 200+ Points.",
+        "description": "Gain 200+ points with expert 1-on-1 SAT tutoring.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo: a student looking tired but determined at a kitchen table late at night, a half-finished SAT practice test open. A clock shows 1:45 AM. Nearby, a tablet displays a tutoring platform with a tutor's face, suggesting a path forward. The scene captures the late-night grind but hints at expert support."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific score improvement and timeline."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Concrete 200+ point gain, top 5% tutors, and personalized matching specified."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free diagnostic assessment is specific, actionable, and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 7.0,
+          "rationale": "Hits key VT elements but slightly less distinctive than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Addresses student struggle and improvement potential but misses dream school emotion."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 6000,
+      "estimated_cost_usd": 0.013612500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Integrated 'top 5% SAT coach' to enhance credibility and distinctiveness, while rephrasing to avoid forbidden words."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed to 'Start Free Assessment' to directly align with the 'free diagnostic' offer in the primary text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_013_v0.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 1,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Is your child struggling to reach their target score? Our top 5% tutors provide 1-on-1 support, delivering an average 200+ point SAT improvement, matched in 24 hours.",
+        "headline": "Boost Test Scores with Expert Tutoring.",
+        "description": "Stop worrying about test prep. Our rigorously vetted top 5% tutors provide personalized 1-on-1 support, delivering an average 200+ point score improvement, with a free diagnostic.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo: Teenager, jaw dropped, fist raised in excited disbelief, staring at a laptop screen displaying a high SAT score. Evening light illuminates a messy desk with energy drink cans. Parent in background, hands over mouth, eyes wide with relief. No text."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Message is immediately clear with specific metrics and timeline."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific outcome with 200+ points, top 5% tutors, and 24-hour matching."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-friction, and immediately actionable."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Includes VT elements like top 5% and matching but less distinctive."
+        },
+        "emotional_resonance": {
+          "score": 7.0,
+          "rationale": "Opens with struggle but focuses more on rational benefits than emotion."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 4000,
+      "estimated_cost_usd": 0.009075000000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary text and description for clearer messaging and outcome-focused language."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Integrated specific credibility markers like 'top 5% tutors,' '1-on-1 support,' 'matched in 24 hours,' 'average 200+ point improvement,' and 'free diagnostic'."
+        },
+        {
+          "dimension": "CTA",
+          "action": "Changed 'Learn More' to 'Start Free Assessment' for a more specific and low-friction next step."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed 'No Cheating' and aggressive tone; adopted a professional and supportive voice throughout."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Shifted from negative fear-based messaging to motivating score gap framing and positive outcomes."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_013_v1.png"
+    },
+    {
+      "brief_id": "brief_013",
+      "variation_index": 3,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Are college dreams slipping away due to a low SAT score? Our 1-on-1 tutoring matches you with a Top 5% expert in 24 hours, targeting exact weak areas. Benefit from 3.4 million learner session ratings and get the fast results you need to achieve an average 200+ point SAT score improvement.",
+        "headline": "Achieve 200+ SAT Points With Expert Tutors.",
+        "description": "Discover how students achieve 200+ point gains with targeted 1-on-1 expert tutoring.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo: slightly shaky, excited. A teen, late evening, eyes wide open, jaw slightly dropped in pure joy at their laptop screen showing a surprisingly high SAT score notification. The scene is tidy, suggesting focused work led to this 'fast answer.' Natural, soft screen glow on their face."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear message but slightly dense with multiple data points in primary text."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific 200+ point improvement with top 5% experts and proven track record."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment is specific, low-barrier, and creates urgency with 24-hour matching."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Incorporates VT differentiators but slightly less parent-focused than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.2,
+          "rationale": "Opens with dream-based pain point but feels slightly formulaic overall."
+        },
+        "average_score": 8.0,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 8000,
+      "estimated_cost_usd": 0.01815,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "CTA",
+          "action": "Changed from 'Learn More' to 'Start Free Assessment' to address the 'generic' feedback and align with the 'low-friction first step' rule, while still serving as an initial engagement for an awareness goal."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_013_v3.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "3.8 GPA. 1260 SAT. Something's off. 1-on-1 expert tutoring raises scores 200+ points on average. Fast.",
+        "headline": "Finally Match SAT Score To Grades.",
+        "description": "Get matched with a top 5% tutor in 24 hours for real gains.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo: a crumpled SAT practice test on a kitchen table, red pen circling a disappointing score (e.g., 1180), a microwave clock showing 11:47 PM in the background. Soft, late-night overhead kitchen light. Focus on the feeling of frustration and exhaustion, captured intimately, as if by a parent from across the table."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Instantly clear problem-solution through high GPA vs low SAT contrast."
+        },
+        "value_proposition": {
+          "score": 8.0,
+          "rationale": "Specific 200+ point improvement and top 5% matching differentiates well."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Free assessment with 24-hour matching creates urgency and specificity."
+        },
+        "brand_voice": {
+          "score": 7.5,
+          "rationale": "Confident and results-focused but slightly less warm than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 8.8,
+          "rationale": "Frustration of score-grade mismatch taps into real parent anxiety immediately."
+        },
+        "average_score": 8.36,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_014_v0.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 1,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT test takers run out of time. That's a strategy problem, not a knowledge one. Our top 5% tutors build confidence and speed. Get matched in 24 hours.",
+        "headline": "Beat the Clock: Score Higher Now.",
+        "description": "A free diagnostic shows exactly what's holding your child back.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style candid photo of a teenage boy, jaw dropped and fist slightly raised, looking at his laptop screen. His mother is visible in the background, smiling with relief. Natural afternoon light in a home study space, with a slightly messy desk showing real life."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Immediately clear problem and solution in under three seconds."
+        },
+        "value_proposition": {
+          "score": 7.8,
+          "rationale": "Addresses specific pain point but lacks concrete outcome metric like score improvement."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Specific free diagnostic with clear next step and 24-hour matching promise."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Distinctly Varsity Tutors with top 5% differentiation and data-driven insight."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Taps into time pressure anxiety but less emotionally compelling than dream school."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_014_v1.png"
+    },
+    {
+      "brief_id": "brief_014",
+      "variation_index": 4,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Tired of late nights and guessing on SAT practice tests, hoping for better scores? Stop the stress. Our 1-on-1 expert tutoring delivers an average 200+ point SAT score improvement, matched to your child's exact weak areas.",
+        "headline": "Effort Isn't Enough. Your Score Can Be.",
+        "description": "Get matched with a top 5% SAT tutor today.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a parent, late night around 1 AM, slumped slightly at a laptop, weary expression. Empty coffee mug next to the keyboard. Reading glasses pushed up on forehead. Soft, dim lamp light. An open SAT practice test book nearby. Shows quiet exhaustion."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Clear pain point to solution flow, immediately understandable message."
+        },
+        "value_proposition": {
+          "score": 8.8,
+          "rationale": "Specific 200+ point improvement, personalized matching, addresses exact weak areas."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Specific free assessment with clear next step and low barrier."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Strong personalization and outcome focus, though headline slightly abstract for VT."
+        },
+        "emotional_resonance": {
+          "score": 8.3,
+          "rationale": "Captures frustration and stress authentically, offers relief and hope."
+        },
+        "average_score": 8.48,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 3500,
+      "estimated_cost_usd": 0.0090375,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Improved sentence flow and combined choppy sentences in primary_text, ensuring the hook is a single, clear sentence ending with punctuation before character 100."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Integrated specific 200+ point average SAT score improvement and emphasized 1-on-1 tutoring matched to weak areas into primary_text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Refined primary_text tone to be more distinct and empathetic, while strictly avoiding forbidden terms."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_014_v4.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 0,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "Over 60% of SAT Math test takers run out of time. That feeling? It's fixable. You know the math, but the clock beats you. Our top 5% tutors show you exactly how to use the built-in calculator and formulas to solve tough problems in 15 seconds, not 75. Get matched in 24 hours with a tutor who will help you find those 100+ point gains on the math section.",
+        "headline": "Master SAT Math Timing. Score Higher.",
+        "description": "Learn to use the Digital SAT's built-in tools for faster math solutions.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style close-up photo: crumpled SAT Math practice test on a kitchen table at 11:30 PM, covered in hurried, incorrect calculations. A red pen circles a low score on the math section. Dim overhead kitchen light, highlighting the exhausted, frustrated expression of a high school junior whose hand is resting on his forehead, reflecting defeat."
+      },
+      "scores": {
+        "clarity": {
+          "score": 8.5,
+          "rationale": "Problem and solution immediately clear with concrete timing example."
+        },
+        "value_proposition": {
+          "score": 8.7,
+          "rationale": "Specific outcome of 100+ points via unique Digital SAT calculator strategy."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Clear free assessment with 24-hour matching creates urgency and specificity."
+        },
+        "brand_voice": {
+          "score": 7.8,
+          "rationale": "Strong problem-solving angle with top 5% tutors, slightly less distinctive VT."
+        },
+        "emotional_resonance": {
+          "score": 9.0,
+          "rationale": "That feeling it's fixable brilliantly captures frustration and hope together."
+        },
+        "average_score": 8.4,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_015_v0.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 1,
+      "cycle": 5,
+      "ad": {
+        "primary_text": "Does running out of time on SAT Math cost valuable points? Over 60% of test takers struggle to finish. Our 1-on-1 tutoring helps students master strategic speed and digital SAT math tools, enabling them to solve questions in 15 seconds, not 75. Achieve an average 200+ point SAT score improvement. Gain the confidence to finish strong and earn the score needed for their top college choices.",
+        "headline": "Digital SAT Math: Own Your Time.",
+        "description": "Master digital SAT tools and strategic timing with 1-on-1 expert support to boost your Math score by 200+ points.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "Teen at desk with laptop, relieved smile, warm natural light, authentic UGC style."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Specific problem and solution clear, though slightly dense with multiple claims."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Concrete timing improvement, specific tools, and quantified 200+ point outcome."
+        },
+        "call_to_action": {
+          "score": 8.0,
+          "rationale": "Free assessment is specific and low-friction entry point."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Professional and outcome-focused but less distinctive than gold standard."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Taps into time pressure anxiety and college admission stakes effectively."
+        },
+        "average_score": 7.8,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": null,
+      "tokens_used": 8000,
+      "estimated_cost_usd": 0.01815,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Rewrote primary_text and description for clearer message, outcome focus, and streamlined concepts."
+        },
+        {
+          "dimension": "Value Prop",
+          "action": "Integrated '1-on-1 tutoring' and '200+ point average SAT score improvement' into primary_text and description."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Revised primary_text and description to reflect a more expert, results-oriented tone, removing generic phrasing."
+        },
+        {
+          "dimension": "Emotion",
+          "action": "Strengthened personal connection to time pressure and highlighted the dream outcome of confidence and college readiness in primary_text."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_015_v1.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 2,
+      "cycle": 2,
+      "ad": {
+        "primary_text": "Sarah knew her math, but the clock kept winning. Her score stalled because she just ran out of time. Most high school juniors struggle with time on the SAT math section. The problem isn't your math skill; it's mastering the digital SAT tools. Expert 1-on-1 guidance shows how to effectively use the built-in calculator and formulas. Solve problems in 15 seconds instead of 75. Get matched with a top 5% expert in 24 hours. Begin with a free diagnostic assessment.",
+        "headline": "Conquer SAT Math Timing, Boost Your Score.",
+        "description": "Master SAT Math timing with strategies for built-in calculator and formulas.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a high school junior and a tutor at a warm kitchen table lit by soft evening light. The tutor points at a math problem on a laptop screen, specifically highlighting the built-in calculator feature. The student has a visible 'aha!' moment, eyes widening slightly, a hint of a smile forming as they grasp the solution. A half-eaten snack and a math textbook are casually present, making it feel real."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Story opening is clear, specific problem identified within first few seconds."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Concrete outcome with timing improvement from 75 to 15 seconds is specific."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Free diagnostic assessment with 24-hour match is specific and actionable."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Uses VT's matching language and top 5% phrasing but less distinctive."
+        },
+        "emotional_resonance": {
+          "score": 8.1,
+          "rationale": "Sarah's relatable frustration captures real student pain point effectively."
+        },
+        "average_score": 7.98,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 2000,
+      "estimated_cost_usd": 0.004537500000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Brand Voice",
+          "action": "Replaced forbidden phrase 'leverage' with 'effectively use' in primary_text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Rephrased 'Our 1-on-1 tutors' to 'Expert 1-on-1 guidance' in primary_text to avoid 'we have tutors' violation."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed urgency phrase 'today' from the primary_text's closing call to action."
+        },
+        {
+          "dimension": "Headline Length",
+          "action": "Revised headline to be exactly 7 words, meeting the 5-8 word count requirement."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_015_v2.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 3,
+      "cycle": 3,
+      "ad": {
+        "primary_text": "Over 60% of test takers run out of time on SAT Math, missing easy points! Master powerful calculator strategies with a top 5% tutor. Learn 15-second techniques built into the test to save minutes and gain 200+ points in 8 weeks. Our 1-on-1 tutoring targets your specific challenges. Begin with a free diagnostic assessment.",
+        "headline": "Master Calculator Strategies for Digital SAT Math.",
+        "description": "Learn the strategies that turn 75-second problems into 15-second wins.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style vertical phone photo. A high school junior, mid-cheer with a slightly shaky hand, holding up their phone screen to the camera. The screen clearly shows a Digital SAT score report with a significantly higher Math section score highlighted. Bright afternoon light streaming into their bedroom, a few math textbooks stacked messily in the background. Pure, unadulterated excitement on their face."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear problem and solution, though multiple concepts compete for attention."
+        },
+        "value_proposition": {
+          "score": 8.5,
+          "rationale": "Specific outcome with concrete timeframe and tangible technique differentiation."
+        },
+        "call_to_action": {
+          "score": 9.0,
+          "rationale": "Clear, specific action with free diagnostic removing friction."
+        },
+        "brand_voice": {
+          "score": 8.0,
+          "rationale": "Strong Varsity Tutors voice with top 5% positioning and specific results."
+        },
+        "emotional_resonance": {
+          "score": 7.5,
+          "rationale": "Taps into frustration of running out of time and missing easy points."
+        },
+        "average_score": 8.16,
+        "passes_threshold": true,
+        "weakest_dimension": "emotional_resonance",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 4000,
+      "estimated_cost_usd": 0.009075000000000001,
+      "status": "published",
+      "changes_made": [
+        {
+          "dimension": "Clarity",
+          "action": "Streamlined primary_text to focus on calculator strategy and specific outcomes."
+        },
+        {
+          "dimension": "Clarity",
+          "action": "Integrated specific, conditional score gain (200+ points in 8 weeks) into primary_text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Replaced 'secret weapon' with professional, outcome-oriented language in primary_text."
+        },
+        {
+          "dimension": "Brand Voice",
+          "action": "Removed 'Secrets' from headline to align with a premium brand voice."
+        }
+      ],
+      "image_url": "output/runs/20260315_200248/images/brief_015_v3.png"
+    },
+    {
+      "brief_id": "brief_015",
+      "variation_index": 4,
+      "cycle": 1,
+      "ad": {
+        "primary_text": "You've crushed every practice problem, but math time always runs out on the SAT. Over 60% of test takers feel that crunch. Imagine solving questions in 15 seconds, not 75, just by knowing the digital tools. Our top 5% tutors show you exactly how. Get matched in 24 hours to focus on your weak areas and master every shortcut. Stop losing points to the clock. Start gaining them with precision.",
+        "headline": "Conquer SAT Math: Master Calculator Shortcuts.",
+        "description": "Learn the built-in digital tools to finish SAT Math faster and score higher.",
+        "cta_button": "Start Free Assessment",
+        "image_prompt": "UGC-style photo of a high school junior slumped at their desk at 12:30 AM, laptop open to a complex SAT Math problem. A half-empty energy drink or coffee cup nearby. Visible frustration on their face, hand running through hair. Desk lamp illuminates the scene, casting shadows. Feels like a candid moment caught by a parent from the doorway, showing the real struggle."
+      },
+      "scores": {
+        "clarity": {
+          "score": 7.8,
+          "rationale": "Clear pain point and solution, though calculator shortcuts concept needs slight decoding."
+        },
+        "value_proposition": {
+          "score": 8.3,
+          "rationale": "Specific outcome promised: solve questions in 15 seconds versus 75 seconds."
+        },
+        "call_to_action": {
+          "score": 8.5,
+          "rationale": "Specific action with 24-hour matching promise creates urgency and clarity."
+        },
+        "brand_voice": {
+          "score": 7.2,
+          "rationale": "Mentions top 5% tutors and matching but less distinctly VT overall."
+        },
+        "emotional_resonance": {
+          "score": 8.7,
+          "rationale": "Taps into real frustration of time pressure and lost points effectively."
+        },
+        "average_score": 8.1,
+        "passes_threshold": true,
+        "weakest_dimension": "brand_voice",
+        "confidence": "high"
+      },
+      "model_used": "gemini-2.5-flash",
+      "tokens_used": 1500,
+      "estimated_cost_usd": 0.0045000000000000005,
+      "status": "published",
+      "image_url": "output/runs/20260315_200248/images/brief_015_v4.png"
+    }
+  ]
+}
