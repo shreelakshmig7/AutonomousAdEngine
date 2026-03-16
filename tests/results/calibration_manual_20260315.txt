@@ -1,0 +1,23 @@
+# Manual calibration — Judge vs GOLD/POOR anchors
+# Run: python3 scripts/calibrate.py
+# Date: 2026-03-15
+
+## Pass criteria (PR2 task 2.6)
+# Gold: average_score >= 8.0, passes_threshold == True
+# Poor: average_score <= 4.0, passes_threshold == False
+
+## Results
+
+--- Testing GOLD Anchor ---
+Gold Average Score: 8.8
+Passes Threshold: True
+# PASS: 8.8 >= 8.0, passes_threshold True
+
+--- Testing POOR Anchor ---
+Poor Average Score: 2.9
+Passes Threshold: False
+Weakest Dimension: emotional_resonance
+# PASS: 2.9 <= 4.0, passes_threshold False
+
+## Conclusion
+Manual calibration PASSED. Judge (Claude Sonnet 4.5) scores GOLD >= 8.0 and POOR <= 4.0 as required.

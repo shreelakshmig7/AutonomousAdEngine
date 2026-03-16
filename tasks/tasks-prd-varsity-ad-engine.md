@@ -87,7 +87,7 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
   - [x] 1.7 Create all `__init__.py` files for `generate/`, `evaluate/`, `iterate/`, `images/` packages
   - [x] 1.8 Create `output/` and `tests/results/` directories with `.gitkeep`
 
-- [ ] 2.0 PR2 — Evaluate Module (Judge + Rubrics) — Sunday Goal
+- [x] 2.0 PR2 — Evaluate Module (Judge + Rubrics) — Sunday Goal
   - [x] 2.1 Write `tests/test_evaluator.py` first (TDD red phase) — all 4 tests with mocked API
   - [x] 2.2 Confirm all 4 tests FAIL and save results to `tests/results/`
   - [x] 2.3 Create `evaluate/rubrics.py`:
@@ -103,7 +103,7 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
     - `scan_output_safety()` in PR2 scope — runs before scoring (competitor names, forbidden words, PII)
   - [x] 2.4 Create `evaluate/judge.py` — `AdJudge` class with `evaluate_ad()` calling Gemini 1.5 Pro, `build_prompt()` injecting calibration anchors, structured dict returns, full error handling
   - [x] 2.5 Run tests — confirm all 4 PASS (green), save results
-  - [ ] 2.6 Manual calibration check: gold anchor scores >= 8.0, poor anchor scores <= 4.0
+  - [x] 2.6 Manual calibration check: gold anchor scores >= 8.0, poor anchor scores <= 4.0 (see `tests/results/calibration_manual_20260315.txt`)
 
 - [x] 3.0 PR3 — Generate Module (Drafter + Prompts + Guardrails + Loaders)
   - [x] 3.1 Add AdBrief + CTA_OPTIONS to `evaluate/rubrics.py`; conftest fixtures `valid_ad_dict`, `sample_brief`
@@ -115,26 +115,26 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
   - [x] 3.7 Delete `generate/constants.py`; move model constants to `prompts.py`
   - [x] 3.8 Run tests — confirm all 10 PASS (green), save `pr3_GREEN_*.txt`; full regression `pr3_REGRESSION_*.txt` (all 14 pass, PR2 unchanged)
 
-- [ ] 4.0 PR4 — Iterate Module + Main Pipeline (50+ Ads)
-  - [ ] 4.1 Write `tests/test_iteration_cap.py` first (TDD red phase) — both iteration tests with mocked API
-  - [ ] 4.2 Confirm both tests FAIL and save results
-  - [ ] 4.3 Create `iterate/controller.py`:
+- [x] 4.0 PR4 — Iterate Module + Main Pipeline (50+ Ads)
+  - [x] 4.1 Write `tests/test_iteration_cap.py` first (TDD red phase) — both iteration tests with mocked API
+  - [x] 4.2 Confirm both tests FAIL and save results
+  - [x] 4.3 Create `iterate/controller.py`:
     - `AdController` class with `run_brief()` orchestrating the 3-cycle loop
     - `build_regeneration_prompt()` — anchors passing scores, targets only `weakest_dimension` (Edge Case 1: Whac-A-Mole fix)
     - Format: "You scored X/10 on [passing dimensions] — preserve these. Rewrite ONLY [weakest_dimension]."
     - Context window: < 1,000 tokens, no full history, weakest rationale stripped to 200 chars
     - `unresolvable` status logic + structured logging
-  - [ ] 4.4 Run iteration tests — confirm both PASS (green), save results
-  - [ ] 4.5 Create `main.py` as a **generator** `run_pipeline_streaming(briefs, competitive_context, brand_guidelines)` that yields progress (e.g. `{"status": "drafting", "brief_id": ...}`); CLI iterates over it with `rich` live progress; write `ads_library.json` + `iteration_log.csv`; validate 50+ ads produced
-  - [ ] 4.6 Write `tests/test_integration.py` (TDD red), implement, confirm PASS, save results
-  - [ ] 4.7 Run full pipeline end-to-end: confirm `ads_library.json` has 50+ passing entries
+  - [x] 4.4 Run iteration tests — confirm both PASS (green), save results
+  - [x] 4.5 Create `main.py` as a **generator** `run_pipeline_streaming(briefs, competitive_context, brand_guidelines)` that yields progress (e.g. `{"status": "drafting", "brief_id": ...}`); CLI iterates over it with `rich` live progress; write `ads_library.json` + `iteration_log.csv`; validate 50+ ads produced
+  - [x] 4.6 Write `tests/test_integration.py` (TDD red), implement, confirm PASS, save results
+  - [x] 4.7 Run full pipeline end-to-end: confirm `ads_library.json` has 50+ passing entries
 
-- [ ] 5.0 PR5 — v2 Image Generation + Quality Visualization
-  - [ ] 5.1 Create `images/image_generator.py` — `AdImageGenerator` class with `generate_image()` calling Imagen / Nano Banana, saves to `output/images/`, returns `image_url`, only runs on ads passing threshold
-  - [ ] 5.2 Wire image generation into `main.py` — each passing ad triggers `generate_image()` with its `image_prompt`, `image_url` saved to `ads_library.json`
-  - [ ] 5.3 Add `output/quality_trends.png` generation to `main.py` — matplotlib/seaborn chart of average score per cycle across all briefs, must show measurable upward slope
-  - [ ] 5.4 Verify `output/iteration_log.csv` captures all fields: `brief_id`, `difficulty`, `cycle`, all 5 dimension scores, `average_score`, `weakest_dimension`, `status`, `tokens_used`, `cost_usd`
-  - [ ] 5.5 Run regression: `pytest tests/ -v` — confirm all previously passing tests still pass
+- [x] 5.0 PR5 — v2 Image Generation + Quality Visualization
+  - [x] 5.1 Create `images/image_generator.py` — `AdImageGenerator` class with `generate_image()` calling Imagen / Nano Banana, saves to `output/images/`, returns `image_url`, only runs on ads passing threshold
+  - [x] 5.2 Wire image generation into `main.py` — each passing ad triggers `generate_image()` with its `image_prompt`, `image_url` saved to `ads_library.json`
+  - [x] 5.3 Add `output/quality_trends.png` generation to `main.py` — matplotlib/seaborn chart of average score per cycle across all briefs, must show measurable upward slope
+  - [x] 5.4 Verify `output/iteration_log.csv` captures all fields: `brief_id`, `difficulty`, `cycle`, all 5 dimension scores, `average_score`, `weakest_dimension`, `status`, `tokens_used`, `cost_usd`
+  - [x] 5.5 Run regression: `pytest tests/ -v` — confirm all previously passing tests still pass
 
 - [ ] 6.0 PR6 — Documentation, README & Submission Polish
   - [ ] 6.1 Write `README.md` — one-command cold-start (`python main.py`), Streamlit (`streamlit run app.py`), prerequisites, `.env` setup, output file descriptions, test run instructions
@@ -144,8 +144,8 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
   - [ ] 6.5 Verify no automatic deductions: 50+ ads ✓, evaluation scores on all ads ✓, iteration attempted ✓, working demo ✓, decision log ✓
 
 - [ ] 7.0 PR7 — Streamlit UI & Deployment
-  - [ ] 7.1 Create `app.py` — Streamlit UI that calls `run_pipeline_streaming()`, displays each yielded progress update live; does not modify pipeline logic
-  - [ ] 7.2 Add `streamlit` to `requirements.txt`
-  - [ ] 7.3 Deploy to Streamlit Cloud — submission URL: `[yourname]-varsity-ad-engine.streamlit.app`
-  - [ ] 7.4 Record demo video — screen recording of Streamlit run
-  - [ ] 7.5 Submission package: GitHub repo URL + Streamlit app URL + demo video; commit output files to repo as fallback (app may sleep on free tier)
+  - [x] 7.1 Create `app.py` — Streamlit UI that calls `run_pipeline_streaming()`, displays each yielded progress update live; does not modify pipeline logic
+  - [x] 7.2 Add `streamlit` to `requirements.txt`
+  - [x] 7.3 Deploy to Streamlit Cloud — submission URL: `[yourname]-varsity-ad-engine.streamlit.app`
+  - [x] 7.4 Record demo video — screen recording of Streamlit run
+  - [ ] 7.5 Submission package: GitHub repo URL + Streamlit app URL + demo video; commit output files to repo as fallback (app may sleep on free tier). See `SUBMISSION.md`.

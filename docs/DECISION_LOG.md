@@ -534,3 +534,31 @@ Running **brief_005 v0** directly **after quota reset** returned:
 ### Lesson
 - **20 req/day free tier** is **insufficient** for a **60-attempt** pipeline.
 - **Production** deployment requires **paid Gemini tier** or **full fallback to Claude** for all drafter calls (or equivalent quota).
+
+---
+
+## Decision: Performance-per-Token Tracking (PRD Bonus)
+
+**Date:** 2026-03-16  
+**Files affected:** `main.py`, `iterate/controller.py`, `output/iteration_log.csv`, `output/ads_library.json`
+
+### What We Did
+
+- **Per-run totals:** Every pipeline run records `total_tokens`, `estimated_cost_usd` in the final yielded status and in the run directory.
+- **Per-variation:** Each `run_brief()` result includes `tokens_used` and `estimated_cost_usd`; these are aggregated in `main.py` and written per row in `iteration_log.csv` (columns `tokens_used`, `cost_usd`).
+- **Per published ad:** Each entry in `ads_library.json` includes `tokens_used` and `estimated_cost_usd` (or equivalent) for that ad's path to publish.
+- **Cost model:** Gemini and Claude cost estimates are applied in both controller and main (e.g. Gemini ~$0.075/1K tokens, Claude ~$0.003/1K tokens) so we can compute cost per publishable ad and ROI.
+
+### Metrics You Can Report
+
+- **Average cost per publishable ad:** Sum `estimated_cost_usd` (or `cost_usd`) for published ads in a run, divide by number of published ads.
+- **Average cycles to reach 7.0+:** From `iteration_log.csv`, average `cycle` at which `status == "published"` (or average `cycle` for rows with `average_score >= 7.0`).
+- **Tokens per publishable ad:** Sum `tokens_used` for the variations that ended published, divide by number of published ads.
+
+### Why
+
+The PRD awards a bonus for performance-per-token and asks for ROI to be documented in the decision log. Tracking cost and tokens per run and per ad allows honest reporting of efficiency and supports the "minimal human intervention" and "measurable quality improvement" goals.
+
+### Confidence
+
+High. The pipeline already records the needed fields; reporting is a matter of aggregating from `iteration_log.csv` and `ads_library.json` for any completed run.

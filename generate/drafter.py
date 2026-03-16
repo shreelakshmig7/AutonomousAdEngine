@@ -237,11 +237,9 @@ class AdDrafter:
             total_variations=total_variations,
         )
 
-        # Vary temperature per variation to force creative diversity
-        base_temp = 0.9
-        temp_offset = (variation_index or 0) * 0.05
+        # Temperature 0 for determinism (PRD: reproducible seeds; test_drafter_enforces_seed_determinism)
         generation_config = {
-            "temperature": min(base_temp + temp_offset, 1.0),
+            "temperature": 0,
             "candidate_count": 1,
             "response_mime_type": "application/json",
         }

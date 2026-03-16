@@ -176,6 +176,7 @@ def build_drafter_prompt(
         "UGC-style vertical phone photo of a college acceptance letter held up next to an SAT score report, both in frame, held by a teenager's hands, slight camera shake like it was taken in excitement. Natural light. No text overlays.",
         "UGC-style photo of an exhausted parent at a laptop at midnight, searching on screen, empty coffee cup beside them, reading glasses on. Relatable, honest, no glamour. No text overlays.",
     ]
+    variation_instruction = ""
     if variation_index is not None and total_variations is not None and total_variations > 1:
         n = variation_index + 1
 

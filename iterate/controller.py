@@ -17,23 +17,10 @@ Key constants / functions:
 from __future__ import annotations
 
 import json
-import time
+from pathlib import Path
 from typing import Any
 
 from pydantic import ValidationError as PydanticValidationError
-
-# #region agent log
-_DEBUG_LOG_PATH = "/Users/shreelakshmigopinatharao/AutonomousAdEngine/.cursor/debug-3c2b3e.log"
-def _debug_log(message: str, data: dict, hypothesis_id: str = ""):
-    try:
-        payload = {"sessionId": "3c2b3e", "location": "controller.py", "message": message, "data": data, "timestamp": int(time.time() * 1000)}
-        if hypothesis_id:
-            payload["hypothesisId"] = hypothesis_id
-        with open(_DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
-            f.write(json.dumps(payload, default=str) + "\n")
-    except Exception:
-        pass
-# #endregion
 
 from evaluate.rubrics import (
     AdBrief,
@@ -97,6 +84,20 @@ def _minimal_ad_from_raw(raw_draft: dict, validation_errors: list) -> AdCopy | N
         return AdCopy.model_validate(minimal)
     except Exception:
         return None
+
+
+def _is_judge_transient_error(error: str | None) -> bool:
+    """True if judge failed due to timeout or connection (retry once)."""
+    if not error:
+        return False
+    err_lower = error.lower()
+    return (
+        "timed out" in err_lower
+        or "timeout" in err_lower
+        or "interrupted" in err_lower
+        or "connection" in err_lower
+        or "request cancelled" in err_lower
+    )
 
 
 REASONABLE_RATIONALE_MAX_CHARS_MULTI: int = 120
@@ -189,6 +190,9 @@ def build_regeneration_prompt(
             strong_names = [DIMENSION_DISPLAY_NAMES.get(d, d) for d in strong_dims]
             preserve_line = f"Do not change the following (they scored 8 or higher): {', '.join(strong_names)}."
         required_section = "\n".join(f"• {f}" for f in required_fixes)
+        voice = (brand_guidelines or {}).get("voice") or {}
+        forbidden_list = voice.get("forbidden_words_and_phrases") or []
+        forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
         return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
 CRITICAL: headline must be exactly 5-8 words. Count the words.
 
@@ -202,6 +206,7 @@ Inputs:
 Constraints:
 • Preservation: Do NOT change dimensions that scored 8 or higher.
 • Fixation: Focus 100% of your creative energy on rewriting only the specific Weak Dimensions.
+• Lengths: primary_text at most 500 characters; image_prompt at most 450 characters.{forbidden_line}
 • JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<display name>", "action": "<short description of what you changed>"}}).
 
 {context_line}
@@ -223,6 +228,9 @@ Return valid JSON only, with this exact structure:
     keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
     guideline_slice = _get_guideline_slice(brand_guidelines, keys)
     display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
+    voice = (brand_guidelines or {}).get("voice") or {}
+    forbidden_list = voice.get("forbidden_words_and_phrases") or []
+    forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
     return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
 CRITICAL: headline must be exactly 5-8 words. Count the words.
 
@@ -234,7 +242,8 @@ Inputs:
 3) Feedback: {rationale}
 
 Constraints:
-• Fixation: Focus 100% on rewriting only the parts that affect {display}.
+• Fixation: Focus 100% on rewriting only the parts that affect {display}.{forbidden_line}
+• Lengths: primary_text at most 500 characters; image_prompt at most 450 characters.
 • JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<name>", "action": "<short description>"}}).
 
 {context_line}
@@ -367,18 +376,12 @@ def run_brief(
                     raw_draft = draft_result.get("raw_draft")
                     validation_errors = draft_result.get("validation_errors") or []
                     minimal_ad = _minimal_ad_from_raw(raw_draft, validation_errors) if raw_draft else None
-                    # #region agent log
-                    _debug_log("draft_schema_fail", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle, "has_raw_draft": raw_draft is not None, "validation_errors_count": len(validation_errors), "minimal_ad_set": minimal_ad is not None, "error_snippet": (err or "")[:180]}, "H1_H3_H4")
-                    # #endregion
                     if minimal_ad is not None:
                         current_ad = minimal_ad
                         scan_fail_rationale = err
                         current_report = None
                     continue
                 # API or other unrecoverable failure: return immediately
-                # #region agent log
-                _debug_log("unresolvable", {"path": "draft_api", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (err or "")[:180]}, "H6")
-                # #endregion
                 mu = draft_result.get("model_used")
                 if mu is not None and not isinstance(mu, str):
                     mu = None
@@ -422,10 +425,22 @@ def run_brief(
                     single_weak_dimension=weakest,
                     single_rationale=rationale,
                 )
+            parsed = None
+            last_regen_exc = None
+            for regen_attempt in range(2):
+                try:
+                    raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.5, "response_mime_type": "application/json"})
+                    cleaned = drafter._clean_json_response(raw)
+                    parsed = json.loads(cleaned)
+                    break
+                except Exception as e:
+                    last_regen_exc = e
+                    if regen_attempt == 0 and ("504" in str(e) or "Deadline Exceeded" in str(e)):
+                        continue
+                    raise
+            if parsed is None:
+                raise last_regen_exc  # type: ignore[misc]
             try:
-                raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.5, "response_mime_type": "application/json"})
-                cleaned = drafter._clean_json_response(raw)
-                parsed = json.loads(cleaned)
                 # Support wrapper {"optimized_ad": {...}, "changes_made": [...]} or legacy plain AdCopy
                 if "optimized_ad" in parsed:
                     current_ad = AdCopy.model_validate(parsed["optimized_ad"])
@@ -436,9 +451,6 @@ def run_brief(
                 total_tokens += 500  # approximate regen call
                 total_cost += _estimate_cost(500, drafter._model_name)
             except PydanticValidationError as ve:
-                # #region agent log
-                _debug_log("regen_validation_fail", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle, "error_snippet": str(ve)[:180]}, "H2")
-                # #endregion
                 iteration_log.append({
                     "cycle": cycle,
                     "regen_validation_failed": True,
@@ -455,29 +467,51 @@ def run_brief(
                     "status": "regen_validation_failed",
                 })
                 if cycle >= MAX_CYCLES:
-                    # #region agent log
-                    _debug_log("unresolvable", {"path": "regen_validation_max", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": str(ve)[:180]}, "H2")
-                    # #endregion
-                    return {
-                        "brief_id": brief.id,
-                        "variation_index": variation_index,
-                        "status": "unresolvable",
-                        "cycles_used": cycle,
-                        "final_ad": None,
-                        "final_score": None,
-                        "final_report": None,
-                        "iteration_log": iteration_log,
-                        "changes_made": last_changes_made,
-                        "model_used": model_used,
-                        "tokens_used": total_tokens,
-                        "estimated_cost_usd": total_cost,
-                        "error": str(ve),
-                    }
-                continue
+                    # Last-cycle truncation fallback: try fixing length-only violations
+                    opt = dict(parsed.get("optimized_ad") or parsed)
+                    if isinstance(opt.get("primary_text"), str) and len(opt["primary_text"]) > 500:
+                        opt["primary_text"] = opt["primary_text"][:500]
+                    if isinstance(opt.get("image_prompt"), str) and len(opt["image_prompt"]) > 450:
+                        opt["image_prompt"] = opt["image_prompt"][:450]
+                    try:
+                        current_ad = AdCopy.model_validate(opt)
+                        last_changes_made = parsed.get("changes_made") or []
+                        iteration_log.append({
+                            "cycle": cycle,
+                            "regen_validation_failed": True,
+                            "error": str(ve),
+                            "recovery": "truncation_fallback",
+                            "primary_text": getattr(current_ad, "primary_text", "")[:80] or "",
+                            "headline": getattr(current_ad, "headline", "") or "",
+                            "clarity": None,
+                            "value_proposition": None,
+                            "call_to_action": None,
+                            "brand_voice": None,
+                            "emotional_resonance": None,
+                            "average_score": None,
+                            "weakest_dimension": None,
+                            "status": "regen_validation_recovered",
+                        })
+                        # fall through to scan/judge below
+                    except Exception:
+                        return {
+                            "brief_id": brief.id,
+                            "variation_index": variation_index,
+                            "status": "unresolvable",
+                            "cycles_used": cycle,
+                            "final_ad": None,
+                            "final_score": None,
+                            "final_report": None,
+                            "iteration_log": iteration_log,
+                            "changes_made": last_changes_made,
+                            "model_used": model_used,
+                            "tokens_used": total_tokens,
+                            "estimated_cost_usd": total_cost,
+                            "error": str(ve),
+                        }
+                else:
+                    continue
             except Exception as e:
-                # #region agent log
-                _debug_log("unresolvable", {"path": "regen_exception", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": str(e)[:180]}, "H6")
-                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -495,9 +529,6 @@ def run_brief(
                 }
 
         if current_ad is None:
-            # #region agent log
-            _debug_log("break_no_ad", {"brief_id": brief.id, "variation_index": variation_index, "cycle": cycle}, "H1")
-            # #endregion
             break
 
         scan_result = scan_output_safety(current_ad, forbidden_phrases=forbidden_phrases)
@@ -520,9 +551,6 @@ def run_brief(
                 "status": "scan_failed",
             })
             if cycle >= MAX_CYCLES:
-                # #region agent log
-                _debug_log("unresolvable", {"path": "scan_max", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (scan_result.get("error") or "Safety violations")[:180]}, "H5")
-                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -542,11 +570,17 @@ def run_brief(
             current_report = None
             continue
 
-        judge_result = judge.evaluate_ad(current_ad)
-        if not judge_result.get("success"):
-            # #region agent log
-            _debug_log("unresolvable", {"path": "judge_fail", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle, "error_snippet": (judge_result.get("error") or "Judge failed")[:180]}, "H6")
-            # #endregion
+        judge_result = None
+        last_judge_err = None
+        for judge_attempt in range(2):
+            judge_result = judge.evaluate_ad(current_ad)
+            if judge_result.get("success"):
+                break
+            last_judge_err = judge_result.get("error", "Judge failed")
+            if judge_attempt == 0 and _is_judge_transient_error(last_judge_err):
+                continue
+            break
+        if not judge_result or not judge_result.get("success"):
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -560,7 +594,7 @@ def run_brief(
                 "model_used": model_used,
                 "tokens_used": total_tokens,
                 "estimated_cost_usd": total_cost,
-                "error": judge_result.get("error", "Judge failed"),
+                "error": judge_result.get("error", last_judge_err) if judge_result else (last_judge_err or "Judge failed"),
             }
 
         report = judge_result.get("data")
@@ -569,9 +603,6 @@ def run_brief(
             try:
                 report = EvaluationReport.model_validate(report)
             except Exception:
-                # #region agent log
-                _debug_log("unresolvable", {"path": "judge_report_invalid", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
-                # #endregion
                 return {
                     "brief_id": brief.id,
                     "variation_index": variation_index,
@@ -588,9 +619,6 @@ def run_brief(
                     "error": "Judge returned data that is not a valid EvaluationReport",
                 }
         if report is None:
-            # #region agent log
-            _debug_log("unresolvable", {"path": "judge_report_none", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
-            # #endregion
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -651,9 +679,6 @@ def run_brief(
             }
 
         if cycle >= MAX_CYCLES:
-            # #region agent log
-            _debug_log("unresolvable", {"path": "max_cycles_never_passed", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H6")
-            # #endregion
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -670,9 +695,6 @@ def run_brief(
                 "error": None,
             }
 
-    # #region agent log
-    _debug_log("unresolvable", {"path": "max_cycles_no_ad", "brief_id": brief.id, "variation_index": variation_index, "cycles_used": cycle}, "H1")
-    # #endregion
     return {
         "brief_id": brief.id,
         "variation_index": variation_index,

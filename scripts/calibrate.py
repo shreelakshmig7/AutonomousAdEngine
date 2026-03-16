@@ -1,3 +1,11 @@
+import sys
+from pathlib import Path
+
+# Ensure project root is on path (run from repo root or scripts/)
+_root = Path(__file__).resolve().parent.parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
+
 from evaluate.judge import AdJudge
 from evaluate.rubrics import GOLD_ANCHOR, POOR_ANCHOR, AdCopy
 
