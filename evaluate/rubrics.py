@@ -8,7 +8,9 @@ Pydantic schemas. scan_output_safety() runs before scoring. All anchors and
 constants live here — judge imports them at module level.
 
 Key constants / classes:
-  QUALITY_THRESHOLD, MAX_CYCLES, DIMENSIONS, DIMENSION_PRIORITY, HOOK_MAX_CHARS
+  QUALITY_THRESHOLD, MAX_EVALUATION_CYCLES, MAX_PRE_JUDGE_REPAIR_ATTEMPTS,
+  MAX_DRAFT_RETRIES_NO_MINIMAL, MAX_CYCLES (alias),
+  DIMENSIONS, DIMENSION_PRIORITY, HOOK_MAX_CHARS
   CTA_OPTIONS, GOLD_ANCHOR, POOR_ANCHOR
   AdBrief, AdCopy, DimensionScore, EvaluationReport
   scan_output_safety()
@@ -30,7 +32,14 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 QUALITY_THRESHOLD: float = 7.0
 # Dimensions scoring >= this are preserved in iteration (no edits)
 STRONG_DIMENSION_THRESHOLD: float = 8.0
-MAX_CYCLES: int = 3
+# Max judge evaluations per brief×variation (cycle 1 = first score, then up to 2 more if below threshold)
+MAX_EVALUATION_CYCLES: int = 3
+# Max editor-regeneration attempts to fix schema/validation/safety before any judge (cumulative per variation)
+MAX_PRE_JUDGE_REPAIR_ATTEMPTS: int = 2
+# Max full-draft retries when schema error yields no minimal AdCopy (avoids infinite loop)
+MAX_DRAFT_RETRIES_NO_MINIMAL: int = 2
+# Backward-compatible alias — same as MAX_EVALUATION_CYCLES
+MAX_CYCLES: int = MAX_EVALUATION_CYCLES
 EXCELLENT_THRESHOLD: float = 7.5
 DIMENSIONS: list[str] = [
     "clarity",

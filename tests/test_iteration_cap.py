@@ -18,6 +18,7 @@ from evaluate.rubrics import (
     DimensionScore,
     EvaluationReport,
     MAX_CYCLES,
+    MAX_PRE_JUDGE_REPAIR_ATTEMPTS,
     QUALITY_THRESHOLD,
 )
 
@@ -301,3 +302,56 @@ def test_dimension_to_guideline_mapping_complete() -> None:
     for dim in required:
         assert dim in DIMENSION_TO_GUIDELINE_KEY, f"Missing dimension: {dim}"
     assert len(DIMENSION_TO_GUIDELINE_KEY) == 5
+
+
+def test_pre_judge_repair_exhausted_scan_never_passes(
+    sample_brief: AdBrief,
+    valid_ad_copy: AdCopy,
+) -> None:
+    """After MAX_PRE_JUDGE_REPAIR_ATTEMPTS regens, scan still failing → unresolvable, judge never called."""
+    from iterate.controller import run_brief
+
+    draft_return = {
+        "success": True,
+        "data": valid_ad_copy,
+        "tokens_used": 100,
+        "model_used": "gemini-2.5-flash",
+        "error": None,
+    }
+
+    with (
+        patch("iterate.controller.AdDrafter") as MockDrafter,
+        patch("iterate.controller.AdJudge") as MockJudge,
+        patch(
+            "iterate.controller.scan_output_safety",
+            return_value={"success": True, "safe": False, "error": "Safety violations: test"},
+        ),
+        patch("iterate.controller._editor_regen") as mock_regen,
+    ):
+        mock_drafter_instance = MagicMock()
+        mock_drafter_instance.draft_ad.return_value = draft_return
+        MockDrafter.return_value = mock_drafter_instance
+
+        mock_judge_instance = MagicMock()
+        MockJudge.return_value = mock_judge_instance
+
+        mock_regen.return_value = {
+            "success": True,
+            "data": valid_ad_copy,
+            "error": None,
+            "changes_made": [],
+        }
+
+        result = run_brief(
+            sample_brief,
+            SAMPLE_CONTEXT,
+            SAMPLE_GUIDELINES,
+            variation_index=0,
+        )
+
+    assert result["status"] == "unresolvable"
+    assert result["cycles_used"] == 0
+    assert mock_judge_instance.evaluate_ad.call_count == 0
+    assert result["iteration_log"] == []
+    assert mock_regen.call_count == MAX_PRE_JUDGE_REPAIR_ATTEMPTS
+    assert result.get("error", "").startswith("safety_failure_exhausted")

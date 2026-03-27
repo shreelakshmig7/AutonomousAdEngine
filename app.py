@@ -585,27 +585,37 @@ def main() -> None:
 
     log_df = load_iteration_log_df(log_path)
 
-    # --- Self-Healing Proof: ads that failed cycle 1 and were healed (published) in 2+ cycles ---
+    # --- Self-Healing Proof: first judged evaluation vs final published (evaluation cycles from pipeline) ---
     st.subheader("Self-Healing Proof")
     if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns:
         has_copy = "primary_text" in log_df.columns
         has_status = "status" in log_df.columns
         groups = log_df.groupby(["brief_id", "variation"], dropna=False)
         healed: list[tuple[Any, Any, pd.Series, pd.Series]] = []
+
+        def _num_cycle_col(series: pd.Series) -> pd.Series:
+            return pd.to_numeric(series, errors="coerce")
+
         for (bid, var), grp in groups:
-            cycles = pd.to_numeric(grp["cycle"], errors="coerce").dropna()
-            if cycles.empty or cycles.max() < 2:
+            judged = grp[pd.to_numeric(grp["average_score"], errors="coerce").notna()]
+            if judged.empty:
                 continue
-            c1_rows = grp[grp["cycle"] == 1]
-            c_final = int(cycles.max())
-            final_rows = grp[grp["cycle"] == c_final]
-            if c1_rows.empty or final_rows.empty:
+            judged_sorted = judged.assign(_c=_num_cycle_col(judged["cycle"])).sort_values("_c")
+            first_judged = judged_sorted.iloc[0]
+            if not has_status:
                 continue
-            final_row = final_rows.iloc[-1]
-            # Only show as healed when the final cycle actually published (reached threshold)
-            if has_status and str(final_row.get("status")).strip().lower() != "published":
+            pub = grp[
+                grp["status"].astype(str).str.strip().str.lower() == "published"
+            ]
+            if pub.empty:
                 continue
-            healed.append((bid, var, c1_rows.iloc[0], final_row))
+            pub_sorted = pub.assign(_c=_num_cycle_col(pub["cycle"])).sort_values("_c")
+            final_row = pub_sorted.iloc[-1]
+            c_first = float(pd.to_numeric(first_judged["cycle"], errors="coerce"))
+            c_final = float(pd.to_numeric(final_row["cycle"], errors="coerce"))
+            if c_final <= c_first:
+                continue
+            healed.append((bid, var, first_judged, final_row))
         if not healed:
             st.info("All ads passed on first attempt — no healing needed.")
         else:
@@ -622,8 +632,8 @@ def main() -> None:
                     ad_by_brief_var[(b, v)] = a
 
             for bid, var, r1, r2 in healed:
-                s1 = float(r1["average_score"]) if pd.notna(r1.get("average_score")) else 0.0
-                s2 = float(r2["average_score"]) if pd.notna(r2.get("average_score")) else 0.0
+                s1 = float(r1["average_score"])
+                s2 = float(r2["average_score"])
                 delta = round(s2 - s1, 1)
                 if delta > 0:
                     title = f"Brief {bid} · Var {var} — Score lifted from {s1} → {s2} (+{delta})"
@@ -634,7 +644,7 @@ def main() -> None:
                 with st.expander(title, expanded=False):
                     col_initial, col_healed = st.columns(2)
                     with col_initial:
-                        st.markdown("### Initial Draft")
+                        st.markdown("### First judged evaluation")
                         pt1 = "—"
                         if has_copy and "primary_text" in r1.index:
                             pt1 = r1["primary_text"]

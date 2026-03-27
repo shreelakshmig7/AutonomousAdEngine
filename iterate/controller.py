@@ -3,21 +3,20 @@ controller.py
 -------------
 Varsity Ad Engine — Nerdy / Gauntlet — Iteration controller (PR4)
 -------------------------------------------------------------------
-run_brief() orchestrates draft → scan → judge → iterate. build_regeneration_prompt()
-uses a surgical Senior Ad Copy Editor persona: targeted optimizations on weak
-dimensions only, preservation of dimensions scoring >= 8, JSON output with
-optimized_ad and changes_made. Gates 1–2 run before calling drafter.
+run_brief() orchestrates draft → pre-judge repair cap (schema/safety) → judge →
+quality regen. Logged cycle 1..N is the Nth judge evaluation only (not repair
+loops). build_regeneration_prompt() uses a surgical Senior Ad Copy Editor persona.
 
 Key constants / functions:
   DIMENSION_TO_GUIDELINE_KEY — map dimension to brand_guidelines slice
-  run_brief()               — full cycle; returns changes_made from last regen
+  run_brief()               — MAX_EVALUATION_CYCLES judge passes; pre-judge repairs capped
   build_regeneration_prompt() — surgical multi-dimension regen prompt
+  _editor_regen()           — Gemini JSON editor call + AdCopy validation
 """
 
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
 from pydantic import ValidationError as PydanticValidationError
@@ -29,7 +28,9 @@ from evaluate.rubrics import (
     DIMENSIONS,
     EvaluationReport,
     GOLD_ANCHOR,
-    MAX_CYCLES,
+    MAX_DRAFT_RETRIES_NO_MINIMAL,
+    MAX_EVALUATION_CYCLES,
+    MAX_PRE_JUDGE_REPAIR_ATTEMPTS,
     QUALITY_THRESHOLD,
     STRONG_DIMENSION_THRESHOLD,
     scan_output_safety,
@@ -98,6 +99,58 @@ def _is_judge_transient_error(error: str | None) -> bool:
         or "connection" in err_lower
         or "request cancelled" in err_lower
     )
+
+
+def _editor_regen(drafter: AdDrafter, regen_prompt: str) -> dict[str, Any]:
+    """
+    Call Gemini with editor JSON prompt; parse optimized_ad; validate as AdCopy.
+
+    Args:
+        drafter: AdDrafter instance (uses _call_gemini, _clean_json_response).
+        regen_prompt: Full prompt string.
+
+    Returns:
+        dict: success, data (AdCopy if success), error, changes_made (list).
+    """
+    parsed: dict | None = None
+    last_regen_exc: Exception | None = None
+    for regen_attempt in range(2):
+        try:
+            raw = drafter._call_gemini(
+                regen_prompt,
+                drafter._model_name,
+                {"temperature": 0.5, "response_mime_type": "application/json"},
+            )
+            cleaned = drafter._clean_json_response(raw)
+            parsed = json.loads(cleaned)
+            break
+        except Exception as e:
+            last_regen_exc = e
+            if regen_attempt == 0 and ("504" in str(e) or "Deadline Exceeded" in str(e)):
+                continue
+            return {
+                "success": False,
+                "data": None,
+                "error": str(e),
+                "changes_made": [],
+            }
+    if parsed is None:
+        return {
+            "success": False,
+            "data": None,
+            "error": str(last_regen_exc) if last_regen_exc else "Regen parse failed",
+            "changes_made": [],
+        }
+    try:
+        if "optimized_ad" in parsed:
+            ad = AdCopy.model_validate(parsed["optimized_ad"])
+            changes = parsed.get("changes_made") or []
+        else:
+            ad = AdCopy.model_validate(parsed)
+            changes = []
+        return {"success": True, "data": ad, "error": None, "changes_made": changes}
+    except PydanticValidationError as ve:
+        return {"success": False, "data": None, "error": str(ve), "changes_made": []}
 
 
 REASONABLE_RATIONALE_MAX_CHARS_MULTI: int = 120
@@ -268,11 +321,11 @@ def run_brief(
     total_variations: int = 5,
 ) -> dict[str, Any]:
     """
-    Run the full draft → scan → judge → iterate cycle for one brief variation.
+    Run draft → validate/scan repairs (capped) → judge → iterate for one brief variation.
 
-    Gates: (1) validate_free_text, (2) sanitize_for_injection, (3) draft_ad,
-    (4) scan_output_safety, (5) evaluate_ad, (6) passes_threshold check.
-    On scan failure: treat as failed cycle; regenerate targeting brand_voice; cap at MAX_CYCLES.
+    Evaluation cycle N (logged as cycle=N) is assigned only after the Nth successful judge call.
+    Pre-judge schema/validation/safety issues are repaired with at most
+    MAX_PRE_JUDGE_REPAIR_ATTEMPTS editor regenerations (no judge, no iteration_log row).
 
     Args:
         brief: Validated AdBrief.
@@ -337,8 +390,8 @@ def run_brief(
     last_changes_made: list[dict[str, str]] = []
     current_ad: AdCopy | None = None
     current_report: EvaluationReport | None = None
-    scan_fail_rationale: str = ""  # when scan fails, pass this as regen rationale
-    cycle = 0
+    evaluation_cycles_completed: int = 0
+    pre_judge_repairs_used: int = 0
     total_tokens = 0
     model_used: str | None = None
     total_cost = 0.0
@@ -354,221 +407,171 @@ def run_brief(
             return (tokens / 1000) * 0.003
         return 0.0
 
-    while cycle < MAX_CYCLES:
-        cycle += 1
+    def _regen_cost_update() -> None:
+        nonlocal total_tokens, total_cost
+        total_tokens += 500
+        total_cost += _estimate_cost(500, drafter._model_name)
 
-        if current_ad is None:
-            # First cycle: full draft from brief
-            draft_result = drafter.draft_ad(
-                brief,
-                competitive_context,
-                brand_guidelines,
-                seed=seed,
-                variation_index=variation_index,
-                total_variations=total_variations,
-            )
-            if not draft_result.get("success"):
-                err = draft_result.get("error")
-                if not err:
-                    err = "Draft failed (primary and fallback exhausted or validation failed)."
-                # Schema/validation failure: treat as failed cycle and continue so next iteration can retry or regen fix
-                if _is_schema_validation_draft_error(err):
-                    raw_draft = draft_result.get("raw_draft")
-                    validation_errors = draft_result.get("validation_errors") or []
-                    minimal_ad = _minimal_ad_from_raw(raw_draft, validation_errors) if raw_draft else None
-                    if minimal_ad is not None:
-                        current_ad = minimal_ad
-                        scan_fail_rationale = err
-                        current_report = None
-                    continue
-                # API or other unrecoverable failure: return immediately
-                mu = draft_result.get("model_used")
-                if mu is not None and not isinstance(mu, str):
-                    mu = None
-                return {
-                    "brief_id": brief.id,
-                    "variation_index": variation_index,
-                    "status": "unresolvable",
-                    "cycles_used": cycle,
-                    "final_ad": None,
-                    "final_score": None,
-                    "final_report": None,
-                    "iteration_log": iteration_log,
-                    "changes_made": last_changes_made,
-                    "model_used": mu,
-                    "tokens_used": total_tokens,
-                    "estimated_cost_usd": total_cost,
-                    "error": err,
-                }
-            current_ad = draft_result.get("data")
-            total_tokens += draft_result.get("tokens_used", 0)
-            model_used = draft_result.get("model_used") or model_used
-            total_cost += _estimate_cost(draft_result.get("tokens_used", 0), model_used)
-        else:
-            # Regen cycle: surgical prompt and parse optimized_ad + changes_made
-            if current_report is not None:
-                regen_prompt = build_regeneration_prompt(
-                    current_ad,
-                    brand_guidelines,
-                    brief.goal,
-                    brief.hook_type,
-                    report=current_report,
-                )
+    def acquire_valid_safe_ad(post_judge_regen_prompt: str | None) -> tuple[bool, str | None]:
+        """
+        Set current_ad to schema-valid AdCopy passing scan_output_safety.
+
+        Pre-judge repairs (schema/safety/regen validation) consume MAX_PRE_JUDGE_REPAIR_ATTEMPTS
+        total per variation. Post-judge regen prompt runs first when provided (quality iteration;
+        if it fails, repairs use the same pre-judge budget).
+
+        Returns:
+            (True, None) on success, or (False, error_message).
+        """
+        nonlocal current_ad, last_changes_made, pre_judge_repairs_used, model_used, total_tokens, total_cost
+
+        draft_retries_no_minimal = 0
+
+        if post_judge_regen_prompt is not None:
+            rr = _editor_regen(drafter, post_judge_regen_prompt)
+            _regen_cost_update()
+            if rr.get("success"):
+                current_ad = rr.get("data")
+                last_changes_made = list(rr.get("changes_made") or [])
             else:
-                weakest = "brand_voice"
-                rationale = scan_fail_rationale
-                regen_prompt = build_regeneration_prompt(
+                rationale = (rr.get("error") or "Judge-guided regen failed").strip()
+                fixed = False
+                while not fixed:
+                    if pre_judge_repairs_used >= MAX_PRE_JUDGE_REPAIR_ATTEMPTS:
+                        return False, f"pre_judge_repair_exhausted:{rationale}"
+                    pre_judge_repairs_used += 1
+                    base = current_ad
+                    if base is None:
+                        return False, rationale
+                    rp = build_regeneration_prompt(
+                        base,
+                        brand_guidelines,
+                        brief.goal,
+                        brief.hook_type,
+                        single_weak_dimension="brand_voice",
+                        single_rationale=rationale,
+                    )
+                    rr2 = _editor_regen(drafter, rp)
+                    _regen_cost_update()
+                    if rr2.get("success"):
+                        current_ad = rr2.get("data")
+                        last_changes_made = list(rr2.get("changes_made") or [])
+                        fixed = True
+                    else:
+                        rationale = (rr2.get("error") or rationale).strip()
+
+        while True:
+            if current_ad is None:
+                draft_result = drafter.draft_ad(
+                    brief,
+                    competitive_context,
+                    brand_guidelines,
+                    seed=seed,
+                    variation_index=variation_index,
+                    total_variations=total_variations,
+                )
+                if not draft_result.get("success"):
+                    err = draft_result.get("error")
+                    if not err:
+                        err = "Draft failed (primary and fallback exhausted or validation failed)."
+                    if _is_schema_validation_draft_error(err):
+                        raw_draft = draft_result.get("raw_draft")
+                        validation_errors = draft_result.get("validation_errors") or []
+                        minimal_ad = _minimal_ad_from_raw(raw_draft, validation_errors) if raw_draft else None
+                        if minimal_ad is None:
+                            draft_retries_no_minimal += 1
+                            if draft_retries_no_minimal > MAX_DRAFT_RETRIES_NO_MINIMAL:
+                                return False, f"schema_validation_exhausted:{err}"
+                            continue
+                        if pre_judge_repairs_used >= MAX_PRE_JUDGE_REPAIR_ATTEMPTS:
+                            return False, f"schema_validation_exhausted:{err}"
+                        pre_judge_repairs_used += 1
+                        regen_prompt = build_regeneration_prompt(
+                            minimal_ad,
+                            brand_guidelines,
+                            brief.goal,
+                            brief.hook_type,
+                            single_weak_dimension="brand_voice",
+                            single_rationale=err,
+                        )
+                        rr = _editor_regen(drafter, regen_prompt)
+                        _regen_cost_update()
+                        if not rr.get("success"):
+                            current_ad = None
+                            continue
+                        current_ad = rr.get("data")
+                        last_changes_made = list(rr.get("changes_made") or [])
+                    else:
+                        mu = draft_result.get("model_used")
+                        if mu is not None and not isinstance(mu, str):
+                            mu = None
+                        model_used = mu or model_used
+                        return False, err
+                else:
+                    current_ad = draft_result.get("data")
+                    total_tokens += draft_result.get("tokens_used", 0)
+                    model_used = draft_result.get("model_used") or model_used
+                    total_cost += _estimate_cost(draft_result.get("tokens_used", 0), model_used)
+
+            scan_result = scan_output_safety(current_ad, forbidden_phrases=forbidden_phrases)
+            if scan_result.get("safe", True):
+                return True, None
+
+            rationale = (scan_result.get("error") or "Safety violations.").strip()
+            fixed_scan = False
+            while not fixed_scan:
+                if pre_judge_repairs_used >= MAX_PRE_JUDGE_REPAIR_ATTEMPTS:
+                    return False, f"safety_failure_exhausted:{rationale}"
+                pre_judge_repairs_used += 1
+                rp = build_regeneration_prompt(
                     current_ad,
                     brand_guidelines,
                     brief.goal,
                     brief.hook_type,
-                    single_weak_dimension=weakest,
+                    single_weak_dimension="brand_voice",
                     single_rationale=rationale,
                 )
-            parsed = None
-            last_regen_exc = None
-            for regen_attempt in range(2):
-                try:
-                    raw = drafter._call_gemini(regen_prompt, drafter._model_name, {"temperature": 0.5, "response_mime_type": "application/json"})
-                    cleaned = drafter._clean_json_response(raw)
-                    parsed = json.loads(cleaned)
-                    break
-                except Exception as e:
-                    last_regen_exc = e
-                    if regen_attempt == 0 and ("504" in str(e) or "Deadline Exceeded" in str(e)):
-                        continue
-                    raise
-            if parsed is None:
-                raise last_regen_exc  # type: ignore[misc]
-            try:
-                # Support wrapper {"optimized_ad": {...}, "changes_made": [...]} or legacy plain AdCopy
-                if "optimized_ad" in parsed:
-                    current_ad = AdCopy.model_validate(parsed["optimized_ad"])
-                    last_changes_made = parsed.get("changes_made") or []
+                rr = _editor_regen(drafter, rp)
+                _regen_cost_update()
+                if rr.get("success"):
+                    current_ad = rr.get("data")
+                    last_changes_made = list(rr.get("changes_made") or [])
+                    fixed_scan = True
                 else:
-                    current_ad = AdCopy.model_validate(parsed)
-                    last_changes_made = []
-                total_tokens += 500  # approximate regen call
-                total_cost += _estimate_cost(500, drafter._model_name)
-            except PydanticValidationError as ve:
-                iteration_log.append({
-                    "cycle": cycle,
-                    "regen_validation_failed": True,
-                    "error": str(ve),
-                    "primary_text": getattr(current_ad, "primary_text", "") or "",
-                    "headline": getattr(current_ad, "headline", "") or "",
-                    "clarity": None,
-                    "value_proposition": None,
-                    "call_to_action": None,
-                    "brand_voice": None,
-                    "emotional_resonance": None,
-                    "average_score": None,
-                    "weakest_dimension": None,
-                    "status": "regen_validation_failed",
-                })
-                if cycle >= MAX_CYCLES:
-                    # Last-cycle truncation fallback: try fixing length-only violations
-                    opt = dict(parsed.get("optimized_ad") or parsed)
-                    if isinstance(opt.get("primary_text"), str) and len(opt["primary_text"]) > 500:
-                        opt["primary_text"] = opt["primary_text"][:500]
-                    if isinstance(opt.get("image_prompt"), str) and len(opt["image_prompt"]) > 450:
-                        opt["image_prompt"] = opt["image_prompt"][:450]
-                    try:
-                        current_ad = AdCopy.model_validate(opt)
-                        last_changes_made = parsed.get("changes_made") or []
-                        iteration_log.append({
-                            "cycle": cycle,
-                            "regen_validation_failed": True,
-                            "error": str(ve),
-                            "recovery": "truncation_fallback",
-                            "primary_text": getattr(current_ad, "primary_text", "")[:80] or "",
-                            "headline": getattr(current_ad, "headline", "") or "",
-                            "clarity": None,
-                            "value_proposition": None,
-                            "call_to_action": None,
-                            "brand_voice": None,
-                            "emotional_resonance": None,
-                            "average_score": None,
-                            "weakest_dimension": None,
-                            "status": "regen_validation_recovered",
-                        })
-                        # fall through to scan/judge below
-                    except Exception:
-                        return {
-                            "brief_id": brief.id,
-                            "variation_index": variation_index,
-                            "status": "unresolvable",
-                            "cycles_used": cycle,
-                            "final_ad": None,
-                            "final_score": None,
-                            "final_report": None,
-                            "iteration_log": iteration_log,
-                            "changes_made": last_changes_made,
-                            "model_used": model_used,
-                            "tokens_used": total_tokens,
-                            "estimated_cost_usd": total_cost,
-                            "error": str(ve),
-                        }
-                else:
-                    continue
-            except Exception as e:
-                return {
-                    "brief_id": brief.id,
-                    "variation_index": variation_index,
-                    "status": "unresolvable",
-                    "cycles_used": cycle,
-                    "final_ad": None,
-                    "final_score": None,
-                    "final_report": None,
-                    "iteration_log": iteration_log,
-                    "changes_made": last_changes_made,
-                    "model_used": model_used,
-                    "tokens_used": total_tokens,
-                    "estimated_cost_usd": total_cost,
-                    "error": str(e),
-                }
+                    rationale = (rr.get("error") or rationale).strip()
 
-        if current_ad is None:
-            break
+    while evaluation_cycles_completed < MAX_EVALUATION_CYCLES:
+        if evaluation_cycles_completed == 0:
+            ok, acq_err = acquire_valid_safe_ad(None)
+        else:
+            pjg = build_regeneration_prompt(
+                current_ad,
+                brand_guidelines,
+                brief.goal,
+                brief.hook_type,
+                report=current_report,
+            )
+            ok, acq_err = acquire_valid_safe_ad(pjg)
 
-        scan_result = scan_output_safety(current_ad, forbidden_phrases=forbidden_phrases)
-        if not scan_result.get("safe", True):
-            # Treat as failed cycle; regenerate targeting brand_voice with scan error as rationale
-            scan_fail_rationale = scan_result.get("error", "Safety violations.")
-            iteration_log.append({
-                "cycle": cycle,
-                "scan_failed": True,
-                "error": scan_result.get("error"),
-                "primary_text": getattr(current_ad, "primary_text", "") or "",
-                "headline": getattr(current_ad, "headline", "") or "",
-                "clarity": None,
-                "value_proposition": None,
-                "call_to_action": None,
-                "brand_voice": None,
-                "emotional_resonance": None,
-                "average_score": None,
-                "weakest_dimension": None,
-                "status": "scan_failed",
-            })
-            if cycle >= MAX_CYCLES:
-                return {
-                    "brief_id": brief.id,
-                    "variation_index": variation_index,
-                    "status": "unresolvable",
-                    "cycles_used": cycle,
-                    "final_ad": None,
-                    "final_score": None,
-                    "final_report": None,
-                    "iteration_log": iteration_log,
-                    "changes_made": last_changes_made,
-                    "model_used": model_used,
-                    "tokens_used": total_tokens,
-                    "estimated_cost_usd": total_cost,
-                    "error": scan_result.get("error", "Safety violations"),
-                }
-            # Next iteration will use build_regeneration_prompt with single_weak_dimension=brand_voice
-            current_report = None
-            continue
+        if not ok:
+            return {
+                "brief_id": brief.id,
+                "variation_index": variation_index,
+                "status": "unresolvable",
+                "cycles_used": evaluation_cycles_completed,
+                "final_ad": None,
+                "final_score": None,
+                "final_report": None,
+                "iteration_log": iteration_log,
+                "changes_made": last_changes_made,
+                "model_used": model_used,
+                "tokens_used": total_tokens,
+                "estimated_cost_usd": total_cost,
+                "error": acq_err or "acquire_valid_safe_ad_failed",
+            }
+
+        evaluation_cycles_completed += 1
+        ev_cycle_num = evaluation_cycles_completed
 
         judge_result = None
         last_judge_err = None
@@ -585,7 +588,7 @@ def run_brief(
                 "brief_id": brief.id,
                 "variation_index": variation_index,
                 "status": "unresolvable",
-                "cycles_used": cycle,
+                "cycles_used": evaluation_cycles_completed,
                 "final_ad": current_ad,
                 "final_score": None,
                 "final_report": None,
@@ -598,7 +601,6 @@ def run_brief(
             }
 
         report = judge_result.get("data")
-        # Publish path must always attach an EvaluationReport instance (not dict/serialized).
         if report is not None and not isinstance(report, EvaluationReport):
             try:
                 report = EvaluationReport.model_validate(report)
@@ -607,7 +609,7 @@ def run_brief(
                     "brief_id": brief.id,
                     "variation_index": variation_index,
                     "status": "unresolvable",
-                    "cycles_used": cycle,
+                    "cycles_used": evaluation_cycles_completed,
                     "final_ad": current_ad,
                     "final_score": None,
                     "final_report": None,
@@ -623,7 +625,7 @@ def run_brief(
                 "brief_id": brief.id,
                 "variation_index": variation_index,
                 "status": "unresolvable",
-                "cycles_used": cycle,
+                "cycles_used": evaluation_cycles_completed,
                 "final_ad": current_ad,
                 "final_score": None,
                 "final_report": None,
@@ -635,7 +637,7 @@ def run_brief(
                 "error": "Judge succeeded but returned no report data",
             }
         current_report = report
-        total_tokens += 1500  # approximate judge call
+        total_tokens += 1500
         total_cost += _estimate_cost(1500, getattr(judge, "_model_name", "claude-sonnet-4-5"))
 
         def _dim_score(name: str) -> float | None:
@@ -645,7 +647,7 @@ def run_brief(
             return round(float(ds.score), 1)
 
         log_entry: dict[str, Any] = {
-            "cycle": cycle,
+            "cycle": ev_cycle_num,
             "primary_text": getattr(current_ad, "primary_text", "") or "",
             "headline": getattr(current_ad, "headline", "") or "",
             "clarity": _dim_score("clarity"),
@@ -666,7 +668,7 @@ def run_brief(
                 "brief_id": brief.id,
                 "variation_index": variation_index,
                 "status": "published",
-                "cycles_used": cycle,
+                "cycles_used": evaluation_cycles_completed,
                 "final_ad": current_ad,
                 "final_score": report.average_score,
                 "final_report": report,
@@ -678,12 +680,12 @@ def run_brief(
                 "error": None,
             }
 
-        if cycle >= MAX_CYCLES:
+        if evaluation_cycles_completed >= MAX_EVALUATION_CYCLES:
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
                 "status": "unresolvable",
-                "cycles_used": cycle,
+                "cycles_used": evaluation_cycles_completed,
                 "final_ad": None,
                 "final_score": report.average_score,
                 "final_report": report,
@@ -699,7 +701,7 @@ def run_brief(
         "brief_id": brief.id,
         "variation_index": variation_index,
         "status": "unresolvable",
-        "cycles_used": cycle,
+        "cycles_used": evaluation_cycles_completed,
         "final_ad": None,
         "final_score": None,
         "final_report": None,
@@ -708,5 +710,5 @@ def run_brief(
         "model_used": model_used,
         "tokens_used": total_tokens,
         "estimated_cost_usd": total_cost,
-        "error": "Max cycles reached",
+        "error": "max_evaluation_cycles_reached",
     }
