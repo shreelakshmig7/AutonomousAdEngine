@@ -36,6 +36,7 @@ from evaluate.rubrics import (
     AdCopy,
     EvaluationReport,
 )
+from rate_limiter import anthropic_semaphore
 
 # Judge: Claude (Anthropic). Override via JUDGE_MODEL in .env.
 JUDGE_MODEL: str = "claude-sonnet-4-5"
@@ -143,16 +144,21 @@ Scores are floats in 1.0–10.0 (e.g. 7.5, 8.2). average_score will be computed 
         """
         Call Claude and return raw response text (JSON string).
         Extracted so tests can patch this method.
+        Uses anthropic_semaphore to limit concurrent requests across threads.
         """
-        prompt = self.build_prompt(ad)
-        response = self._client.messages.create(
-            model=self._model_name,
-            max_tokens=JUDGE_MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if not response.content or not response.content[0].text:
-            return "{}"
-        return response.content[0].text.strip()
+        anthropic_semaphore.acquire()
+        try:
+            prompt = self.build_prompt(ad)
+            response = self._client.messages.create(
+                model=self._model_name,
+                max_tokens=JUDGE_MAX_TOKENS,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            if not response.content or not response.content[0].text:
+                return "{}"
+            return response.content[0].text.strip()
+        finally:
+            anthropic_semaphore.release()
 
     def evaluate_ad(self, ad: AdCopy) -> dict[str, Any]:
         """

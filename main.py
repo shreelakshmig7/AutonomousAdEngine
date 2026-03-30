@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
@@ -47,6 +48,10 @@ RUNS_DIR: str = "output/runs"
 # Cost estimation (PR4 briefing CORRECTION 8)
 GEMINI_FLASH_COST_PER_1K_TOKENS: float = 0.000075
 CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
+
+# Parallel execution — tuneable via env vars
+PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 10))
+IMAGE_MAX_WORKERS: int = int(os.environ.get("IMAGE_MAX_WORKERS", 8))
 
 # PR5 CSV columns — one row per evaluation event (includes ad copy per cycle for self-healing proof)
 CSV_FIELDNAMES: list[str] = [
@@ -184,10 +189,12 @@ def run_pipeline_streaming(
     """
     Run the full pipeline for all briefs and variations; yield progress updates.
 
-    For each brief × variation_index runs run_brief(). Writes ads_library.json,
-    iteration_log.csv (one row per evaluation event), quality_trends.png into
-    a run-specific directory. When output_base_dir is None, uses
-    output/runs/<run_id>/ and also updates output/ for "latest".
+    Submits all brief×variation jobs into a single bounded ThreadPoolExecutor
+    (PIPELINE_MAX_WORKERS) so multiple briefs run concurrently. Rate-limiting
+    is handled at the API call level via semaphores in rate_limiter.py.
+
+    Image generation is decoupled: published ads are collected first, then
+    images are generated in a parallel post-processing pass (IMAGE_MAX_WORKERS).
 
     Args:
         briefs: List of validated AdBriefs.
@@ -230,52 +237,59 @@ def run_pipeline_streaming(
     except Exception:
         pass
 
-    for brief in briefs:
-        for variation_index in range(VARIATIONS_PER_BRIEF):
-            yield {
-                "brief_id": brief.id,
-                "variation_index": variation_index,
-                "status": "drafting",
-                "cycle": 0,
-                "score": None,
-                "weakest_dimension": None,
-                "message": f"Drafting {brief.id} variation {variation_index}",
-            }
+    # Build brief lookup for resolving brief from (brief_id, variation_index)
+    brief_by_id: dict[str, AdBrief] = {b.id: b for b in briefs}
 
-        with ThreadPoolExecutor(max_workers=VARIATIONS_PER_BRIEF) as executor:
-            futures = {
-                executor.submit(
-                    run_brief,
+    # Build all jobs: (brief, variation_index) pairs
+    all_jobs: list[tuple[AdBrief, int]] = [
+        (brief, i) for brief in briefs for i in range(VARIATIONS_PER_BRIEF)
+    ]
+
+    # Yield initial "drafting" status for all variations
+    for brief, variation_index in all_jobs:
+        yield {
+            "brief_id": brief.id,
+            "variation_index": variation_index,
+            "status": "drafting",
+            "cycle": 0,
+            "score": None,
+            "weakest_dimension": None,
+            "message": f"Drafting {brief.id} variation {variation_index}",
+        }
+
+    # Phase 1: Run all variations in a bounded global thread pool
+    # Semaphores in rate_limiter.py gate actual API calls, so we can safely
+    # submit all jobs without overwhelming Gemini or Anthropic endpoints.
+    pending_images: list[dict[str, Any]] = []  # Collected for phase 2
+
+    with ThreadPoolExecutor(max_workers=PIPELINE_MAX_WORKERS) as executor:
+        futures = {
+            executor.submit(
+                run_brief,
+                brief,
+                competitive_context,
+                brand_guidelines,
+                variation_index=variation_index,
+                seed=DEFAULT_SEED + variation_index,
+                total_variations=VARIATIONS_PER_BRIEF,
+            ): (brief, variation_index)
+            for brief, variation_index in all_jobs
+        }
+
+        for future in as_completed(futures):
+            brief, variation_index = futures[future]
+            try:
+                result = future.result(timeout=VARIATION_RUN_TIMEOUT_SECONDS)
+            except TimeoutError:
+                result = _make_fallback_result(
                     brief,
-                    competitive_context,
-                    brand_guidelines,
-                    variation_index=i,
-                    seed=DEFAULT_SEED + i,
-                    total_variations=VARIATIONS_PER_BRIEF,
-                ): i
-                for i in range(VARIATIONS_PER_BRIEF)
-            }
-            results = []
-            for future in as_completed(futures):
-                variation_index = futures[future]
-                try:
-                    result = future.result(timeout=VARIATION_RUN_TIMEOUT_SECONDS)
-                    results.append(result)
-                except TimeoutError:
-                    results.append(
-                        _make_fallback_result(
-                            brief,
-                            variation_index,
-                            f"timeout after {VARIATION_RUN_TIMEOUT_SECONDS}s",
-                        )
-                    )
-                except Exception as e:
-                    results.append(_make_fallback_result(brief, variation_index, str(e)))
+                    variation_index,
+                    f"timeout after {VARIATION_RUN_TIMEOUT_SECONDS}s",
+                )
+            except Exception as e:
+                result = _make_fallback_result(brief, variation_index, str(e))
 
-        results.sort(key=lambda r: r.get("variation_index", 0))
-
-        for result in results:
-            variation_index = result.get("variation_index", 0)
+            # --- Process result (same logic as before) ---
             status = result.get("status", "unresolvable")
             cycles_used = result.get("cycles_used", 0)
             final_score = result.get("final_score")
@@ -343,7 +357,6 @@ def run_pipeline_streaming(
                 if final_ad is not None:
                     # Published path: controller guarantees final_report is EvaluationReport.
                     if not isinstance(final_report, EvaluationReport):
-                        # Should not happen after controller fix; avoid writing incomplete scores.
                         cycle_scores = {
                             "average_score": final_score or 0,
                             "error": "final_report was not an EvaluationReport; re-run pipeline",
@@ -378,26 +391,8 @@ def run_pipeline_streaming(
                         }
 
                     ad_id = f"{result.get('brief_id', brief.id)}_v{variation_index}"
-                    image_url = None
-                    if image_generator is not None and getattr(final_ad, "image_prompt", None):
-                        # Inject this variation's copy so the image uses its headline/CTA, not generic text
-                        copy_line = (
-                            f'\n\nExact copy to display in this ad image (use verbatim): '
-                            f'Headline: "{final_ad.headline}". CTA: {final_ad.cta_button}.'
-                        )
-                        # Pass tone, goal, hook_type so image stays on-brand and not arrogant
-                        tone_goal_line = (
-                            f'\n\nGuardrails: Tone must be {brief.tone}; goal is {brief.goal}. '
-                            'Keep all text in the image empowering and approachable, not arrogant. Use the headline and CTA verbatim above.'
-                        )
-                        image_prompt_with_copy = (final_ad.image_prompt or "").strip() + copy_line + tone_goal_line
-                        img_result = image_generator.generate_image(
-                            image_prompt_with_copy, ad_id
-                        )
-                        if img_result.get("success") and img_result.get("data"):
-                            image_url = img_result["data"]
 
-                    entry = {
+                    ad_entry: dict[str, Any] = {
                         "brief_id": result.get("brief_id", brief.id),
                         "variation_index": variation_index,
                         "cycle": cycles_used,
@@ -410,13 +405,27 @@ def run_pipeline_streaming(
                     }
                     changes_made = result.get("changes_made")
                     if changes_made:
-                        entry["changes_made"] = changes_made
-                    if image_url:
-                        entry["image_url"] = image_url
-                    ads_library.append(entry)
+                        ad_entry["changes_made"] = changes_made
+
+                    # Collect image gen work for phase 2 instead of blocking here
+                    if image_generator is not None and getattr(final_ad, "image_prompt", None):
+                        copy_line = (
+                            f'\n\nExact copy to display in this ad image (use verbatim): '
+                            f'Headline: "{final_ad.headline}". CTA: {final_ad.cta_button}.'
+                        )
+                        tone_goal_line = (
+                            f'\n\nGuardrails: Tone must be {brief.tone}; goal is {brief.goal}. '
+                            'Keep all text in the image empowering and approachable, not arrogant. Use the headline and CTA verbatim above.'
+                        )
+                        image_prompt_with_copy = (final_ad.image_prompt or "").strip() + copy_line + tone_goal_line
+                        pending_images.append({
+                            "ad_id": ad_id,
+                            "image_prompt": image_prompt_with_copy,
+                            "ad_entry": ad_entry,
+                        })
+                    ads_library.append(ad_entry)
             else:
                 total_unresolvable += 1
-                # Unresolvable with no log entries still need a summary row if cycles ran
                 if not log_entries and cycles_used > 0:
                     iteration_rows.append({
                         "brief_id": result.get("brief_id", brief.id),
@@ -436,6 +445,27 @@ def run_pipeline_streaming(
                         "tokens_used": tokens_used,
                         "cost_usd": cost_usd,
                     })
+
+    # Phase 2: Generate images in parallel for all published ads
+    if pending_images and image_generator is not None:
+        with ThreadPoolExecutor(max_workers=IMAGE_MAX_WORKERS) as img_executor:
+            img_futures = {
+                img_executor.submit(
+                    image_generator.generate_image,
+                    item["image_prompt"],
+                    item["ad_id"],
+                ): item
+                for item in pending_images
+            }
+            for future in as_completed(img_futures):
+                item = img_futures[future]
+                try:
+                    img_result = future.result()
+                    if img_result.get("success") and img_result.get("data"):
+                        # Patch image_url into the ad_entry already in ads_library
+                        item["ad_entry"]["image_url"] = img_result["data"]
+                except Exception:
+                    pass  # Image gen failure is non-fatal
 
     # Write output files to run directory
     with open(run_ads_path, "w") as f:

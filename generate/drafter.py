@@ -36,6 +36,7 @@ from tenacity import (
 
 from evaluate.rubrics import AdCopy, AdBrief
 from generate.guardrails import validate_free_text
+from rate_limiter import gemini_semaphore, anthropic_semaphore
 from generate.prompts import (
     DEFAULT_SEED,
     DRAFTER_MODEL,
@@ -125,35 +126,45 @@ class AdDrafter:
         """
         Make the Google API call. Returns raw response text.
         Tests may patch _call_gemini when invoking it directly (e.g. controller regen).
+        Uses gemini_semaphore to limit concurrent requests across threads.
         """
-        genai = _get_genai()
-        config = generation_config or {}
-        config_obj = genai.GenerationConfig(
-            temperature=config.get("temperature", 0.7),
-            candidate_count=config.get("candidate_count", 1),
-            response_mime_type=config.get("response_mime_type", "application/json"),
-        )
-        gemini_model = genai.GenerativeModel(model)
-        response = gemini_model.generate_content(prompt, generation_config=config_obj)
-        if not response or not response.text:
-            return "{}"
-        return response.text
+        gemini_semaphore.acquire()
+        try:
+            genai = _get_genai()
+            config = generation_config or {}
+            config_obj = genai.GenerationConfig(
+                temperature=config.get("temperature", 0.7),
+                candidate_count=config.get("candidate_count", 1),
+                response_mime_type=config.get("response_mime_type", "application/json"),
+            )
+            gemini_model = genai.GenerativeModel(model)
+            response = gemini_model.generate_content(prompt, generation_config=config_obj)
+            if not response or not response.text:
+                return "{}"
+            return response.text
+        finally:
+            gemini_semaphore.release()
 
     def _call_claude(self, prompt: str, model: str) -> str:
         """
         Fallback call via Anthropic SDK. Same prompt must request JSON only.
+        Uses anthropic_semaphore to limit concurrent requests across threads.
         """
         import anthropic
 
-        client = anthropic.Anthropic(api_key=_load_anthropic_api_key())
-        response = client.messages.create(
-            model=model,
-            max_tokens=CLAUDE_DRAFTER_MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if not response.content or not response.content[0].text:
-            return "{}"
-        return response.content[0].text.strip()
+        anthropic_semaphore.acquire()
+        try:
+            client = anthropic.Anthropic(api_key=_load_anthropic_api_key())
+            response = client.messages.create(
+                model=model,
+                max_tokens=CLAUDE_DRAFTER_MAX_TOKENS,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            if not response.content or not response.content[0].text:
+                return "{}"
+            return response.content[0].text.strip()
+        finally:
+            anthropic_semaphore.release()
 
     def _call_model(
         self,
