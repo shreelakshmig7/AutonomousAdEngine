@@ -448,6 +448,14 @@ def run_pipeline_streaming(
 
     # Phase 2: Generate images in parallel for all published ads
     if pending_images and image_generator is not None:
+        total_images = len(pending_images)
+        images_done = 0
+        yield {
+            "status": "generating_images",
+            "message": f"Generating {total_images} companion images…",
+            "images_total": total_images,
+            "images_done": 0,
+        }
         with ThreadPoolExecutor(max_workers=IMAGE_MAX_WORKERS) as img_executor:
             img_futures = {
                 img_executor.submit(
@@ -459,13 +467,38 @@ def run_pipeline_streaming(
             }
             for future in as_completed(img_futures):
                 item = img_futures[future]
+                images_done += 1
                 try:
                     img_result = future.result()
                     if img_result.get("success") and img_result.get("data"):
                         # Patch image_url into the ad_entry already in ads_library
                         item["ad_entry"]["image_url"] = img_result["data"]
+                        yield {
+                            "status": "image_done",
+                            "message": f"Image {images_done}/{total_images}: {item['ad_id']} ✓",
+                            "images_total": total_images,
+                            "images_done": images_done,
+                            "ad_id": item["ad_id"],
+                            "image_success": True,
+                        }
+                    else:
+                        yield {
+                            "status": "image_done",
+                            "message": f"Image {images_done}/{total_images}: {item['ad_id']} (failed)",
+                            "images_total": total_images,
+                            "images_done": images_done,
+                            "ad_id": item["ad_id"],
+                            "image_success": False,
+                        }
                 except Exception:
-                    pass  # Image gen failure is non-fatal
+                    yield {
+                        "status": "image_done",
+                        "message": f"Image {images_done}/{total_images}: {item['ad_id']} (error)",
+                        "images_total": total_images,
+                        "images_done": images_done,
+                        "ad_id": item["ad_id"],
+                        "image_success": False,
+                    }
 
     # Write output files to run directory
     with open(run_ads_path, "w") as f:
@@ -675,7 +708,11 @@ if __name__ == "__main__":
             if update.get("status") == "complete":
                 final = update
                 break
-            if "brief_id" in update:
+            if update.get("status") == "generating_images":
+                console.print(f"\n[cyan]{update.get('message', 'Generating images…')}[/cyan]")
+            elif update.get("status") == "image_done":
+                console.print(f"[dim]{update.get('message', '')}[/dim]")
+            elif "brief_id" in update:
                 table.add_row(
                     update.get("brief_id", ""),
                     str(update.get("variation_index", "")),
