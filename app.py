@@ -25,6 +25,18 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 
+
+def _safe_rerun() -> None:
+    """
+    Call st.rerun() wrapped in try/except to handle Streamlit Cloud's
+    'SessionInfo before it was initialized' race condition gracefully.
+    This is a known Streamlit framework bug triggered by rapid reruns.
+    """
+    try:
+        st.rerun()
+    except Exception:
+        pass  # Non-fatal; next poll cycle will recover
+
 # Plotly optional — if install fails on Cloud, app still loads with fallbacks
 try:
     import plotly.express as px
@@ -310,8 +322,8 @@ def run_pipeline_stream_ui() -> None:
 
         output_box.code("".join(log_lines[-30:]), language=None)
         if proc.poll() is None:
-            time.sleep(1.0)  # Throttle reruns to avoid "SessionInfo before it was initialized" on Cloud
-            st.rerun()
+            time.sleep(2.0)  # Throttle reruns — higher with parallel pipeline to avoid SessionInfo race
+            _safe_rerun()
         else:
             # Process exited; drain queue for exit sentinel so we show correct exit code
             exit_code = proc.returncode if proc.returncode is not None else -1
@@ -404,7 +416,7 @@ def main() -> None:
         st.session_state["selected_run"] = "Latest"
     if st.session_state["selected_run"] not in run_options:
         st.session_state["selected_run"] = run_options[0]
-        st.rerun()
+        _safe_rerun()
     run_index = run_options.index(st.session_state["selected_run"])
 
     # Resolve paths for selected run
@@ -438,11 +450,11 @@ def main() -> None:
         )
         if chosen != st.session_state["selected_run"]:
             st.session_state["selected_run"] = chosen
-            st.rerun()
+            _safe_rerun()
         st.divider()
         if st.button("Run Pipeline", type="primary", use_container_width=True):
             st.session_state["run_pipeline_requested"] = True
-            st.rerun()
+            _safe_rerun()
         st.divider()
         st.subheader("Filters")
         selected_briefs = st.multiselect(
@@ -732,12 +744,12 @@ def main() -> None:
                     st.write(primary_text)
                     if st.button("show less", key=f"less_{bid}_{var}", type="secondary"):
                         st.session_state[read_more_key] = False
-                        st.rerun()
+                        _safe_rerun()
                 else:
                     st.write(primary_text[:PRIMARY_TEXT_VISIBLE_CHARS] + " …")
                     if st.button("read more", key=f"more_{bid}_{var}", type="secondary"):
                         st.session_state[read_more_key] = True
-                        st.rerun()
+                        _safe_rerun()
             image_url = a.get("image_url")
             if image_url:
                 # Normalize path (forward slashes; handle relative to repo root)
