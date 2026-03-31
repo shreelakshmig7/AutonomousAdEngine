@@ -52,6 +52,7 @@ NAV_ITEMS: list[tuple[str, str, str]] = [
     ("library", "Library", "📁"),
     ("healing", "Self-Healing", "🔧"),
     ("analytics", "Analytics", "📈"),
+    ("pipeline", "Run Pipeline", "▶️"),
     ("settings", "Settings", "⚙️"),
 ]
 
@@ -269,6 +270,25 @@ h1, h2, h3 {
     border-radius: 6px !important;
 }
 
+/* ── Pipeline scrollable log ── */
+.pipeline-log {
+    background: #000;
+    border: 1px solid rgba(0,252,64,0.1);
+    border-radius: 6px;
+    padding: 16px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--secondary);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.pipeline-log::-webkit-scrollbar { width: 6px; }
+.pipeline-log::-webkit-scrollbar-track { background: #0a0e14; }
+.pipeline-log::-webkit-scrollbar-thumb { background: #44484f; border-radius: 3px; }
+
 /* ── Success / error banners ── */
 .stSuccess {
     background: rgba(0,252,64,0.06) !important;
@@ -280,6 +300,39 @@ h1, h2, h3 {
     border-left: 2px solid var(--error) !important;
     color: var(--error) !important;
 }
+
+/* ── Main-area select/multiselect/slider widgets ── */
+[data-baseweb="select"] > div {
+    background: var(--surface-highest) !important;
+    border: 1px solid var(--outline-var) !important;
+    border-radius: 4px !important;
+    color: var(--on-surface) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 11px !important;
+}
+[data-baseweb="select"] svg { color: var(--on-surface-var) !important; }
+[data-baseweb="popover"] ul { background: var(--surface-high) !important; }
+[data-baseweb="popover"] li { color: var(--on-surface) !important; font-family: 'Space Grotesk', sans-serif !important; font-size: 11px !important; }
+[data-baseweb="popover"] li:hover { background: var(--surface-highest) !important; }
+[data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] { background: var(--secondary) !important; }
+[data-testid="stSlider"] [data-baseweb="slider"] > div > div:first-child { background: var(--surface-highest) !important; }
+[data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(2) { background: var(--secondary) !important; }
+[data-testid="stSlider"] [data-testid="stThumbValue"] { color: var(--secondary) !important; font-family: 'Space Grotesk', sans-serif !important; font-size: 10px !important; }
+
+/* ── Primary button (main area) ── */
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, var(--primary), #00cffc) !important;
+    color: #002a35 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    border: none !important;
+    border-radius: 4px !important;
+}
+.stButton > button[kind="primary"]:hover { filter: brightness(1.1) !important; }
+.stButton > button[kind="primary"]:disabled { opacity: 0.5 !important; }
 
 /* ── Multiselect tags ── */
 [data-baseweb="tag"] {
@@ -693,11 +746,23 @@ def run_pipeline_stream_ui() -> None:
         log_lines = []
         st.session_state["run_pipeline_requested"] = False
 
+    import html as _html
+
     st.markdown(
         '<div class="kinetic-section-title"><span class="acc" style="background:#ac89ff"></span>Pipeline Output</div>',
         unsafe_allow_html=True,
     )
     output_box = st.empty()
+
+    def _render_log(lines: list[str]) -> None:
+        """Render all log lines in a scrollable container with auto-scroll to bottom."""
+        escaped = _html.escape("".join(lines))
+        # JS snippet scrolls the container to the bottom on each render
+        output_box.markdown(
+            f'<div class="pipeline-log" id="pipeline-log-box">{escaped}</div>'
+            f'<script>var el=document.getElementById("pipeline-log-box");if(el)el.scrollTop=el.scrollHeight;</script>',
+            unsafe_allow_html=True,
+        )
 
     if proc is not None and line_queue is not None:
         while True:
@@ -708,14 +773,12 @@ def run_pipeline_stream_ui() -> None:
             if isinstance(item, tuple) and item[0] is None:
                 _, exit_code = item
                 st.session_state["pipeline_process"] = None
-                st.session_state["pipeline_log_lines"] = []
                 st.session_state["pipeline_queue"] = None
                 if exit_code == 0:
-                    st.success("Pipeline complete! Reload the dashboard to see results.")
+                    st.success("Pipeline complete! Go to Dashboard to see results.")
                 else:
                     st.error(f"Pipeline failed with exit code {exit_code}")
-                output_box.code("".join(log_lines[-30:]), language=None)
-                st.button("View Dashboard", type="primary")
+                _render_log(log_lines)
                 return
             if isinstance(item, str):
                 if item.startswith("ERROR:"):
@@ -724,7 +787,7 @@ def run_pipeline_stream_ui() -> None:
                     return
                 log_lines.append(item)
         st.session_state["pipeline_log_lines"] = log_lines
-        output_box.code("".join(log_lines[-30:]), language=None)
+        _render_log(log_lines)
         if proc.poll() is None:
             time.sleep(2.0)
             _safe_rerun()
@@ -743,12 +806,11 @@ def run_pipeline_stream_ui() -> None:
                 st.success("Pipeline complete!")
             else:
                 st.error(f"Pipeline failed with exit code {exit_code}")
-            output_box.code("".join(log_lines[-30:]), language=None)
-            st.button("View Dashboard", type="primary")
+            _render_log(log_lines)
         return
 
     if log_lines:
-        output_box.code("".join(log_lines[-30:]), language=None)
+        _render_log(log_lines)
 
 
 # ---------------------------------------------------------------------------
@@ -1331,6 +1393,39 @@ def _render_healing(log_df: pd.DataFrame | None) -> None:
         st.markdown(card_html, unsafe_allow_html=True)
 
 
+def _render_pipeline_page(run_options: list[str]) -> None:
+    """Run Pipeline page: run selector, start button, scrollable output."""
+    # Controls row
+    c1, c2, c3 = st.columns([3, 2, 7])
+    with c1:
+        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
+                     format_func=lambda x: "Latest" if x == "Latest" else x, key="_run_sel",
+                     label_visibility="collapsed")
+        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
+            st.session_state["selected_run"] = st.session_state["_run_sel"]
+    with c2:
+        is_running = st.session_state.get("pipeline_process") is not None
+        btn_label = "⏳ Running..." if is_running else "▶  Start Pipeline"
+        if st.button(btn_label, type="primary", use_container_width=True, disabled=is_running):
+            st.session_state["run_pipeline_requested"] = True
+            _safe_rerun()
+
+    st.markdown("<div style='height:12px'></div>", unsafe_allow_html=True)
+
+    # Show pipeline streaming UI (or idle message)
+    if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
+        run_pipeline_stream_ui()
+    elif st.session_state.get("pipeline_log_lines"):
+        # Show last run's output
+        run_pipeline_stream_ui()
+    else:
+        st.markdown(
+            '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:12px;color:#a8abb3;padding:40px 0;text-align:center">'
+            'Select a run or click <b>Start Pipeline</b> to generate new ads.</div>',
+            unsafe_allow_html=True,
+        )
+
+
 def _render_settings() -> None:
     st.markdown('<div class="kinetic-section-title"><span class="acc" style="background:#69daff"></span>API Configuration</div>', unsafe_allow_html=True)
     gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
@@ -1447,7 +1542,7 @@ def main() -> None:
 
     # ── MAIN CONTENT ──
 
-    # Top bar with page title + controls
+    # Top bar
     page_label = dict([(i, l) for i, l, _ in NAV_ITEMS]).get(st.session_state["active_page"], "Dashboard")
     gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
     claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
@@ -1468,44 +1563,41 @@ def main() -> None:
         unsafe_allow_html=True,
     )
 
-    # Controls row: run selector + pipeline button + filters (when applicable)
-    ctrl_cols = st.columns([2, 2, 1] if st.session_state["active_page"] != "library" else [2, 2, 3, 2])
-    with ctrl_cols[0]:
-        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
-                     format_func=lambda x: "Latest (output/)" if x == "Latest" else x, key="_run_sel",
-                     label_visibility="collapsed")
-        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
-            st.session_state["selected_run"] = st.session_state["_run_sel"]
-    with ctrl_cols[1]:
-        if st.button("▶  Run Pipeline", type="primary", use_container_width=True):
-            st.session_state["run_pipeline_requested"] = True
+    # Route pages
+    active = st.session_state["active_page"]
 
-    if st.session_state["active_page"] == "library":
-        with ctrl_cols[2]:
+    if active == "pipeline":
+        _render_pipeline_page(run_options)
+        return
+
+    # Run selector for data pages (not pipeline, not settings)
+    if active not in ("settings",):
+        sel_cols = st.columns([3, 9])
+        with sel_cols[0]:
+            st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
+                         format_func=lambda x: "Latest" if x == "Latest" else x, key="_run_sel",
+                         label_visibility="collapsed")
+            if st.session_state["_run_sel"] != st.session_state["selected_run"]:
+                st.session_state["selected_run"] = st.session_state["_run_sel"]
+
+    # Library filters
+    if active == "library":
+        filt_cols = st.columns([5, 2])
+        with filt_cols[0]:
             selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
-        with ctrl_cols[3]:
+        with filt_cols[1]:
             min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1, label_visibility="collapsed")
     else:
         selected_briefs = brief_ids_sorted
         min_score = DEFAULT_MIN_SCORE
 
-    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-
-    # Pipeline running?
-    if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
-        run_pipeline_stream_ui()
-        return
-
     if not result.get("success"):
         st.error(result.get("error") or "Failed to load ads library.")
         return
 
-    if not published and st.session_state["active_page"] not in ("settings", "healing"):
-        st.info("No ads generated yet. Click **Run Pipeline** in the sidebar.")
+    if not published and active not in ("settings", "healing"):
+        st.info("No ads generated yet. Go to **Run Pipeline** in the sidebar.")
         return
-
-    # Route pages
-    active = st.session_state["active_page"]
 
     if active == "dashboard":
         _render_dashboard(published, log_df)
