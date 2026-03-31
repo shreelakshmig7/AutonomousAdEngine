@@ -47,12 +47,12 @@ DIMENSION_LABELS: dict[str, str] = {
     "emotional_resonance": "Emotion",
 }
 
-NAV_ITEMS: list[tuple[str, str]] = [
-    ("dashboard", "Dashboard"),
-    ("library", "Library"),
-    ("healing", "Self-Healing"),
-    ("analytics", "Analytics"),
-    ("settings", "Settings"),
+NAV_ITEMS: list[tuple[str, str, str]] = [
+    ("dashboard", "Dashboard", "📊"),
+    ("library", "Library", "📁"),
+    ("healing", "Self-Healing", "🔧"),
+    ("analytics", "Analytics", "📈"),
+    ("settings", "Settings", "⚙️"),
 ]
 
 # Map each scoring dimension to the ad field that best represents it
@@ -1385,82 +1385,66 @@ def main() -> None:
     brief_ids_sorted = sorted({str(a.get("brief_id", "")) for a in ads if a.get("brief_id")}, key=lambda x: (len(x), x))
     log_df = load_iteration_log_df(log_path)
 
-    # ── SIDEBAR ──
+    # ── SIDEBAR — brand + nav only ──
     with st.sidebar:
         st.markdown(SIDEBAR_BRAND_HTML, unsafe_allow_html=True)
 
-        # Nav
-        nav_labels = [f"  {label}" for _, label in NAV_ITEMS]
-        nav_ids = [i for i, _ in NAV_ITEMS]
+        nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
+        nav_ids = [i for i, _, _ in NAV_ITEMS]
         try:
             current_idx = nav_ids.index(st.session_state["active_page"])
         except ValueError:
-            current_idx = 1
+            current_idx = 0
         selected_nav = st.radio("nav", nav_labels, index=current_idx, label_visibility="collapsed")
         chosen_id = nav_ids[nav_labels.index(selected_nav)]
-        # Just update session state — Streamlit already reruns on widget change,
-        # so calling _safe_rerun() here would cause a double-rerun (SessionInfo race).
         if chosen_id != st.session_state["active_page"]:
             st.session_state["active_page"] = chosen_id
 
-        st.divider()
-
-        # Run selector
-        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
-                     format_func=lambda x: "Latest (output/)" if x == "Latest" else x, key="_run_sel")
-        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
-            st.session_state["selected_run"] = st.session_state["_run_sel"]
-
-        if st.button("Run Pipeline", type="primary", use_container_width=True):
-            st.session_state["run_pipeline_requested"] = True
-
-        st.divider()
-
-        # Filters (only relevant pages)
-        if st.session_state["active_page"] == "library":
-            st.markdown('<div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.13em;color:#a8abb3;padding:0 4px;margin-bottom:6px">Filters</div>', unsafe_allow_html=True)
-            selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
-            min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1)
-        else:
-            selected_briefs = brief_ids_sorted
-            min_score = DEFAULT_MIN_SCORE
-
-        # API status
-        st.divider()
-        gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
-        claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
-        g_dot = "#00fc40" if gemini_ok else "#ff716c"
-        c_dot = "#00fc40" if claude_ok else "#ff716c"
-        st.markdown(f"""
-        <div style="padding:0 4px">
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#a8abb3;margin-bottom:8px">API Status</div>
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:11px">
-            <div style="width:6px;height:6px;border-radius:50%;background:{g_dot};box-shadow:0 0 6px {g_dot}55;flex-shrink:0"></div>
-            <span><b>Gemini</b> — {"connected" if gemini_ok else "not set"}</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:7px;font-size:11px">
-            <div style="width:6px;height:6px;border-radius:50%;background:{c_dot};box-shadow:0 0 6px {c_dot}55;flex-shrink:0"></div>
-            <span><b>Claude</b> — {"connected" if claude_ok else "not set"}</span>
-          </div>
-        </div>""", unsafe_allow_html=True)
-
     # ── MAIN CONTENT ──
 
-    # Page title bar
-    page_label = dict(NAV_ITEMS).get(st.session_state["active_page"], "Dashboard")
-    active_tasks_color = "#00fc40"
-    st.markdown(f"""
-    <div class="kinetic-topbar">
-      <div>
-        <div class="page-title">{page_label}</div>
-        <div class="page-sub">Varsity Tutors · SAT Prep Campaign</div>
-      </div>
-      <div class="kinetic-topbar-right">
-        <span style="color:#ac89ff">$0.042/token</span>
-        <span style="color:{active_tasks_color}">● Active Tasks</span>
-      </div>
-    </div>
-    <div style="height:20px"></div>""", unsafe_allow_html=True)
+    # Top bar with page title + controls
+    page_label = dict([(i, l) for i, l, _ in NAV_ITEMS]).get(st.session_state["active_page"], "Dashboard")
+    gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
+    claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    g_dot = "#00fc40" if gemini_ok else "#ff716c"
+    c_dot = "#00fc40" if claude_ok else "#ff716c"
+    st.markdown(
+        f'<div class="kinetic-topbar">'
+        f'<div>'
+        f'<div class="page-title">{page_label}</div>'
+        f'<div class="page-sub">Varsity Tutors · SAT Prep Campaign</div>'
+        f'</div>'
+        f'<div class="kinetic-topbar-right">'
+        f'<span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:{g_dot};display:inline-block"></span> Gemini</span>'
+        f'<span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:{c_dot};display:inline-block"></span> Claude</span>'
+        f'<span style="color:#ac89ff">$0.042/token</span>'
+        f'</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    # Controls row: run selector + pipeline button + filters (when applicable)
+    ctrl_cols = st.columns([2, 2, 1] if st.session_state["active_page"] != "library" else [2, 2, 3, 2])
+    with ctrl_cols[0]:
+        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
+                     format_func=lambda x: "Latest (output/)" if x == "Latest" else x, key="_run_sel",
+                     label_visibility="collapsed")
+        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
+            st.session_state["selected_run"] = st.session_state["_run_sel"]
+    with ctrl_cols[1]:
+        if st.button("▶  Run Pipeline", type="primary", use_container_width=True):
+            st.session_state["run_pipeline_requested"] = True
+
+    if st.session_state["active_page"] == "library":
+        with ctrl_cols[2]:
+            selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
+        with ctrl_cols[3]:
+            min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1, label_visibility="collapsed")
+    else:
+        selected_briefs = brief_ids_sorted
+        min_score = DEFAULT_MIN_SCORE
+
+    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
     # Pipeline running?
     if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
