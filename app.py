@@ -823,40 +823,47 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
 
     if img_resolved:
         img_b64 = base64.b64encode(img_resolved.read_bytes()).decode()
-        img_area = f"""
-        <div class="ad-img-area has-image">
-          <img src="data:image/png;base64,{img_b64}" alt="Ad image">
-          <div class="ad-id-tag">{bid} · v{var}</div>
-          <div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>
-        </div>"""
+        img_area = (
+            f'<div class="ad-img-area has-image">'
+            f'<img src="data:image/png;base64,{img_b64}" alt="">'
+            f'<div class="ad-id-tag">{bid} · v{var}</div>'
+            f'<div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>'
+            f'</div>'
+        )
         has_image = True
     else:
-        img_area = f"""
-        <div class="ad-img-area no-image">
-          <div style="font-size:26px;opacity:0.2">🔳</div>
-          <div class="ad-no-img-label">Image not available</div>
-          <div class="ad-id-tag">{bid} · v{var}</div>
-          <div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>
-        </div>"""
+        img_area = (
+            f'<div class="ad-img-area no-image">'
+            f'<div style="font-size:26px;opacity:0.2">&#x1F533;</div>'
+            f'<div class="ad-no-img-label">Image not available</div>'
+            f'<div class="ad-id-tag">{bid} · v{var}</div>'
+            f'<div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>'
+            f'</div>'
+        )
         has_image = False
 
-    # Truncate text
-    hl_trunc = headline[:55] + "…" if len(headline) > 55 else headline
-    pt_trunc = primary_text[:95] + "…" if len(primary_text) > 95 else primary_text
+    # Truncate + HTML-escape ad copy so special chars don't break the markdown renderer
+    import html as _html
+    hl_raw = headline[:55] + "…" if len(headline) > 55 else headline
+    pt_raw = primary_text[:95] + "…" if len(primary_text) > 95 else primary_text
+    hl_trunc = _html.escape(hl_raw)
+    pt_trunc = _html.escape(pt_raw)
+    cta_esc = _html.escape(cta)
 
-    card_html = f"""
-    <div class="ad-thumb-card">
-      {img_area}
-      <div class="ad-card-inner">
-        <div class="ad-sponsor">Varsity Tutors · Sponsored</div>
-        <div class="ad-headline-text">{hl_trunc}</div>
-        <div class="ad-preview-text">{pt_trunc}</div>
-      </div>
-      <div class="ad-card-footer">
-        <div class="ad-cta-text">{cta} →</div>
-        <div class="ad-score-bars">{pip_html}</div>
-      </div>
-    </div>"""
+    card_html = (
+        f'<div class="ad-thumb-card">'
+        f'{img_area}'
+        f'<div class="ad-card-inner">'
+        f'<div class="ad-sponsor">Varsity Tutors · Sponsored</div>'
+        f'<div class="ad-headline-text">{hl_trunc}</div>'
+        f'<div class="ad-preview-text">{pt_trunc}</div>'
+        f'</div>'
+        f'<div class="ad-card-footer">'
+        f'<div class="ad-cta-text">{cta_esc} &#x2192;</div>'
+        f'<div class="ad-score-bars">{pip_html}</div>'
+        f'</div>'
+        f'</div>'
+    )
 
     st.markdown(card_html, unsafe_allow_html=True)
 
@@ -1256,9 +1263,10 @@ def main() -> None:
             current_idx = 1
         selected_nav = st.radio("nav", nav_labels, index=current_idx, label_visibility="collapsed")
         chosen_id = nav_ids[nav_labels.index(selected_nav)]
+        # Just update session state — Streamlit already reruns on widget change,
+        # so calling _safe_rerun() here would cause a double-rerun (SessionInfo race).
         if chosen_id != st.session_state["active_page"]:
             st.session_state["active_page"] = chosen_id
-            _safe_rerun()
 
         st.divider()
 
@@ -1267,11 +1275,9 @@ def main() -> None:
                      format_func=lambda x: "Latest (output/)" if x == "Latest" else x, key="_run_sel")
         if st.session_state["_run_sel"] != st.session_state["selected_run"]:
             st.session_state["selected_run"] = st.session_state["_run_sel"]
-            _safe_rerun()
 
         if st.button("Run Pipeline", type="primary", use_container_width=True):
             st.session_state["run_pipeline_requested"] = True
-            _safe_rerun()
 
         st.divider()
 
