@@ -19,6 +19,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
@@ -51,7 +52,8 @@ CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
 
 # Parallel execution — tuneable via env vars
 PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 10))
-IMAGE_MAX_WORKERS: int = int(os.environ.get("IMAGE_MAX_WORKERS", 8))
+IMAGE_MAX_WORKERS: int = int(os.environ.get("IMAGE_MAX_WORKERS", 4))
+IMAGE_STAGGER_DELAY: float = float(os.environ.get("IMAGE_STAGGER_DELAY", 0.5))  # seconds between submissions
 
 # PR5 CSV columns — one row per evaluation event (includes ad copy per cycle for self-healing proof)
 CSV_FIELDNAMES: list[str] = [
@@ -457,14 +459,18 @@ def run_pipeline_streaming(
             "images_done": 0,
         }
         with ThreadPoolExecutor(max_workers=IMAGE_MAX_WORKERS) as img_executor:
-            img_futures = {
-                img_executor.submit(
-                    image_generator.generate_image,
-                    item["image_prompt"],
-                    item["ad_id"],
-                ): item
-                for item in pending_images
-            }
+            img_futures = {}
+            for img_idx, item in enumerate(pending_images):
+                img_futures[
+                    img_executor.submit(
+                        image_generator.generate_image,
+                        item["image_prompt"],
+                        item["ad_id"],
+                    )
+                ] = item
+                # Stagger submissions to avoid burst rate-limit hits
+                if img_idx < len(pending_images) - 1 and IMAGE_STAGGER_DELAY > 0:
+                    time.sleep(IMAGE_STAGGER_DELAY)
             for future in as_completed(img_futures):
                 item = img_futures[future]
                 images_done += 1

@@ -37,6 +37,89 @@ def _safe_rerun() -> None:
     except Exception:
         pass  # Non-fatal; next poll cycle will recover
 
+def _retry_single_image(ad_entry: dict[str, Any], brief_id: str, variation: Any) -> None:
+    """
+    Retry image generation for a single ad and update ads_library.json on disk.
+    Called when user clicks "Retry image generation" on an ad card.
+
+    Args:
+        ad_entry: The ad dict from ads_library (mutated in-place on success).
+        brief_id: Brief ID string.
+        variation: Variation index.
+    """
+    try:
+        from images.image_generator import AdImageGenerator
+    except ImportError:
+        st.error("Image generator module not available.")
+        return
+
+    ad_body = ad_entry.get("ad") or {}
+    image_prompt = ad_body.get("image_prompt", "")
+    if not image_prompt:
+        st.warning("No image prompt available for this ad.")
+        return
+
+    ad_id = f"{brief_id}_v{variation}"
+
+    # Determine images directory (run-specific or default)
+    selected_run = st.session_state.get("selected_run")
+    if selected_run and selected_run != "Latest":
+        images_dir = str(RUNS_DIR / selected_run / "images")
+    else:
+        images_dir = str(REPO_ROOT / "output" / "runs" / "images")
+        # Use latest run dir if it exists
+        if RUNS_DIR.is_dir():
+            run_dirs = sorted(
+                [d for d in RUNS_DIR.iterdir() if d.is_dir() and d.name != "images"],
+                reverse=True,
+            )
+            if run_dirs:
+                images_dir = str(run_dirs[0] / "images")
+
+    generator = AdImageGenerator(output_dir=images_dir)
+    with st.spinner(f"Regenerating image for {ad_id}..."):
+        result = generator.generate_image(image_prompt, ad_id)
+
+    if result.get("success") and result.get("data"):
+        ad_entry["image_url"] = result["data"]
+        # Persist the updated image_url to ads_library.json
+        _persist_image_url_to_library(brief_id, variation, result["data"])
+        st.success(f"Image generated for {ad_id}")
+    else:
+        st.error(f"Image retry failed: {result.get('error', 'unknown error')}")
+
+
+def _persist_image_url_to_library(brief_id: str, variation: Any, image_url: str) -> None:
+    """
+    Update the image_url field for a specific ad in ads_library.json on disk.
+
+    Args:
+        brief_id: Brief ID to match.
+        variation: Variation index to match.
+        image_url: New image path to set.
+    """
+    selected_run = st.session_state.get("selected_run")
+    if selected_run and selected_run != "Latest":
+        lib_path = RUNS_DIR / selected_run / "ads_library.json"
+    else:
+        lib_path = ADS_LIBRARY_PATH
+
+    if not lib_path.exists():
+        return
+    try:
+        with open(lib_path, encoding="utf-8") as f:
+            data = json.load(f)
+        ads = data.get("ads", [])
+        for ad in ads:
+            if str(ad.get("brief_id")) == str(brief_id) and ad.get("variation_index") == int(variation):
+                ad["image_url"] = image_url
+                break
+        with open(lib_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass  # Non-fatal; image is already generated on disk
+
+
 # Plotly optional — if install fails on Cloud, app still loads with fallbacks
 try:
     import plotly.express as px
@@ -751,6 +834,7 @@ def main() -> None:
                         st.session_state[read_more_key] = True
                         _safe_rerun()
             image_url = a.get("image_url")
+            image_shown = False
             if image_url:
                 # Normalize path (forward slashes; handle relative to repo root)
                 url_str = str(image_url).replace("\\", "/")
@@ -769,8 +853,19 @@ def main() -> None:
                         img_path = try_cwd
                 if img_path.is_file():
                     st.image(str(img_path), width=AD_PREVIEW_IMAGE_WIDTH, use_container_width=False)
-                else:
-                    st.caption(f"Image path not found: {image_url}")
+                    image_shown = True
+            if not image_shown:
+                # Placeholder for missing/failed image with retry option
+                st.markdown(
+                    '<div style="width:360px;height:200px;background:#f0f2f6;border:2px dashed #bbb;'
+                    'border-radius:8px;display:flex;align-items:center;justify-content:center;'
+                    'color:#888;font-size:14px;">Image not available</div>',
+                    unsafe_allow_html=True,
+                )
+                retry_key = f"retry_img_{bid}_{var}"
+                if st.button("Retry image generation", key=retry_key, type="secondary"):
+                    _retry_single_image(a, bid, var)
+                    _safe_rerun()
             st.markdown(f"**{headline}**")
             desc = ad_body.get("description")
             if desc:

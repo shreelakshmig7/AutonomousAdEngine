@@ -15,12 +15,16 @@ Key:
 
 from __future__ import annotations
 
+import logging
 import os
 import re
+import time
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -81,9 +85,15 @@ class AdImageGenerator:
         self._output_dir = output_dir
         self._model_name = model_name or os.environ.get("IMAGE_GEN_MODEL") or IMAGE_GEN_MODEL
 
+    # Retry configuration for image generation
+    IMAGE_MAX_RETRIES: int = 3
+    IMAGE_RETRY_BASE_DELAY: float = 2.0  # seconds; doubles each retry
+
     def generate_image(self, image_prompt: str, ad_id: str) -> dict[str, Any]:
         """
         Generate image from prompt and save as PNG. Returns structured result only.
+        Retries up to IMAGE_MAX_RETRIES times with exponential backoff on API
+        failures or empty responses to handle rate-limit / transient errors.
 
         Args:
             image_prompt: UGC-style scene description from AdCopy.
@@ -99,19 +109,38 @@ class AdImageGenerator:
                 "error": "Empty image_prompt",
             }
         prompt = image_prompt.strip()
-        try:
-            raw_bytes = self._invoke_model(prompt)
-        except Exception as e:
+        last_error: str = ""
+        for attempt in range(1, self.IMAGE_MAX_RETRIES + 1):
+            try:
+                raw_bytes = self._invoke_model(prompt)
+            except Exception as e:
+                last_error = str(e)
+                logger.warning(
+                    "Image gen attempt %d/%d failed for %s: %s",
+                    attempt, self.IMAGE_MAX_RETRIES, ad_id, last_error,
+                )
+                if attempt < self.IMAGE_MAX_RETRIES:
+                    delay = self.IMAGE_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                    time.sleep(delay)
+                continue
+            if not raw_bytes:
+                last_error = "No image bytes in model response"
+                logger.warning(
+                    "Image gen attempt %d/%d empty response for %s",
+                    attempt, self.IMAGE_MAX_RETRIES, ad_id,
+                )
+                if attempt < self.IMAGE_MAX_RETRIES:
+                    delay = self.IMAGE_RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                    time.sleep(delay)
+                continue
+            # Success — break out and save
+            break
+        else:
+            # All retries exhausted
             return {
                 "success": False,
                 "data": None,
-                "error": str(e),
-            }
-        if not raw_bytes:
-            return {
-                "success": False,
-                "data": None,
-                "error": "No image bytes in model response",
+                "error": f"Failed after {self.IMAGE_MAX_RETRIES} attempts: {last_error}",
             }
         out_path = Path(self._output_dir)
         out_path.mkdir(parents=True, exist_ok=True)
