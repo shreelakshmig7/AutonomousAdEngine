@@ -49,11 +49,20 @@ DIMENSION_LABELS: dict[str, str] = {
 
 NAV_ITEMS: list[tuple[str, str]] = [
     ("dashboard", "Dashboard"),
-    ("campaigns", "Campaigns"),
     ("library", "Library"),
+    ("healing", "Self-Healing"),
     ("analytics", "Analytics"),
     ("settings", "Settings"),
 ]
+
+# Map each scoring dimension to the ad field that best represents it
+DIMENSION_TO_FIELD: dict[str, str] = {
+    "clarity": "headline",
+    "value_proposition": "primary_text",
+    "call_to_action": "cta_button",
+    "brand_voice": "primary_text",
+    "emotional_resonance": "primary_text",
+}
 
 # ---------------------------------------------------------------------------
 # CSS — Kinetic Observatory theme
@@ -441,6 +450,13 @@ h1, h2, h3 {
 .sh-text.healed  { background: rgba(0,252,64,0.04); border-left: 2px solid var(--secondary); }
 .sh-score { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-top: 10px; }
 .sh-sub { font-size: 10px; margin-top: 3px; }
+.sh-dim-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 10px; }
+.sh-dim-label { font-family: 'Space Grotesk', sans-serif; width: 70px; color: var(--on-surface-var); text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; }
+.sh-dim-bar { height: 6px; border-radius: 3px; flex: 1; background: var(--surface-highest); overflow: hidden; }
+.sh-dim-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.sh-dim-val { font-family: 'Space Grotesk', sans-serif; width: 28px; text-align: right; font-weight: 600; font-size: 10px; }
+.sh-field-label { font-family: 'Space Grotesk', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--on-surface-var); margin-top: 10px; margin-bottom: 4px; }
+.sh-field-value { font-size: 11px; line-height: 1.5; color: var(--on-surface); }
 
 /* ── Top custom bar ── */
 .kinetic-topbar {
@@ -781,14 +797,14 @@ def _score_pip_color(v: float | None) -> str:
 
 def _render_metric(label: str, value: str, delta: str | None, border_color: str) -> None:
     delta_html = f'<div class="m-delta" style="color:#00fc40">{delta}</div>' if delta else ""
-    st.markdown(
-        f"""<div class="kinetic-metric" style="border-left-color:{border_color}">
-              <div class="m-label">{label}</div>
-              <div class="m-value">{value}</div>
-              {delta_html}
-            </div>""",
-        unsafe_allow_html=True,
+    html = (
+        f'<div class="kinetic-metric" style="border-left-color:{border_color}">'
+        f'<div class="m-label">{label}</div>'
+        f'<div class="m-value">{value}</div>'
+        f'{delta_html}'
+        f'</div>'
     )
+    st.markdown(html, unsafe_allow_html=True)
 
 
 def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
@@ -877,8 +893,9 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 # Page renderers
 # ---------------------------------------------------------------------------
-def _render_dashboard(published: list, log_df: pd.DataFrame | None, selected_briefs: list, min_score: float) -> None:
-    """Full dashboard: metrics + charts + self-healing + ad gallery."""
+def _render_dashboard(published: list, log_df: pd.DataFrame | None) -> None:
+    """Dashboard overview: metrics + charts only."""
+    import html as _html
 
     # Collect scores
     scores_list: list[tuple[dict, float]] = []
@@ -905,6 +922,23 @@ def _render_dashboard(published: list, log_df: pd.DataFrame | None, selected_bri
     brief_means = {b: sum(v) / len(v) for b, v in by_brief.items()}
     top_brief = max(brief_means, key=lambda k: brief_means[k]) if brief_means else "—"
 
+    # Count healed ads from iteration log
+    healed_count = 0
+    if log_df is not None and not log_df.empty and "cycle" in log_df.columns:
+        def _nc(s: "pd.Series") -> "pd.Series":
+            return pd.to_numeric(s, errors="coerce")
+        for (_, _), grp in log_df.groupby(["brief_id", "variation"], dropna=False):
+            judged = grp[_nc(grp["average_score"]).notna()]
+            if judged.empty:
+                continue
+            first = judged.assign(_c=_nc(judged["cycle"])).sort_values("_c").iloc[0]
+            pub = grp[grp["status"].astype(str).str.strip().str.lower() == "published"]
+            if pub.empty:
+                continue
+            final = pub.assign(_c=_nc(pub["cycle"])).sort_values("_c").iloc[-1]
+            if float(_nc(pd.Series([final["cycle"]])).iloc[0] or 0) > float(_nc(pd.Series([first["cycle"]])).iloc[0] or 0):
+                healed_count += 1
+
     # ── Metrics row ──
     c1, c2, c3, c4 = st.columns(4, gap="medium")
     with c1:
@@ -914,14 +948,13 @@ def _render_dashboard(published: list, log_df: pd.DataFrame | None, selected_bri
     with c3:
         _render_metric("Pass Rate", f"{pass_rate:.0f}%", None, "#ac89ff")
     with c4:
-        delta_str = f"avg {brief_means.get(top_brief, 0):.1f}" if top_brief != "—" else None
+        delta_str = f"{healed_count} ads healed" if healed_count > 0 else None
         _render_metric("Top Brief", top_brief, delta_str, "#00fc40")
 
     st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
 
     # ── Charts ──
     try:
-        import plotly.express as px
         import plotly.graph_objects as go
         _PLOTLY = True
     except ImportError:
@@ -996,75 +1029,6 @@ def _render_dashboard(published: list, log_df: pd.DataFrame | None, selected_bri
                 height=300,
             )
             st.plotly_chart(fig2, use_container_width=True)
-
-    st.divider()
-
-    # ── Self-healing ──
-    st.markdown(
-        '<div class="kinetic-section-title"><span class="acc" style="background:#ac89ff"></span>Self-Healing Proof</div>',
-        unsafe_allow_html=True,
-    )
-    if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns and "status" in log_df.columns:
-        def _nc(s: "pd.Series") -> "pd.Series":
-            return pd.to_numeric(s, errors="coerce")
-
-        healed = []
-        for (bid_g, var_g), grp in log_df.groupby(["brief_id", "variation"], dropna=False):
-            judged = grp[_nc(grp["average_score"]).notna()]
-            if judged.empty:
-                continue
-            first = judged.assign(_c=_nc(judged["cycle"])).sort_values("_c").iloc[0]
-            pub = grp[grp["status"].astype(str).str.strip().str.lower() == "published"]
-            if pub.empty:
-                continue
-            final = pub.assign(_c=_nc(pub["cycle"])).sort_values("_c").iloc[-1]
-            if float(_nc(pd.Series([final["cycle"]])).iloc[0] or 0) <= float(_nc(pd.Series([first["cycle"]])).iloc[0] or 0):
-                continue
-            healed.append((bid_g, var_g, first, final))
-
-        if not healed:
-            st.markdown('<div style="font-family:\'Space Grotesk\',sans-serif;font-size:12px;color:#a8abb3;padding:12px 0;">All ads passed on first attempt — no healing needed.</div>', unsafe_allow_html=True)
-        else:
-            for bid_g, var_g, r1, r2 in healed[:5]:
-                s1 = float(r1["average_score"])
-                s2 = float(r2["average_score"])
-                delta = round(s2 - s1, 1)
-                delta_str = f"+{delta}" if delta > 0 else str(delta)
-                pt1 = str(r1.get("primary_text") or "—").strip() or "—"
-                pt2 = str(r2.get("primary_text") or "—").strip() or "—"
-                if len(pt1) > 140:
-                    pt1 = pt1[:140] + "…"
-                if len(pt2) > 140:
-                    pt2 = pt2[:140] + "…"
-                delta_color = "#00fc40" if delta > 0 else "#ff716c"
-                st.markdown(f"""
-                <div class="sh-card">
-                  <div class="sh-header">
-                    <span>Brief {bid_g} · Var {var_g} — {s1} → {s2}</span>
-                    <span class="sh-delta" style="color:{delta_color}">{delta_str}</span>
-                  </div>
-                  <div class="sh-cols">
-                    <div>
-                      <div class="sh-col-title">First Judged</div>
-                      <div class="sh-text initial">{pt1}</div>
-                      <div class="sh-score" style="color:#ff716c">{s1}</div>
-                      <div class="sh-sub" style="color:#ff716c">Weakest: {r1.get('weakest_dimension','—')}</div>
-                    </div>
-                    <div>
-                      <div class="sh-col-title">Healed Draft</div>
-                      <div class="sh-text healed">{pt2}</div>
-                      <div class="sh-score" style="color:#00fc40">{s2}</div>
-                      <div class="sh-sub" style="color:#00fc40">All dimensions passed 7.0 ✓</div>
-                    </div>
-                  </div>
-                </div>""", unsafe_allow_html=True)
-    else:
-        st.caption("Run the pipeline to see self-healing proof.")
-
-    st.divider()
-
-    # ── Ad gallery ──
-    _render_ad_gallery(published, selected_briefs, min_score)
 
 
 def _render_ad_gallery(published: list, selected_briefs: list, min_score: float) -> None:
@@ -1160,6 +1124,177 @@ def _render_analytics(published: list) -> None:
         st.plotly_chart(fig2, use_container_width=True)
 
 
+def _render_healing(log_df: pd.DataFrame | None) -> None:
+    """Dedicated Self-Healing page with dimension-level before/after comparisons."""
+    import html as _html
+
+    st.markdown(
+        '<div class="kinetic-section-title"><span class="acc" style="background:#ac89ff"></span>Self-Healing Proof</div>',
+        unsafe_allow_html=True,
+    )
+
+    if log_df is None or log_df.empty:
+        st.info("No iteration data available. Run the pipeline first — ads that fail the quality threshold will be automatically repaired and re-judged.")
+        return
+
+    required_cols = {"cycle", "average_score", "status", "brief_id", "variation"}
+    if not required_cols.issubset(set(log_df.columns)):
+        st.info("Iteration log missing required columns. Run the pipeline to generate self-healing data.")
+        return
+
+    def _nc(s: "pd.Series") -> "pd.Series":
+        return pd.to_numeric(s, errors="coerce")
+
+    # CSV column names for dimensions (may differ from DIMENSION_KEYS)
+    dim_csv_cols = {
+        "clarity": "clarity",
+        "value_proposition": "value_prop",
+        "call_to_action": "cta",
+        "brand_voice": "brand_voice",
+        "emotional_resonance": "emotional_resonance",
+    }
+
+    healed = []
+    for (bid_g, var_g), grp in log_df.groupby(["brief_id", "variation"], dropna=False):
+        judged = grp[_nc(grp["average_score"]).notna()]
+        if judged.empty:
+            continue
+        first = judged.assign(_c=_nc(judged["cycle"])).sort_values("_c").iloc[0]
+        pub = grp[grp["status"].astype(str).str.strip().str.lower() == "published"]
+        if pub.empty:
+            continue
+        final = pub.assign(_c=_nc(pub["cycle"])).sort_values("_c").iloc[-1]
+        if float(_nc(pd.Series([final["cycle"]])).iloc[0] or 0) <= float(_nc(pd.Series([first["cycle"]])).iloc[0] or 0):
+            continue
+        healed.append((bid_g, var_g, first, final))
+
+    if not healed:
+        st.markdown(
+            '<div style="font-family:\'Space Grotesk\',sans-serif;font-size:12px;color:#a8abb3;padding:20px 0;">'
+            'All ads passed on first attempt — no healing was needed this run.</div>',
+            unsafe_allow_html=True,
+        )
+        return
+
+    # Summary metric
+    st.markdown(
+        f'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:12px;color:#a8abb3;margin-bottom:20px">'
+        f'{len(healed)} ad{"s" if len(healed) != 1 else ""} required self-healing across this run.</div>',
+        unsafe_allow_html=True,
+    )
+
+    for bid_g, var_g, r1, r2 in healed:
+        s1 = float(r1["average_score"])
+        s2 = float(r2["average_score"])
+        delta = round(s2 - s1, 1)
+        delta_str = f"+{delta}" if delta > 0 else str(delta)
+        delta_color = "#00fc40" if delta > 0 else "#ff716c"
+        weakest = str(r1.get("weakest_dimension", "")).strip()
+
+        # Build dimension score bars for both first and final
+        dim_bars_first = ""
+        dim_bars_final = ""
+        for dim_key in DIMENSION_KEYS:
+            csv_col = dim_csv_cols.get(dim_key, dim_key)
+            label = DIMENSION_LABELS.get(dim_key, dim_key)
+            v1_raw = r1.get(csv_col)
+            v2_raw = r2.get(csv_col)
+            try:
+                v1 = float(v1_raw) if v1_raw is not None and str(v1_raw).strip() != "" else None
+            except (TypeError, ValueError):
+                v1 = None
+            try:
+                v2 = float(v2_raw) if v2_raw is not None and str(v2_raw).strip() != "" else None
+            except (TypeError, ValueError):
+                v2 = None
+
+            # First draft bar
+            pct1 = min(v1 / 10 * 100, 100) if v1 is not None else 0
+            c1 = "#ff716c" if (v1 is not None and v1 < 7.0) else "#69daff" if (v1 is not None and v1 < 8.5) else "#00fc40"
+            v1_str = f"{v1:.1f}" if v1 is not None else "—"
+            is_weak = (dim_key == weakest or csv_col == weakest)
+            weak_marker = ' &#9668;' if is_weak else ''
+            dim_bars_first += (
+                f'<div class="sh-dim-row">'
+                f'<div class="sh-dim-label">{label}</div>'
+                f'<div class="sh-dim-bar"><div class="sh-dim-fill" style="width:{pct1}%;background:{c1}"></div></div>'
+                f'<div class="sh-dim-val" style="color:{c1}">{v1_str}{weak_marker}</div>'
+                f'</div>'
+            )
+
+            # Healed bar
+            pct2 = min(v2 / 10 * 100, 100) if v2 is not None else 0
+            c2 = "#ff716c" if (v2 is not None and v2 < 7.0) else "#69daff" if (v2 is not None and v2 < 8.5) else "#00fc40"
+            v2_str = f"{v2:.1f}" if v2 is not None else "—"
+            dim_bars_final += (
+                f'<div class="sh-dim-row">'
+                f'<div class="sh-dim-label">{label}</div>'
+                f'<div class="sh-dim-bar"><div class="sh-dim-fill" style="width:{pct2}%;background:{c2}"></div></div>'
+                f'<div class="sh-dim-val" style="color:{c2}">{v2_str}</div>'
+                f'</div>'
+            )
+
+        # Determine the field to display based on weakest dimension
+        field_name = DIMENSION_TO_FIELD.get(weakest, "primary_text")
+        field_label = weakest.replace("_", " ").title() if weakest else "Ad Copy"
+
+        # Get field values — use the CSV column name that matches
+        # The CSV may have headline, primary_text columns
+        field_v1 = str(r1.get(field_name) or r1.get("primary_text") or "—").strip()
+        field_v2 = str(r2.get(field_name) or r2.get("primary_text") or "—").strip()
+        field_v1_esc = _html.escape(field_v1)
+        field_v2_esc = _html.escape(field_v2)
+
+        # If the specific field is the same in both, also show primary_text
+        extra_first = ""
+        extra_final = ""
+        if field_name != "primary_text":
+            pt1 = str(r1.get("primary_text") or "").strip()
+            pt2 = str(r2.get("primary_text") or "").strip()
+            if pt1 or pt2:
+                extra_first = (
+                    f'<div class="sh-field-label">Primary Text</div>'
+                    f'<div class="sh-field-value">{_html.escape(pt1) if pt1 else "—"}</div>'
+                )
+                extra_final = (
+                    f'<div class="sh-field-label">Primary Text</div>'
+                    f'<div class="sh-field-value">{_html.escape(pt2) if pt2 else "—"}</div>'
+                )
+
+        card_html = (
+            f'<div class="sh-card">'
+            f'<div class="sh-header">'
+            f'<span>Brief {_html.escape(str(bid_g))} · Var {_html.escape(str(var_g))} — {s1} &#x2192; {s2}</span>'
+            f'<span class="sh-delta" style="color:{delta_color}">{delta_str}</span>'
+            f'</div>'
+            f'<div class="sh-cols">'
+            # Left column: first judged
+            f'<div>'
+            f'<div class="sh-col-title">First Judged (Cycle {int(float(r1.get("cycle", 1)))})</div>'
+            f'{dim_bars_first}'
+            f'<div class="sh-score" style="color:#ff716c">{s1}</div>'
+            f'<div class="sh-sub" style="color:#ff716c">Weakest: {_html.escape(field_label)}</div>'
+            f'<div class="sh-field-label">{_html.escape(field_label)}</div>'
+            f'<div class="sh-text initial">{field_v1_esc}</div>'
+            f'{extra_first}'
+            f'</div>'
+            # Right column: healed
+            f'<div>'
+            f'<div class="sh-col-title">Healed Draft (Cycle {int(float(r2.get("cycle", 1)))})</div>'
+            f'{dim_bars_final}'
+            f'<div class="sh-score" style="color:#00fc40">{s2}</div>'
+            f'<div class="sh-sub" style="color:#00fc40">All dimensions passed 7.0 &#x2713;</div>'
+            f'<div class="sh-field-label">{_html.escape(field_label)}</div>'
+            f'<div class="sh-text healed">{field_v2_esc}</div>'
+            f'{extra_final}'
+            f'</div>'
+            f'</div>'
+            f'</div>'
+        )
+
+        st.markdown(card_html, unsafe_allow_html=True)
+
+
 def _render_settings() -> None:
     st.markdown('<div class="kinetic-section-title"><span class="acc" style="background:#69daff"></span>API Configuration</div>', unsafe_allow_html=True)
     gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
@@ -1221,7 +1356,7 @@ def main() -> None:
     # Session state defaults
     for key, default in [
         ("run_pipeline_requested", False),
-        ("active_page", "campaigns"),
+        ("active_page", "dashboard"),
         ("selected_run", "Latest"),
         ("pipeline_process", None),
         ("pipeline_log_lines", []),
@@ -1282,7 +1417,7 @@ def main() -> None:
         st.divider()
 
         # Filters (only relevant pages)
-        if st.session_state["active_page"] in ("campaigns", "library"):
+        if st.session_state["active_page"] == "library":
             st.markdown('<div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.13em;color:#a8abb3;padding:0 4px;margin-bottom:6px">Filters</div>', unsafe_allow_html=True)
             selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
             min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1)
@@ -1336,18 +1471,21 @@ def main() -> None:
         st.error(result.get("error") or "Failed to load ads library.")
         return
 
-    if not published and st.session_state["active_page"] not in ("settings",):
+    if not published and st.session_state["active_page"] not in ("settings", "healing"):
         st.info("No ads generated yet. Click **Run Pipeline** in the sidebar.")
         return
 
     # Route pages
     active = st.session_state["active_page"]
 
-    if active in ("campaigns", "dashboard"):
-        _render_dashboard(published, log_df, selected_briefs, min_score)
+    if active == "dashboard":
+        _render_dashboard(published, log_df)
 
     elif active == "library":
         _render_ad_gallery(published, selected_briefs, min_score)
+
+    elif active == "healing":
+        _render_healing(log_df)
 
     elif active == "analytics":
         _render_analytics(published)
