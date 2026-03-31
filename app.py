@@ -1408,7 +1408,13 @@ def main() -> None:
         st.session_state["selected_run"] = "Latest"
 
     if st.session_state["selected_run"] == "Latest":
-        ads_path, log_path = None, None
+        # Resolve to the most recent run directory (not the stale root output/)
+        if run_ids:
+            latest_dir = RUNS_DIR / run_ids[0]
+            ads_path = latest_dir / "ads_library.json"
+            log_path = latest_dir / "iteration_log.csv"
+        else:
+            ads_path, log_path = None, None  # fallback to root output/ if no runs exist
     else:
         run_dir = RUNS_DIR / st.session_state["selected_run"]
         ads_path = run_dir / "ads_library.json"
