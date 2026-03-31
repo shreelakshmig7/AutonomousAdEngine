@@ -1386,19 +1386,22 @@ def main() -> None:
     log_df = load_iteration_log_df(log_path)
 
     # ── SIDEBAR — brand + nav only ──
+    nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
+    nav_ids = [i for i, _, _ in NAV_ITEMS]
+
+    # Initialize the radio key to match active_page on first load
+    if "_nav_radio" not in st.session_state:
+        try:
+            st.session_state["_nav_radio"] = nav_labels[nav_ids.index(st.session_state["active_page"])]
+        except ValueError:
+            st.session_state["_nav_radio"] = nav_labels[0]
+
     with st.sidebar:
         st.markdown(SIDEBAR_BRAND_HTML, unsafe_allow_html=True)
+        st.radio("nav", nav_labels, key="_nav_radio", label_visibility="collapsed")
 
-        nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
-        nav_ids = [i for i, _, _ in NAV_ITEMS]
-        try:
-            current_idx = nav_ids.index(st.session_state["active_page"])
-        except ValueError:
-            current_idx = 0
-        selected_nav = st.radio("nav", nav_labels, index=current_idx, label_visibility="collapsed")
-        chosen_id = nav_ids[nav_labels.index(selected_nav)]
-        if chosen_id != st.session_state["active_page"]:
-            st.session_state["active_page"] = chosen_id
+    # Derive active_page from the radio widget's own state
+    st.session_state["active_page"] = nav_ids[nav_labels.index(st.session_state["_nav_radio"])]
 
     # ── MAIN CONTENT ──
 
