@@ -650,6 +650,8 @@ def run_brief(
             "cycle": ev_cycle_num,
             "primary_text": getattr(current_ad, "primary_text", "") or "",
             "headline": getattr(current_ad, "headline", "") or "",
+            "cta_button": getattr(current_ad, "cta_button", "") or "",
+            "description": getattr(current_ad, "description", "") or "",
             "clarity": _dim_score("clarity"),
             "value_proposition": _dim_score("value_proposition"),
             "call_to_action": _dim_score("call_to_action"),

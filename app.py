@@ -55,14 +55,6 @@ NAV_ITEMS: list[tuple[str, str, str]] = [
     ("settings", "Settings", "⚙️"),
 ]
 
-# Map each scoring dimension to the ad field that best represents it
-DIMENSION_TO_FIELD: dict[str, str] = {
-    "clarity": "headline",
-    "value_proposition": "primary_text",
-    "call_to_action": "cta_button",
-    "brand_voice": "primary_text",
-    "emotional_resonance": "primary_text",
-}
 
 # ---------------------------------------------------------------------------
 # CSS — Kinetic Observatory theme
@@ -457,6 +449,8 @@ h1, h2, h3 {
 .sh-dim-val { font-family: 'Space Grotesk', sans-serif; width: 28px; text-align: right; font-weight: 600; font-size: 10px; }
 .sh-field-label { font-family: 'Space Grotesk', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--on-surface-var); margin-top: 10px; margin-bottom: 4px; }
 .sh-field-value { font-size: 11px; line-height: 1.5; color: var(--on-surface); }
+.diff-del { background: rgba(255,113,108,0.18); color: #ff716c; text-decoration: line-through; padding: 1px 3px; border-radius: 2px; }
+.diff-add { background: rgba(0,252,64,0.12); color: #00fc40; padding: 1px 3px; border-radius: 2px; }
 
 /* ── Top custom bar ── */
 .kinetic-topbar {
@@ -783,6 +777,37 @@ def _score_color(v: float) -> tuple[str, str]:
     if v >= 7.0:
         return "#69daff", "rgba(105,218,255,0.12)"
     return "#ff716c", "rgba(255,113,108,0.12)"
+
+
+def _word_diff(old_text: str, new_text: str) -> tuple[str, str]:
+    """Return (old_html, new_html) with word-level diff highlights.
+
+    Removed words in old_text are wrapped in <span class="diff-del">.
+    Added words in new_text are wrapped in <span class="diff-add">.
+    Unchanged words are HTML-escaped normally.
+    """
+    import html as _html
+    import difflib
+
+    old_words = old_text.split()
+    new_words = new_text.split()
+    sm = difflib.SequenceMatcher(None, old_words, new_words)
+
+    old_parts: list[str] = []
+    new_parts: list[str] = []
+    for op, i1, i2, j1, j2 in sm.get_opcodes():
+        if op == "equal":
+            chunk = " ".join(_html.escape(w) for w in old_words[i1:i2])
+            old_parts.append(chunk)
+            new_parts.append(chunk)
+        elif op == "replace":
+            old_parts.append(f'<span class="diff-del">{" ".join(_html.escape(w) for w in old_words[i1:i2])}</span>')
+            new_parts.append(f'<span class="diff-add">{" ".join(_html.escape(w) for w in new_words[j1:j2])}</span>')
+        elif op == "delete":
+            old_parts.append(f'<span class="diff-del">{" ".join(_html.escape(w) for w in old_words[i1:i2])}</span>')
+        elif op == "insert":
+            new_parts.append(f'<span class="diff-add">{" ".join(_html.escape(w) for w in new_words[j1:j2])}</span>')
+    return " ".join(old_parts), " ".join(new_parts)
 
 
 def _score_pip_color(v: float | None) -> str:
@@ -1234,32 +1259,47 @@ def _render_healing(log_df: pd.DataFrame | None) -> None:
                 f'</div>'
             )
 
-        # Determine the field to display based on weakest dimension
-        field_name = DIMENSION_TO_FIELD.get(weakest, "primary_text")
-        field_label = weakest.replace("_", " ").title() if weakest else "Ad Copy"
+        # Show all ad text fields, but only those that actually changed.
+        # Fields available: headline, primary_text, cta_button, description
+        weakest_label = weakest.replace("_", " ").title() if weakest else "—"
+        ad_fields = [
+            ("Headline", "headline"),
+            ("Primary Text", "primary_text"),
+            ("CTA Button", "cta_button"),
+            ("Description", "description"),
+        ]
 
-        # Get field values — use the CSV column name that matches
-        # The CSV may have headline, primary_text columns
-        field_v1 = str(r1.get(field_name) or r1.get("primary_text") or "—").strip()
-        field_v2 = str(r2.get(field_name) or r2.get("primary_text") or "—").strip()
-        field_v1_esc = _html.escape(field_v1)
-        field_v2_esc = _html.escape(field_v2)
+        fields_first_html = ""
+        fields_healed_html = ""
+        any_field_shown = False
+        for label, col in ad_fields:
+            v1 = str(r1.get(col) or "").strip()
+            v2 = str(r2.get(col) or "").strip()
+            if not v1 and not v2:
+                continue  # field not in CSV (old runs)
+            if v1 == v2:
+                continue  # no change — skip
+            any_field_shown = True
+            # Build word-level diff HTML
+            diff1_html = _html.escape(v1) if v1 else "—"
+            diff2_html = _html.escape(v2) if v2 else "—"
+            if v1 and v2:
+                diff1_html, diff2_html = _word_diff(v1, v2)
+            fields_first_html += (
+                f'<div class="sh-field-label">{_html.escape(label)}</div>'
+                f'<div class="sh-text initial">{diff1_html}</div>'
+            )
+            fields_healed_html += (
+                f'<div class="sh-field-label">{_html.escape(label)}</div>'
+                f'<div class="sh-text healed">{diff2_html}</div>'
+            )
 
-        # If the specific field is the same in both, also show primary_text
-        extra_first = ""
-        extra_final = ""
-        if field_name != "primary_text":
-            pt1 = str(r1.get("primary_text") or "").strip()
-            pt2 = str(r2.get("primary_text") or "").strip()
-            if pt1 or pt2:
-                extra_first = (
-                    f'<div class="sh-field-label">Primary Text</div>'
-                    f'<div class="sh-field-value">{_html.escape(pt1) if pt1 else "—"}</div>'
-                )
-                extra_final = (
-                    f'<div class="sh-field-label">Primary Text</div>'
-                    f'<div class="sh-field-value">{_html.escape(pt2) if pt2 else "—"}</div>'
-                )
+        # If no fields changed (old CSV without cta_button/description), show primary_text
+        if not any_field_shown:
+            pt1 = _html.escape(str(r1.get("primary_text") or "—").strip())
+            pt2 = _html.escape(str(r2.get("primary_text") or "—").strip())
+            fields_first_html = f'<div class="sh-field-label">Primary Text</div><div class="sh-text initial">{pt1}</div>'
+            fields_healed_html = f'<div class="sh-field-label">Primary Text</div><div class="sh-text healed">{pt2}</div>'
 
         card_html = (
             f'<div class="sh-card">'
@@ -1273,10 +1313,8 @@ def _render_healing(log_df: pd.DataFrame | None) -> None:
             f'<div class="sh-col-title">First Judged (Cycle {int(float(r1.get("cycle", 1)))})</div>'
             f'{dim_bars_first}'
             f'<div class="sh-score" style="color:#ff716c">{s1}</div>'
-            f'<div class="sh-sub" style="color:#ff716c">Weakest: {_html.escape(field_label)}</div>'
-            f'<div class="sh-field-label">{_html.escape(field_label)}</div>'
-            f'<div class="sh-text initial">{field_v1_esc}</div>'
-            f'{extra_first}'
+            f'<div class="sh-sub" style="color:#ff716c">Weakest: {_html.escape(weakest_label)}</div>'
+            f'{fields_first_html}'
             f'</div>'
             # Right column: healed
             f'<div>'
@@ -1284,9 +1322,7 @@ def _render_healing(log_df: pd.DataFrame | None) -> None:
             f'{dim_bars_final}'
             f'<div class="sh-score" style="color:#00fc40">{s2}</div>'
             f'<div class="sh-sub" style="color:#00fc40">All dimensions passed 7.0 &#x2713;</div>'
-            f'<div class="sh-field-label">{_html.escape(field_label)}</div>'
-            f'<div class="sh-text healed">{field_v2_esc}</div>'
-            f'{extra_final}'
+            f'{fields_healed_html}'
             f'</div>'
             f'</div>'
             f'</div>'
