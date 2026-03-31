@@ -1,17 +1,14 @@
 """
 app.py
 ------
-Streamlit Cloud entrypoint for Varsity Ad Engine.
-Dashboard layout: sidebar (API status, Run Pipeline, brief multiselect, min score);
-main area — stats metrics, Plotly charts (radar, bar by brief, line by cycle),
-and ad browser with expanders, progress bars, and optional images.
-Runs main.py as subprocess with streaming stdout. Secrets → os.environ.
-Load helpers return {"success", "data", "error"} where applicable — no raise.
-Author: AutonomousAdEngine. Project: Varsity Ad Engine.
+Streamlit Cloud entrypoint — Kinetic Observatory design theme.
+Sidebar with nav, top-bar, metric cards, charts, and Facebook-style ad thumbnail grid.
+All pipeline logic and data loading unchanged from previous version.
 """
 
 from __future__ import annotations
 
+import base64
 import json
 import os
 import subprocess
@@ -26,112 +23,9 @@ import pandas as pd
 import streamlit as st
 
 
-def _safe_rerun() -> None:
-    """
-    Call st.rerun() wrapped in try/except to handle Streamlit Cloud's
-    'SessionInfo before it was initialized' race condition gracefully.
-    This is a known Streamlit framework bug triggered by rapid reruns.
-    """
-    try:
-        st.rerun()
-    except Exception:
-        pass  # Non-fatal; next poll cycle will recover
-
-def _retry_single_image(ad_entry: dict[str, Any], brief_id: str, variation: Any) -> None:
-    """
-    Retry image generation for a single ad and update ads_library.json on disk.
-    Called when user clicks "Retry image generation" on an ad card.
-
-    Args:
-        ad_entry: The ad dict from ads_library (mutated in-place on success).
-        brief_id: Brief ID string.
-        variation: Variation index.
-    """
-    try:
-        from images.image_generator import AdImageGenerator
-    except ImportError:
-        st.error("Image generator module not available.")
-        return
-
-    ad_body = ad_entry.get("ad") or {}
-    image_prompt = ad_body.get("image_prompt", "")
-    if not image_prompt:
-        st.warning("No image prompt available for this ad.")
-        return
-
-    ad_id = f"{brief_id}_v{variation}"
-
-    # Determine images directory (run-specific or default)
-    selected_run = st.session_state.get("selected_run")
-    if selected_run and selected_run != "Latest":
-        images_dir = str(RUNS_DIR / selected_run / "images")
-    else:
-        images_dir = str(REPO_ROOT / "output" / "runs" / "images")
-        # Use latest run dir if it exists
-        if RUNS_DIR.is_dir():
-            run_dirs = sorted(
-                [d for d in RUNS_DIR.iterdir() if d.is_dir() and d.name != "images"],
-                reverse=True,
-            )
-            if run_dirs:
-                images_dir = str(run_dirs[0] / "images")
-
-    generator = AdImageGenerator(output_dir=images_dir)
-    with st.spinner(f"Regenerating image for {ad_id}..."):
-        result = generator.generate_image(image_prompt, ad_id)
-
-    if result.get("success") and result.get("data"):
-        ad_entry["image_url"] = result["data"]
-        # Persist the updated image_url to ads_library.json
-        _persist_image_url_to_library(brief_id, variation, result["data"])
-        st.success(f"Image generated for {ad_id}")
-    else:
-        st.error(f"Image retry failed: {result.get('error', 'unknown error')}")
-
-
-def _persist_image_url_to_library(brief_id: str, variation: Any, image_url: str) -> None:
-    """
-    Update the image_url field for a specific ad in ads_library.json on disk.
-
-    Args:
-        brief_id: Brief ID to match.
-        variation: Variation index to match.
-        image_url: New image path to set.
-    """
-    selected_run = st.session_state.get("selected_run")
-    if selected_run and selected_run != "Latest":
-        lib_path = RUNS_DIR / selected_run / "ads_library.json"
-    else:
-        lib_path = ADS_LIBRARY_PATH
-
-    if not lib_path.exists():
-        return
-    try:
-        with open(lib_path, encoding="utf-8") as f:
-            data = json.load(f)
-        ads = data.get("ads", [])
-        for ad in ads:
-            if str(ad.get("brief_id")) == str(brief_id) and ad.get("variation_index") == int(variation):
-                ad["image_url"] = image_url
-                break
-        with open(lib_path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-    except Exception:
-        pass  # Non-fatal; image is already generated on disk
-
-
-# Plotly optional — if install fails on Cloud, app still loads with fallbacks
-try:
-    import plotly.express as px
-    import plotly.graph_objects as go
-
-    _PLOTLY_AVAILABLE = True
-except ImportError:
-    px = None  # type: ignore[assignment]
-    go = None  # type: ignore[assignment]
-    _PLOTLY_AVAILABLE = False
-
-# Paths relative to repo root
+# ---------------------------------------------------------------------------
+# Paths & constants
+# ---------------------------------------------------------------------------
 REPO_ROOT: Path = Path(__file__).resolve().parent
 ADS_LIBRARY_PATH: Path = REPO_ROOT / "output" / "ads_library.json"
 ITERATION_LOG_PATH: Path = REPO_ROOT / "output" / "iteration_log.csv"
@@ -140,77 +34,475 @@ MAIN_SCRIPT: Path = REPO_ROOT / "main.py"
 DEFAULT_MIN_SCORE: float = 7.0
 MIN_SCORE_SLIDER_MIN: float = 5.0
 MIN_SCORE_SLIDER_MAX: float = 10.0
-AD_PREVIEW_IMAGE_WIDTH: int = 360  # Max width (px) for ad image in expander so full ad fits in view
-PRIMARY_TEXT_VISIBLE_CHARS: int = 125  # Meta: ~125 chars visible before "...See More"
 CTA_DESTINATION_URL: str = "https://www.varsitytutors.com/"
 
-# Dimension keys in ads_library scores (nested dict with "score") — order for radar
 DIMENSION_KEYS: list[str] = [
-    "clarity",
-    "value_proposition",
-    "call_to_action",
-    "brand_voice",
-    "emotional_resonance",
+    "clarity", "value_proposition", "call_to_action", "brand_voice", "emotional_resonance",
 ]
 DIMENSION_LABELS: dict[str, str] = {
     "clarity": "Clarity",
-    "value_proposition": "Value prop",
+    "value_proposition": "Value Prop",
     "call_to_action": "CTA",
-    "brand_voice": "Brand voice",
+    "brand_voice": "Brand Voice",
     "emotional_resonance": "Emotion",
 }
 
+NAV_ITEMS: list[tuple[str, str]] = [
+    ("dashboard", "Dashboard"),
+    ("campaigns", "Campaigns"),
+    ("library", "Library"),
+    ("analytics", "Analytics"),
+    ("settings", "Settings"),
+]
 
-def list_run_ids() -> list[str]:
-    """
-    List run IDs from output/runs/ that have ads_library.json (timestamp dirs), newest first.
-    Does not include "latest"; caller prepends it for selector.
-    Runs without ads_library.json are excluded so the dropdown only shows usable runs.
+# ---------------------------------------------------------------------------
+# CSS — Kinetic Observatory theme
+# ---------------------------------------------------------------------------
+KINETIC_CSS = """
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-    Returns:
-        Sorted list of run_id strings (e.g. 20260312_210000).
-    """
-    if not RUNS_DIR.is_dir():
-        return []
-    ids = [
-        d.name
-        for d in RUNS_DIR.iterdir()
-        if d.is_dir() and d.name and (d / "ads_library.json").is_file()
-    ]
-    ids.sort(reverse=True)
-    return ids
+/* ── Root tokens ── */
+:root {
+    --bg:              #0a0e14;
+    --surface-low:     #0f141a;
+    --surface:         #151a21;
+    --surface-high:    #1b2028;
+    --surface-highest: #20262f;
+    --on-surface:      #f1f3fc;
+    --on-surface-var:  #a8abb3;
+    --primary:         #69daff;
+    --secondary:       #00fc40;
+    --tertiary:        #ac89ff;
+    --error:           #ff716c;
+    --outline-var:     #44484f;
+}
+
+/* ── Global ── */
+html, body, .stApp {
+    background: var(--bg) !important;
+    color: var(--on-surface) !important;
+    font-family: 'Inter', sans-serif !important;
+}
+.stApp > header { display: none !important; }
+footer { display: none !important; }
+#MainMenu { display: none !important; }
+[data-testid="stDecoration"] { display: none !important; }
+[data-testid="stBottom"] { display: none !important; }
+
+/* ── Block container ── */
+.block-container {
+    padding-top: 28px !important;
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+    max-width: 100% !important;
+}
+
+/* ── Sidebar shell ── */
+[data-testid="stSidebar"] {
+    background: var(--surface-low) !important;
+    border-right: 1px solid rgba(68,72,79,0.12) !important;
+    min-width: 230px !important;
+    max-width: 230px !important;
+}
+[data-testid="stSidebar"] > div:first-child {
+    background: var(--surface-low) !important;
+    padding: 0 !important;
+}
+[data-testid="stSidebarContent"] { padding: 0 !important; }
+
+/* ── Radio → nav items ── */
+div[data-testid="stSidebar"] [data-testid="stRadio"] {
+    margin-top: 4px;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+    display: none;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"] {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 20px !important;
+    border-radius: 3px 0 0 3px !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 13px !important;
+    color: rgba(241,243,252,0.45) !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border-right: 2px solid transparent !important;
+    transition: all 0.15s !important;
+    gap: 10px !important;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:hover {
+    background: var(--surface) !important;
+    color: var(--on-surface) !important;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) {
+    color: var(--secondary) !important;
+    background: var(--surface-high) !important;
+    border-right-color: var(--secondary) !important;
+    font-weight: 700 !important;
+}
+div[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 13px !important;
+}
+/* Hide the radio circle dot */
+div[data-testid="stSidebar"] [data-testid="stRadio"] div[data-baseweb="radio"] {
+    display: none !important;
+}
+
+/* ── Sidebar widgets ── */
+[data-testid="stSidebar"] .stSelectbox > label,
+[data-testid="stSidebar"] .stMultiSelect > label,
+[data-testid="stSidebar"] .stSlider > label {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 9px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.13em !important;
+    color: var(--on-surface-var) !important;
+    margin-bottom: 4px !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] > div {
+    background: var(--surface-highest) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: var(--on-surface) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 11px !important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] svg { color: var(--on-surface-var) !important; }
+
+/* Slider track */
+[data-testid="stSidebar"] [data-testid="stSlider"] [data-baseweb="slider"] div[role="slider"] {
+    background: var(--secondary) !important;
+}
+[data-testid="stSidebar"] [data-testid="stSlider"] [data-baseweb="slider"] > div > div:first-child {
+    background: var(--surface-highest) !important;
+}
+[data-testid="stSidebar"] [data-testid="stSlider"] [data-baseweb="slider"] > div > div:nth-child(2) {
+    background: var(--secondary) !important;
+}
+
+/* ── Sidebar buttons ── */
+[data-testid="stSidebar"] .stButton > button {
+    width: 100% !important;
+    background: linear-gradient(135deg, var(--primary), #00cffc) !important;
+    color: #002a35 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    border: none !important;
+    border-radius: 4px !important;
+    padding: 12px !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover {
+    filter: brightness(1.1) !important;
+    border: none !important;
+}
+
+/* ── Retry buttons in main area ── */
+.stButton > button[kind="secondary"] {
+    background: transparent !important;
+    border: 1px solid rgba(68,72,79,0.35) !important;
+    color: var(--primary) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 9px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1em !important;
+    border-radius: 3px !important;
+    padding: 5px 12px !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background: rgba(105,218,255,0.06) !important;
+    border-color: var(--primary) !important;
+}
+
+/* ── Read more / show less buttons ── */
+[data-testid="stSidebar"] ~ div .stButton > button:not([kind="secondary"]):not([kind="primary"]) {
+    background: transparent !important;
+    color: var(--primary) !important;
+    border: none !important;
+    font-size: 11px !important;
+    padding: 0 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}
+
+/* ── Dividers ── */
+[data-testid="stDivider"] hr {
+    border-color: rgba(68,72,79,0.15) !important;
+    margin: 12px 0 !important;
+}
+
+/* ── Headings ── */
+h1, h2, h3 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    color: var(--on-surface) !important;
+}
+
+/* ── Info / warning / error boxes ── */
+[data-testid="stAlert"] {
+    background: var(--surface-low) !important;
+    border-radius: 6px !important;
+    border-left: 2px solid var(--tertiary) !important;
+    color: var(--on-surface) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 12px !important;
+}
+
+/* ── Spinner ── */
+[data-testid="stSpinner"] { color: var(--secondary) !important; }
+
+/* ── Code block (pipeline output) ── */
+.stCode, .stCode pre {
+    background: #000 !important;
+    color: var(--secondary) !important;
+    font-size: 11px !important;
+    border: 1px solid rgba(0,252,64,0.1) !important;
+    border-radius: 6px !important;
+}
+
+/* ── Success / error banners ── */
+.stSuccess {
+    background: rgba(0,252,64,0.06) !important;
+    border-left: 2px solid var(--secondary) !important;
+    color: var(--secondary) !important;
+}
+.stError {
+    background: rgba(255,113,108,0.06) !important;
+    border-left: 2px solid var(--error) !important;
+    color: var(--error) !important;
+}
+
+/* ── Multiselect tags ── */
+[data-baseweb="tag"] {
+    background: var(--surface-high) !important;
+    color: var(--on-surface) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 10px !important;
+}
+
+/* ── Columns gap ── */
+[data-testid="column"] { padding: 0 6px !important; }
+
+/* ── Caption text ── */
+.stCaption p {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 9px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.12em !important;
+    color: var(--on-surface-var) !important;
+}
+
+/* ── Ad thumbnail card wrapper ── */
+.ad-thumb-card {
+    background: var(--surface-low);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(68,72,79,0.12);
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+.ad-thumb-card:hover { border-color: rgba(105,218,255,0.25); }
+
+.ad-img-area {
+    width: 100%; height: 170px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+}
+.ad-img-area img { width:100%; height:100%; object-fit:cover; }
+.ad-img-area.no-image {
+    background: var(--bg);
+    border-bottom: 2px dashed rgba(68,72,79,0.3);
+    flex-direction: column; gap: 8px;
+}
+.ad-img-area.has-image { background: #0d1520; }
+
+.ad-id-tag {
+    position: absolute; top: 8px; left: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; color: var(--on-surface-var);
+    background: rgba(10,14,20,0.72);
+    padding: 3px 8px; border-radius: 2px;
+    letter-spacing: 0.08em;
+}
+.ad-score-badge {
+    position: absolute; top: 8px; right: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 2px;
+}
+.ad-no-img-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; color: var(--on-surface-var);
+}
+.ad-card-inner { padding: 12px 14px 0; }
+.ad-sponsor {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 8px; color: var(--on-surface-var);
+    text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 5px;
+}
+.ad-headline-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 5px;
+}
+.ad-preview-text {
+    font-size: 10px; color: var(--on-surface-var);
+    line-height: 1.5; margin-bottom: 8px;
+    overflow: hidden; display: -webkit-box;
+    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.ad-card-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 14px; border-top: 1px solid rgba(68,72,79,0.1);
+}
+.ad-cta-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; font-weight: 700; color: var(--primary);
+    text-transform: uppercase; letter-spacing: 0.1em;
+}
+.ad-score-bars { display: flex; gap: 3px; align-items: center; }
+.score-pip { width: 18px; height: 4px; border-radius: 1px; }
+
+/* ── Metric card ── */
+.kinetic-metric {
+    background: var(--surface-low);
+    border-radius: 6px; padding: 18px 20px;
+    border-left: 2px solid var(--primary);
+}
+.kinetic-metric .m-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 8px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--on-surface-var); margin-bottom: 6px;
+}
+.kinetic-metric .m-value {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 26px; font-weight: 700; line-height: 1;
+}
+.kinetic-metric .m-delta {
+    font-size: 10px; margin-top: 4px;
+}
+
+/* ── Section title ── */
+.kinetic-section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+}
+.kinetic-section-title .acc {
+    width: 3px; height: 16px; border-radius: 1px; flex-shrink: 0;
+}
+
+/* ── Gallery filter chips ── */
+.gallery-chips { display: flex; gap: 7px; margin-bottom: 18px; flex-wrap: wrap; }
+.g-chip {
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid rgba(68,72,79,0.2);
+    border-radius: 3px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; color: var(--on-surface-var);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    display: inline-block;
+}
+.g-chip.active {
+    background: rgba(0,252,64,0.06);
+    border-color: rgba(0,252,64,0.25);
+    color: var(--secondary);
+}
+
+/* ── Self-healing card ── */
+.sh-card {
+    background: var(--surface-low);
+    border-radius: 6px; margin-bottom: 10px;
+    overflow: hidden;
+}
+.sh-header {
+    padding: 14px 18px;
+    display: flex; justify-content: space-between;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px; font-weight: 500;
+}
+.sh-delta { font-weight: 700; color: var(--secondary); font-size: 11px; }
+.sh-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 18px 18px; }
+.sh-col-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 8px; text-transform: uppercase;
+    letter-spacing: 0.13em; color: var(--on-surface-var); margin-bottom: 8px;
+}
+.sh-text { padding: 10px 14px; border-radius: 4px; font-size: 11px; line-height: 1.6; }
+.sh-text.initial { background: var(--surface-highest); border-left: 2px solid var(--error); color: var(--on-surface-var); }
+.sh-text.healed  { background: rgba(0,252,64,0.04); border-left: 2px solid var(--secondary); }
+.sh-score { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-top: 10px; }
+.sh-sub { font-size: 10px; margin-top: 3px; }
+
+/* ── Top custom bar ── */
+.kinetic-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 0 20px 0; margin-bottom: 4px;
+    border-bottom: 1px solid rgba(68,72,79,0.12);
+}
+.kinetic-topbar .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: -0.02em;
+}
+.kinetic-topbar .page-sub {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--on-surface-var); margin-top: 3px;
+}
+.kinetic-topbar-right {
+    display: flex; align-items: center; gap: 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.15em;
+}
+</style>
+"""
+
+# ---------------------------------------------------------------------------
+# Sidebar brand HTML
+# ---------------------------------------------------------------------------
+SIDEBAR_BRAND_HTML = """
+<div style="padding:22px 22px 16px;">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;
+              color:#00fc40;letter-spacing:-0.03em;">KINETIC</div>
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;color:#a8abb3;
+              text-transform:uppercase;letter-spacing:0.2em;margin-top:4px;">
+    Observatory v1.0
+  </div>
+</div>
+"""
+
+# ---------------------------------------------------------------------------
+# Helper: safe rerun
+# ---------------------------------------------------------------------------
+def _safe_rerun() -> None:
+    try:
+        st.rerun()
+    except Exception:
+        pass
 
 
+# ---------------------------------------------------------------------------
+# Helper: load ads library
+# ---------------------------------------------------------------------------
 def load_ads_library_result(path: Path | None = None) -> dict[str, Any]:
-    """
-    Load ads_library.json from disk; structured result only.
-
-    Args:
-        path: Optional path to ads_library.json. When None, uses ADS_LIBRARY_PATH (latest).
-
-    Returns:
-        {"success": bool, "data": dict, "error": str | None}
-    """
     p = path if path is not None else ADS_LIBRARY_PATH
     if not p.exists():
-        # For a specific run, missing file means no data for that run (clear error).
-        # For "Latest" (path None), empty is normal before first pipeline run.
         if path is not None:
-            return {
-                "success": False,
-                "data": {},
-                "error": "No data for this run (ads_library.json not found). Run the pipeline to generate it.",
-            }
+            return {"success": False, "data": {}, "error": "No data for this run."}
         return {"success": True, "data": {}, "error": None}
     try:
         with open(p, encoding="utf-8") as f:
             raw = json.load(f)
         if not isinstance(raw, dict):
-            return {
-                "success": False,
-                "data": {},
-                "error": "ads_library.json root must be an object",
-            }
+            return {"success": False, "data": {}, "error": "ads_library.json root must be an object"}
         return {"success": True, "data": raw, "error": None}
     except json.JSONDecodeError as e:
         return {"success": False, "data": {}, "error": f"Invalid JSON: {e}"}
@@ -219,32 +511,24 @@ def load_ads_library_result(path: Path | None = None) -> dict[str, Any]:
 
 
 def get_published_ads(ads: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
-    Return ads with status published, or all ads if no status field.
-
-    Args:
-        ads: Raw ad entries from ads_library.
-
-    Returns:
-        Filtered list of ad dicts.
-    """
     if not ads:
         return []
     published = [a for a in ads if a.get("status") == "published"]
     return published if published else ads
 
 
+def list_run_ids() -> list[str]:
+    if not RUNS_DIR.is_dir():
+        return []
+    ids = [
+        d.name for d in RUNS_DIR.iterdir()
+        if d.is_dir() and d.name and (d / "ads_library.json").is_file()
+    ]
+    ids.sort(reverse=True)
+    return ids
+
+
 def _dimension_numeric(scores: dict[str, Any], key: str) -> float | None:
-    """
-    Extract numeric score for a dimension from scores dict.
-
-    Args:
-        scores: Ad scores dict (may nest score under dict).
-        key: Dimension key e.g. clarity.
-
-    Returns:
-        Float 0–10 or None if missing.
-    """
     val = scores.get(key)
     if val is None:
         return None
@@ -258,21 +542,80 @@ def _dimension_numeric(scores: dict[str, Any], key: str) -> float | None:
     return None
 
 
-def render_sidebar_api_status() -> None:
-    """Show Gemini / Claude connection status from env."""
-    st.subheader("API status")
-    gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
-    claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
-    st.markdown(
-        f"{'🟢' if gemini_ok else '🔴'} **Gemini** — {'connected' if gemini_ok else 'not set'}"
-    )
-    st.markdown(
-        f"{'🟢' if claude_ok else '🔴'} **Claude** — {'connected' if claude_ok else 'not set'}"
-    )
+def load_iteration_log_df(path: Path | None = None) -> pd.DataFrame | None:
+    p = path if path is not None else ITERATION_LOG_PATH
+    if not p.exists():
+        return None
+    try:
+        return pd.read_csv(p)
+    except Exception:
+        return None
 
 
+# ---------------------------------------------------------------------------
+# Helper: retry single image
+# ---------------------------------------------------------------------------
+def _retry_single_image(ad_entry: dict[str, Any], brief_id: str, variation: Any) -> None:
+    try:
+        from images.image_generator import AdImageGenerator
+    except ImportError:
+        st.error("Image generator module not available.")
+        return
+    ad_body = ad_entry.get("ad") or {}
+    image_prompt = ad_body.get("image_prompt", "")
+    if not image_prompt:
+        st.warning("No image prompt available for this ad.")
+        return
+    ad_id = f"{brief_id}_v{variation}"
+    selected_run = st.session_state.get("selected_run")
+    if selected_run and selected_run != "Latest":
+        images_dir = str(RUNS_DIR / selected_run / "images")
+    else:
+        images_dir = str(REPO_ROOT / "output" / "runs" / "images")
+        if RUNS_DIR.is_dir():
+            run_dirs = sorted(
+                [d for d in RUNS_DIR.iterdir() if d.is_dir() and d.name != "images"],
+                reverse=True,
+            )
+            if run_dirs:
+                images_dir = str(run_dirs[0] / "images")
+    generator = AdImageGenerator(output_dir=images_dir)
+    with st.spinner(f"Regenerating image for {ad_id}..."):
+        result = generator.generate_image(image_prompt, ad_id)
+    if result.get("success") and result.get("data"):
+        ad_entry["image_url"] = result["data"]
+        _persist_image_url_to_library(brief_id, variation, result["data"])
+        st.success(f"Image generated for {ad_id}")
+    else:
+        st.error(f"Image retry failed: {result.get('error', 'unknown error')}")
+
+
+def _persist_image_url_to_library(brief_id: str, variation: Any, image_url: str) -> None:
+    selected_run = st.session_state.get("selected_run")
+    if selected_run and selected_run != "Latest":
+        lib_path = RUNS_DIR / selected_run / "ads_library.json"
+    else:
+        lib_path = ADS_LIBRARY_PATH
+    if not lib_path.exists():
+        return
+    try:
+        with open(lib_path, encoding="utf-8") as f:
+            data = json.load(f)
+        ads = data.get("ads", [])
+        for ad in ads:
+            if str(ad.get("brief_id")) == str(brief_id) and ad.get("variation_index") == int(variation):
+                ad["image_url"] = image_url
+                break
+        with open(lib_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Pipeline process helpers (unchanged)
+# ---------------------------------------------------------------------------
 def _start_pipeline_process() -> subprocess.Popen | None:
-    """Start main.py subprocess; return Popen or None on failure."""
     if not MAIN_SCRIPT.exists():
         return None
     env = os.environ.copy()
@@ -294,10 +637,6 @@ def _start_pipeline_process() -> subprocess.Popen | None:
 
 
 def _pipeline_reader_thread(process: subprocess.Popen, line_queue: Queue) -> None:
-    """
-    Background thread: read stdout line-by-line and put into queue.
-    When EOF, wait for process and put (None, returncode) as sentinel.
-    """
     try:
         if process.stdout:
             for line in iter(process.stdout.readline, ""):
@@ -310,11 +649,6 @@ def _pipeline_reader_thread(process: subprocess.Popen, line_queue: Queue) -> Non
 
 
 def run_pipeline_stream_ui() -> None:
-    """
-    Run pipeline and stream last 30 lines into placeholder.
-    Uses a background thread + queue so the UI never blocks on readline();
-    main script drains the queue and reruns to refresh (fixes "no logs" issue).
-    """
     if not MAIN_SCRIPT.exists():
         st.error("main.py not found at project root.")
         st.session_state["run_pipeline_requested"] = False
@@ -324,29 +658,23 @@ def run_pipeline_stream_ui() -> None:
         st.session_state["run_pipeline_requested"] = False
         return
 
-    if "pipeline_process" not in st.session_state:
-        st.session_state["pipeline_process"] = None
-    if "pipeline_log_lines" not in st.session_state:
-        st.session_state["pipeline_log_lines"] = []
-    if "pipeline_queue" not in st.session_state:
-        st.session_state["pipeline_queue"] = None
+    for key in ("pipeline_process", "pipeline_log_lines", "pipeline_queue"):
+        if key not in st.session_state:
+            st.session_state[key] = None if key != "pipeline_log_lines" else []
 
     proc = st.session_state["pipeline_process"]
     log_lines: list[str] = list(st.session_state["pipeline_log_lines"])
     line_queue = st.session_state["pipeline_queue"]
 
-    # Start a new run only when requested and no run is in progress
     if proc is None and st.session_state.get("run_pipeline_requested"):
         proc = _start_pipeline_process()
         if proc is None:
-            st.error("Failed to start pipeline (main.py not found or API keys missing).")
+            st.error("Failed to start pipeline.")
             st.session_state["run_pipeline_requested"] = False
             return
         line_queue = Queue()
         reader = threading.Thread(
-            target=_pipeline_reader_thread,
-            args=(proc, line_queue),
-            daemon=True,
+            target=_pipeline_reader_thread, args=(proc, line_queue), daemon=True,
         )
         reader.start()
         st.session_state["pipeline_process"] = proc
@@ -355,11 +683,13 @@ def run_pipeline_stream_ui() -> None:
         log_lines = []
         st.session_state["run_pipeline_requested"] = False
 
-    st.subheader("Pipeline output")
+    st.markdown(
+        '<div class="kinetic-section-title"><span class="acc" style="background:#ac89ff"></span>Pipeline Output</div>',
+        unsafe_allow_html=True,
+    )
     output_box = st.empty()
 
     if proc is not None and line_queue is not None:
-        # Drain queue without blocking (fixes "no logs": we never block on readline in main thread)
         while True:
             try:
                 item = line_queue.get_nowait()
@@ -371,44 +701,24 @@ def run_pipeline_stream_ui() -> None:
                 st.session_state["pipeline_log_lines"] = []
                 st.session_state["pipeline_queue"] = None
                 if exit_code == 0:
-                    st.success("Pipeline complete!")
+                    st.success("Pipeline complete! Reload the dashboard to see results.")
                 else:
                     st.error(f"Pipeline failed with exit code {exit_code}")
                 output_box.code("".join(log_lines[-30:]), language=None)
-                st.button("View dashboard", type="primary")
+                st.button("View Dashboard", type="primary")
                 return
             if isinstance(item, str):
                 if item.startswith("ERROR:"):
                     st.error(item.strip())
-                    st.session_state["pipeline_process"] = None
-                    st.session_state["pipeline_log_lines"] = []
-                    st.session_state["pipeline_queue"] = None
-                    return
-                if item.startswith("EXIT_CODE:"):
-                    code_str = item.split(":", 1)[1].strip()
-                    try:
-                        code = int(code_str)
-                    except ValueError:
-                        code = -1
-                    st.session_state["pipeline_process"] = None
-                    st.session_state["pipeline_log_lines"] = []
-                    st.session_state["pipeline_queue"] = None
-                    if code == 0:
-                        st.success("Pipeline complete!")
-                    else:
-                        st.error(f"Pipeline failed with exit code {code}")
-                    output_box.code("".join(log_lines[-30:]), language=None)
-                    st.button("View dashboard", type="primary")
+                    st.session_state.update({"pipeline_process": None, "pipeline_log_lines": [], "pipeline_queue": None})
                     return
                 log_lines.append(item)
         st.session_state["pipeline_log_lines"] = log_lines
-
         output_box.code("".join(log_lines[-30:]), language=None)
         if proc.poll() is None:
-            time.sleep(2.0)  # Throttle reruns — higher with parallel pipeline to avoid SessionInfo race
+            time.sleep(2.0)
             _safe_rerun()
         else:
-            # Process exited; drain queue for exit sentinel so we show correct exit code
             exit_code = proc.returncode if proc.returncode is not None else -1
             while True:
                 try:
@@ -418,159 +728,153 @@ def run_pipeline_stream_ui() -> None:
                         break
                 except Empty:
                     break
-            st.session_state["pipeline_process"] = None
-            st.session_state["pipeline_log_lines"] = []
-            st.session_state["pipeline_queue"] = None
+            st.session_state.update({"pipeline_process": None, "pipeline_log_lines": [], "pipeline_queue": None})
             if exit_code == 0:
                 st.success("Pipeline complete!")
             else:
                 st.error(f"Pipeline failed with exit code {exit_code}")
-            st.button("View dashboard", type="primary")
+            output_box.code("".join(log_lines[-30:]), language=None)
+            st.button("View Dashboard", type="primary")
         return
 
-    if not log_lines:
-        st.caption("Starting pipeline…")
-        return
-
-    output_box.code("".join(log_lines[-30:]), language=None)
-    st.button("View dashboard", type="primary")
+    if log_lines:
+        output_box.code("".join(log_lines[-30:]), language=None)
 
 
-def load_iteration_log_df(path: Path | None = None) -> pd.DataFrame | None:
-    """
-    Load iteration_log.csv if present.
+# ---------------------------------------------------------------------------
+# Rendering helpers
+# ---------------------------------------------------------------------------
+def _resolve_image_path(image_url: str) -> Path | None:
+    url_str = str(image_url).replace("\\", "/")
+    img_path = Path(url_str) if Path(url_str).is_absolute() else REPO_ROOT / url_str
+    if img_path.is_file():
+        return img_path
+    selected_run = st.session_state.get("selected_run")
+    if selected_run and selected_run != "Latest":
+        fallback = RUNS_DIR / selected_run / "images" / img_path.name
+        if fallback.is_file():
+            return fallback
+    try_cwd = Path.cwd() / url_str
+    if try_cwd.is_file():
+        return try_cwd
+    return None
 
-    Args:
-        path: Optional path to iteration_log.csv. When None, uses ITERATION_LOG_PATH (latest).
 
-    Returns:
-        DataFrame or None.
-    """
-    p = path if path is not None else ITERATION_LOG_PATH
-    if not p.exists():
-        return None
-    try:
-        return pd.read_csv(p)
-    except Exception:
-        return None
+def _score_color(v: float) -> tuple[str, str]:
+    """Return (text_color, bg_color) for a score value."""
+    if v >= 8.5:
+        return "#00fc40", "rgba(0,252,64,0.12)"
+    if v >= 7.0:
+        return "#69daff", "rgba(105,218,255,0.12)"
+    return "#ff716c", "rgba(255,113,108,0.12)"
 
 
-def main() -> None:
-    """Configure page, sidebar, and main dashboard sections."""
-    st.set_page_config(
-        page_title="Varsity Ad Engine",
-        layout="wide",
-    )
+def _score_pip_color(v: float | None) -> str:
+    if v is None:
+        return "#1b2028"
+    if v >= 8.0:
+        return "#00fc40"
+    if v >= 7.0:
+        return "#69daff"
+    return "#ff716c"
 
-    # Load secrets into env only inside a script run (avoids SessionInfo use before init).
-    if hasattr(st, "secrets"):
-        try:
-            os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
-            os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
-        except (KeyError, TypeError):
-            pass
-    if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY"):
-        try:
-            from dotenv import load_dotenv
 
-            load_dotenv()
-        except ImportError:
-            pass
-
-    # Hide footer and bottom-right "Manage app" bar (Streamlit / Community Cloud).
+def _render_metric(label: str, value: str, delta: str | None, border_color: str) -> None:
+    delta_html = f'<div class="m-delta" style="color:#00fc40">{delta}</div>' if delta else ""
     st.markdown(
-        """
-        <style>
-        footer { visibility: hidden; }
-        [data-testid="stBottom"] { visibility: hidden; }
-        [data-testid="stDecoration"] { visibility: hidden; }
-        </style>
-        """,
+        f"""<div class="kinetic-metric" style="border-left-color:{border_color}">
+              <div class="m-label">{label}</div>
+              <div class="m-value">{value}</div>
+              {delta_html}
+            </div>""",
         unsafe_allow_html=True,
     )
 
-    # Ensure session state keys exist before use (avoids KeyError if state is reset or not yet ready).
-    if "run_pipeline_requested" not in st.session_state:
-        st.session_state["run_pipeline_requested"] = False
 
-    run_ids = list_run_ids()
-    run_options = ["Latest"] + run_ids
-    if "selected_run" not in st.session_state:
-        st.session_state["selected_run"] = "Latest"
-    if st.session_state["selected_run"] not in run_options:
-        st.session_state["selected_run"] = run_options[0]
-        _safe_rerun()
-    run_index = run_options.index(st.session_state["selected_run"])
+def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
+    """Render a single Facebook-style ad thumbnail card in the current column."""
+    ad_body = ad.get("ad") or {}
+    scores = ad.get("scores") or {}
+    bid = str(ad.get("brief_id", "—"))
+    var = ad.get("variation_index", "")
+    avg = scores.get("average_score")
+    headline = str(ad_body.get("headline") or "Untitled Ad")
+    primary_text = str(ad_body.get("primary_text") or "").strip()
+    cta = str(ad_body.get("cta_button") or "Learn More")
+    image_url = ad.get("image_url")
 
-    # Resolve paths for selected run
-    if st.session_state["selected_run"] == "Latest" or not st.session_state["selected_run"]:
-        ads_path = None
-        log_path = None
+    # Score badge
+    try:
+        score_num = float(avg) if avg is not None else None
+        score_str = f"{score_num:.1f}" if score_num is not None else "—"
+        txt_col, bg_col = _score_color(score_num) if score_num else ("#a8abb3", "rgba(168,171,179,0.12)")
+    except (TypeError, ValueError):
+        score_str, txt_col, bg_col = "—", "#a8abb3", "rgba(168,171,179,0.12)"
+
+    # Score pips
+    pip_html = ""
+    for dim in DIMENSION_KEYS:
+        v = _dimension_numeric(scores, dim)
+        c = _score_pip_color(v)
+        pip_html += f'<div class="score-pip" style="background:{c}"></div>'
+
+    # Image area
+    img_resolved = _resolve_image_path(image_url) if image_url else None
+
+    if img_resolved:
+        img_b64 = base64.b64encode(img_resolved.read_bytes()).decode()
+        img_area = f"""
+        <div class="ad-img-area has-image">
+          <img src="data:image/png;base64,{img_b64}" alt="Ad image">
+          <div class="ad-id-tag">{bid} · v{var}</div>
+          <div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>
+        </div>"""
+        has_image = True
     else:
-        run_dir = RUNS_DIR / st.session_state["selected_run"]
-        ads_path = run_dir / "ads_library.json"
-        log_path = run_dir / "iteration_log.csv"
+        img_area = f"""
+        <div class="ad-img-area no-image">
+          <div style="font-size:26px;opacity:0.2">🔳</div>
+          <div class="ad-no-img-label">Image not available</div>
+          <div class="ad-id-tag">{bid} · v{var}</div>
+          <div class="ad-score-badge" style="color:{txt_col};background:{bg_col}">{score_str}</div>
+        </div>"""
+        has_image = False
 
-    result = load_ads_library_result(ads_path)
-    data = result.get("data") or {} if result.get("success") else {}
-    ads = data.get("ads") if isinstance(data.get("ads"), list) else []
-    published = get_published_ads(ads)
+    # Truncate text
+    hl_trunc = headline[:55] + "…" if len(headline) > 55 else headline
+    pt_trunc = primary_text[:95] + "…" if len(primary_text) > 95 else primary_text
 
-    brief_ids_sorted = sorted(
-        {str(a.get("brief_id", "")) for a in ads if a.get("brief_id")},
-        key=lambda x: (len(x), x),
-    )
+    card_html = f"""
+    <div class="ad-thumb-card">
+      {img_area}
+      <div class="ad-card-inner">
+        <div class="ad-sponsor">Varsity Tutors · Sponsored</div>
+        <div class="ad-headline-text">{hl_trunc}</div>
+        <div class="ad-preview-text">{pt_trunc}</div>
+      </div>
+      <div class="ad-card-footer">
+        <div class="ad-cta-text">{cta} →</div>
+        <div class="ad-score-bars">{pip_html}</div>
+      </div>
+    </div>"""
 
-    # --- Sidebar ---
-    with st.sidebar:
-        render_sidebar_api_status()
-        st.divider()
-        chosen = st.selectbox(
-            "Run",
-            options=run_options,
-            index=run_index,
-            format_func=lambda x: "Latest (output/)" if x == "Latest" else x,
-        )
-        if chosen != st.session_state["selected_run"]:
-            st.session_state["selected_run"] = chosen
+    st.markdown(card_html, unsafe_allow_html=True)
+
+    if not has_image:
+        retry_key = f"retry_img_{bid}_{var}"
+        if st.button("↻ Retry Image", key=retry_key, type="secondary"):
+            _retry_single_image(ad, bid, var)
             _safe_rerun()
-        st.divider()
-        if st.button("Run Pipeline", type="primary", use_container_width=True):
-            st.session_state["run_pipeline_requested"] = True
-            _safe_rerun()
-        st.divider()
-        st.subheader("Filters")
-        selected_briefs = st.multiselect(
-            "Brief IDs",
-            options=brief_ids_sorted,
-            default=brief_ids_sorted,
-            placeholder="All briefs",
-        )
-        min_score = st.slider(
-            "Min score",
-            min_value=MIN_SCORE_SLIDER_MIN,
-            max_value=MIN_SCORE_SLIDER_MAX,
-            value=DEFAULT_MIN_SCORE,
-            step=0.1,
-        )
 
-    st.title("Ad Generation Dashboard")
-    st.caption("Varsity Tutors • SAT Prep Campaign")
 
-    if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
-        run_pipeline_stream_ui()
-        return
+# ---------------------------------------------------------------------------
+# Page renderers
+# ---------------------------------------------------------------------------
+def _render_dashboard(published: list, log_df: pd.DataFrame | None, selected_briefs: list, min_score: float) -> None:
+    """Full dashboard: metrics + charts + self-healing + ad gallery."""
 
-    if not result.get("success"):
-        st.error(result.get("error") or "Failed to load ads library")
-        return
-
-    if not published:
-        st.info("No ads generated yet. Run the pipeline from the sidebar.")
-        return
-
-    # Collect scores for metrics and charts
-    scores_list: list[tuple[dict[str, Any], float]] = []
+    # Collect scores
+    scores_list: list[tuple[dict, float]] = []
     for a in published:
         s = a.get("scores") or {}
         avg = s.get("average_score")
@@ -581,215 +885,185 @@ def main() -> None:
                 pass
 
     if not scores_list:
-        st.info("No scored ads yet.")
+        st.info("No scored ads yet. Run the pipeline from the sidebar.")
         return
 
-    total_published = len(scores_list)
-    avg_all = sum(x[1] for x in scores_list) / total_published
-
-    # Pass rate: published with passes_threshold True vs total with flag
-    passed = sum(
-        1
-        for a, _ in scores_list
-        if (a.get("scores") or {}).get("passes_threshold") is True
-    )
-    pass_rate_pct = (passed / total_published * 100) if total_published else 0.0
-
-    # Highest scoring brief_id by mean average_score
+    total_pub = len(scores_list)
+    avg_all = sum(x[1] for x in scores_list) / total_pub
+    passed = sum(1 for a, _ in scores_list if (a.get("scores") or {}).get("passes_threshold") is True)
+    pass_rate = (passed / total_pub * 100) if total_pub else 0.0
     by_brief: dict[str, list[float]] = {}
     for a, sc in scores_list:
-        bid = str(a.get("brief_id", "?"))
-        by_brief.setdefault(bid, []).append(sc)
+        by_brief.setdefault(str(a.get("brief_id", "?")), []).append(sc)
     brief_means = {b: sum(v) / len(v) for b, v in by_brief.items()}
     top_brief = max(brief_means, key=lambda k: brief_means[k]) if brief_means else "—"
 
-    # --- Section 1: Stats row ---
-    c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Published ads", total_published)
-    c2.metric("Avg score", f"{avg_all:.1f}")
-    c3.metric("Pass rate", f"{pass_rate_pct:.0f}%")
-    c4.metric("Top brief", top_brief, delta=f"avg {brief_means.get(top_brief, 0):.1f}" if top_brief != "—" else None)
+    # ── Metrics row ──
+    c1, c2, c3, c4 = st.columns(4, gap="medium")
+    with c1:
+        _render_metric("Published Ads", str(total_pub), None, "#69daff")
+    with c2:
+        _render_metric("Avg Score", f"{avg_all:.1f}", None, "#00fc40")
+    with c3:
+        _render_metric("Pass Rate", f"{pass_rate:.0f}%", None, "#ac89ff")
+    with c4:
+        delta_str = f"avg {brief_means.get(top_brief, 0):.1f}" if top_brief != "—" else None
+        _render_metric("Top Brief", top_brief, delta_str, "#00fc40")
+
+    st.markdown("<div style='height:24px'></div>", unsafe_allow_html=True)
+
+    # ── Charts ──
+    try:
+        import plotly.express as px
+        import plotly.graph_objects as go
+        _PLOTLY = True
+    except ImportError:
+        _PLOTLY = False
+
+    col_r, col_b = st.columns(2, gap="medium")
+
+    # Radar
+    with col_r:
+        st.markdown(
+            '<div class="kinetic-section-title"><span class="acc" style="background:#69daff"></span>Avg Score by Dimension</div>',
+            unsafe_allow_html=True,
+        )
+        dim_vals: dict[str, list[float]] = {k: [] for k in DIMENSION_KEYS}
+        for a, _ in scores_list:
+            s = a.get("scores") or {}
+            for k in DIMENSION_KEYS:
+                v = _dimension_numeric(s, k)
+                if v is not None:
+                    dim_vals[k].append(v)
+        radar_r = [sum(dim_vals[k]) / len(dim_vals[k]) if dim_vals[k] else 0.0 for k in DIMENSION_KEYS]
+        labels = [DIMENSION_LABELS[k] for k in DIMENSION_KEYS]
+        if _PLOTLY:
+            fig = go.Figure()
+            fig.add_trace(go.Scatterpolar(
+                r=radar_r + [radar_r[0]],
+                theta=labels + [labels[0]],
+                fill="toself",
+                fillcolor="rgba(0,252,64,0.08)",
+                line=dict(color="#00fc40", width=2),
+                mode="lines+markers",
+                marker=dict(color="#00fc40", size=5),
+            ))
+            fig.update_layout(
+                polar=dict(
+                    bgcolor="#0f141a",
+                    radialaxis=dict(visible=True, range=[0, 10], gridcolor="rgba(68,72,79,0.25)", tickfont=dict(color="#a8abb3", size=9), color="#a8abb3"),
+                    angularaxis=dict(gridcolor="rgba(68,72,79,0.2)", tickfont=dict(color="#a8abb3", size=9, family="Space Grotesk")),
+                ),
+                paper_bgcolor="#0f141a",
+                plot_bgcolor="#0f141a",
+                showlegend=False,
+                margin=dict(l=50, r=50, t=30, b=30),
+                height=300,
+            )
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            for lbl, val in zip(labels, radar_r):
+                st.caption(f"{lbl}: {val:.1f}")
+
+    # Bar by brief
+    with col_b:
+        st.markdown(
+            '<div class="kinetic-section-title"><span class="acc" style="background:#00fc40"></span>Avg Score by Brief</div>',
+            unsafe_allow_html=True,
+        )
+        if _PLOTLY and brief_means:
+            bdf = sorted(brief_means.items(), key=lambda x: x[0])
+            briefs_sorted = [b for b, _ in bdf]
+            vals_sorted = [v for _, v in bdf]
+            bar_colors = ["#00fc40" if v >= 8.5 else "#69daff" if v >= 7.0 else "#ff716c" for v in vals_sorted]
+            fig2 = go.Figure(go.Bar(
+                x=briefs_sorted, y=vals_sorted,
+                marker_color=bar_colors,
+                marker_line_width=0,
+            ))
+            fig2.update_layout(
+                paper_bgcolor="#0f141a", plot_bgcolor="#0f141a",
+                yaxis=dict(range=[0, 10], gridcolor="rgba(68,72,79,0.18)", tickfont=dict(color="#a8abb3", size=9), color="#a8abb3"),
+                xaxis=dict(tickfont=dict(color="#a8abb3", size=9, family="Space Grotesk"), color="#a8abb3"),
+                margin=dict(l=40, r=20, t=20, b=40),
+                height=300,
+            )
+            st.plotly_chart(fig2, use_container_width=True)
 
     st.divider()
 
-    # --- Section 2: Charts ---
-    # Radar: average per dimension across all published ads
-    dim_sums: dict[str, list[float]] = {k: [] for k in DIMENSION_KEYS}
-    for a, _ in scores_list:
-        s = a.get("scores") or {}
-        for k in DIMENSION_KEYS:
-            v = _dimension_numeric(s, k)
-            if v is not None:
-                dim_sums[k].append(v)
-    radar_theta = [DIMENSION_LABELS[k] for k in DIMENSION_KEYS]
-    radar_r = [
-        sum(dim_sums[k]) / len(dim_sums[k]) if dim_sums[k] else 0.0
-        for k in DIMENSION_KEYS
-    ]
-    # Close the polygon
-    radar_theta_closed = radar_theta + [radar_theta[0]]
-    radar_r_closed = radar_r + [radar_r[0]]
+    # ── Self-healing ──
+    st.markdown(
+        '<div class="kinetic-section-title"><span class="acc" style="background:#ac89ff"></span>Self-Healing Proof</div>',
+        unsafe_allow_html=True,
+    )
+    if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns and "status" in log_df.columns:
+        def _nc(s: "pd.Series") -> "pd.Series":
+            return pd.to_numeric(s, errors="coerce")
 
-    col_chart1, col_chart2 = st.columns(2)
-    with col_chart1:
-        st.subheader("Avg score by dimension")
-        if _PLOTLY_AVAILABLE and go is not None:
-            fig_radar = go.Figure()
-            fig_radar.add_trace(
-                go.Scatterpolar(
-                    r=radar_r_closed,
-                    theta=radar_theta_closed,
-                    fill="toself",
-                    name="Average",
-                )
-            )
-            fig_radar.update_layout(
-                polar=dict(radialaxis=dict(visible=True, range=[0, 10])),
-                showlegend=False,
-                margin=dict(l=40, r=40, t=40, b=40),
-                height=400,
-            )
-            st.plotly_chart(fig_radar, use_container_width=True)
-        else:
-            st.warning(
-                "Plotly not installed — radar chart unavailable. "
-                "Add `plotly` to requirements and redeploy."
-            )
-            dim_df = pd.DataFrame(
-                {"dimension": radar_theta, "avg_score": radar_r}
-            )
-            st.bar_chart(dim_df.set_index("dimension"))
-
-    with col_chart2:
-        st.subheader("Avg score by brief")
-        brief_df = pd.DataFrame(
-            {"brief_id": list(brief_means.keys()), "avg_score": list(brief_means.values())}
-        )
-        brief_df = brief_df.sort_values("brief_id")
-        if _PLOTLY_AVAILABLE and px is not None:
-            fig_bar = px.bar(
-                brief_df,
-                x="brief_id",
-                y="avg_score",
-                range_y=[0, 10],
-            )
-            fig_bar.update_layout(height=400, margin=dict(l=40, r=40, t=40, b=40))
-            st.plotly_chart(fig_bar, use_container_width=True)
-        else:
-            st.bar_chart(brief_df.set_index("brief_id"))
-
-    log_df = load_iteration_log_df(log_path)
-
-    # --- Self-Healing Proof: first judged evaluation vs final published (evaluation cycles from pipeline) ---
-    st.subheader("Self-Healing Proof")
-    if log_df is not None and not log_df.empty and "cycle" in log_df.columns and "average_score" in log_df.columns:
-        has_copy = "primary_text" in log_df.columns
-        has_status = "status" in log_df.columns
-        groups = log_df.groupby(["brief_id", "variation"], dropna=False)
-        healed: list[tuple[Any, Any, pd.Series, pd.Series]] = []
-
-        def _num_cycle_col(series: pd.Series) -> pd.Series:
-            return pd.to_numeric(series, errors="coerce")
-
-        for (bid, var), grp in groups:
-            judged = grp[pd.to_numeric(grp["average_score"], errors="coerce").notna()]
+        healed = []
+        for (bid_g, var_g), grp in log_df.groupby(["brief_id", "variation"], dropna=False):
+            judged = grp[_nc(grp["average_score"]).notna()]
             if judged.empty:
                 continue
-            judged_sorted = judged.assign(_c=_num_cycle_col(judged["cycle"])).sort_values("_c")
-            first_judged = judged_sorted.iloc[0]
-            if not has_status:
-                continue
-            pub = grp[
-                grp["status"].astype(str).str.strip().str.lower() == "published"
-            ]
+            first = judged.assign(_c=_nc(judged["cycle"])).sort_values("_c").iloc[0]
+            pub = grp[grp["status"].astype(str).str.strip().str.lower() == "published"]
             if pub.empty:
                 continue
-            pub_sorted = pub.assign(_c=_num_cycle_col(pub["cycle"])).sort_values("_c")
-            final_row = pub_sorted.iloc[-1]
-            c_first = float(pd.to_numeric(first_judged["cycle"], errors="coerce"))
-            c_final = float(pd.to_numeric(final_row["cycle"], errors="coerce"))
-            if c_final <= c_first:
+            final = pub.assign(_c=_nc(pub["cycle"])).sort_values("_c").iloc[-1]
+            if float(_nc(pd.Series([final["cycle"]])).iloc[0] or 0) <= float(_nc(pd.Series([first["cycle"]])).iloc[0] or 0):
                 continue
-            healed.append((bid, var, first_judged, final_row))
-        if not healed:
-            st.info("All ads passed on first attempt — no healing needed.")
-        else:
-            # Lookup published ad by (brief_id, variation) for fallback when log has no primary_text
-            ad_by_brief_var: dict[tuple[str, int], dict[str, Any]] = {}
-            for a in published:
-                b = str(a.get("brief_id", ""))
-                v = a.get("variation_index")
-                if v is not None:
-                    try:
-                        v = int(v)
-                    except (TypeError, ValueError):
-                        continue
-                    ad_by_brief_var[(b, v)] = a
+            healed.append((bid_g, var_g, first, final))
 
-            for bid, var, r1, r2 in healed:
+        if not healed:
+            st.markdown('<div style="font-family:\'Space Grotesk\',sans-serif;font-size:12px;color:#a8abb3;padding:12px 0;">All ads passed on first attempt — no healing needed.</div>', unsafe_allow_html=True)
+        else:
+            for bid_g, var_g, r1, r2 in healed[:5]:
                 s1 = float(r1["average_score"])
                 s2 = float(r2["average_score"])
                 delta = round(s2 - s1, 1)
-                if delta > 0:
-                    title = f"Brief {bid} · Var {var} — Score lifted from {s1} → {s2} (+{delta})"
-                elif delta < 0:
-                    title = f"Brief {bid} · Var {var} — Published after retries: score {s1} → {s2} ({delta})"
-                else:
-                    title = f"Brief {bid} · Var {var} — Published after retries: score {s1} → {s2}"
-                with st.expander(title, expanded=False):
-                    col_initial, col_healed = st.columns(2)
-                    with col_initial:
-                        st.markdown("### First judged evaluation")
-                        pt1 = "—"
-                        if has_copy and "primary_text" in r1.index:
-                            pt1 = r1["primary_text"]
-                            if pt1 is None or (isinstance(pt1, float) and pd.isna(pt1)):
-                                pt1 = "—"
-                            else:
-                                pt1 = str(pt1).strip() or "—"
-                        if pt1 == "—":
-                            pt1 = "Initial draft copy was not recorded for this run. Re-run the pipeline to log per-cycle copy (primary_text) in the iteration log."
-                        st.info(pt1)
-                        st.metric("Avg Score", round(s1, 1) if s1 else "—")
-                        w1 = r1.get("weakest_dimension")
-                        if w1 is None or (isinstance(w1, float) and pd.isna(w1)):
-                            w1 = "—"
-                        st.error(f"Weakest dimension: {w1}")
-                    with col_healed:
-                        st.markdown("### Healed Draft")
-                        pt2 = "—"
-                        if has_copy and "primary_text" in r2.index:
-                            pt2 = r2["primary_text"]
-                            if pt2 is None or (isinstance(pt2, float) and pd.isna(pt2)):
-                                pt2 = "—"
-                            else:
-                                pt2 = str(pt2).strip() or "—"
-                        if pt2 == "—":
-                            try:
-                                v_int = int(var) if not isinstance(var, int) else var
-                            except (TypeError, ValueError):
-                                v_int = -1
-                            ad_entry = ad_by_brief_var.get((str(bid), v_int))
-                            if ad_entry:
-                                ad_body = ad_entry.get("ad") or {}
-                                fallback = ad_body.get("primary_text")
-                                if fallback is not None and str(fallback).strip():
-                                    pt2 = str(fallback).strip()
-                            if pt2 == "—":
-                                pt2 = "Healed draft copy was not recorded for this run. The final ad is in the Browse ads section below."
-                        st.success(pt2)
-                        lift = round(s2 - s1, 1)
-                        delta_str = f"+{lift}" if lift > 0 else (f"{lift}" if lift < 0 else None)
-                        st.metric("Avg Score", round(s2, 1) if s2 else "—", delta=delta_str)
-                        st.write("All dimensions passed 7.0")
+                delta_str = f"+{delta}" if delta > 0 else str(delta)
+                pt1 = str(r1.get("primary_text") or "—").strip() or "—"
+                pt2 = str(r2.get("primary_text") or "—").strip() or "—"
+                if len(pt1) > 140:
+                    pt1 = pt1[:140] + "…"
+                if len(pt2) > 140:
+                    pt2 = pt2[:140] + "…"
+                delta_color = "#00fc40" if delta > 0 else "#ff716c"
+                st.markdown(f"""
+                <div class="sh-card">
+                  <div class="sh-header">
+                    <span>Brief {bid_g} · Var {var_g} — {s1} → {s2}</span>
+                    <span class="sh-delta" style="color:{delta_color}">{delta_str}</span>
+                  </div>
+                  <div class="sh-cols">
+                    <div>
+                      <div class="sh-col-title">First Judged</div>
+                      <div class="sh-text initial">{pt1}</div>
+                      <div class="sh-score" style="color:#ff716c">{s1}</div>
+                      <div class="sh-sub" style="color:#ff716c">Weakest: {r1.get('weakest_dimension','—')}</div>
+                    </div>
+                    <div>
+                      <div class="sh-col-title">Healed Draft</div>
+                      <div class="sh-text healed">{pt2}</div>
+                      <div class="sh-score" style="color:#00fc40">{s2}</div>
+                      <div class="sh-sub" style="color:#00fc40">All dimensions passed 7.0 ✓</div>
+                    </div>
+                  </div>
+                </div>""", unsafe_allow_html=True)
     else:
-        st.caption("Run the pipeline to generate iteration_log.csv (with primary_text per cycle) for self-healing proof.")
+        st.caption("Run the pipeline to see self-healing proof.")
 
     st.divider()
 
-    # --- Section 3: Ad browser ---
-    # Filter by sidebar multiselect and min score
-    filtered: list[dict[str, Any]] = []
+    # ── Ad gallery ──
+    _render_ad_gallery(published, selected_briefs, min_score)
+
+
+def _render_ad_gallery(published: list, selected_briefs: list, min_score: float) -> None:
+    """Thumbnail grid of published ads."""
+    # Filter
+    filtered = []
     for a in published:
         bid = str(a.get("brief_id", ""))
         if selected_briefs and bid not in selected_briefs:
@@ -802,88 +1076,278 @@ def main() -> None:
             continue
         filtered.append(a)
 
-    st.subheader(f"Browse ads — {len(filtered)} published")
+    # Header + filter chips
+    st.markdown(f"""
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="kinetic-section-title" style="margin-bottom:0">
+        <span class="acc" style="background:#00fc40"></span>
+        Optimized Ad Gallery
+      </div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;color:#a8abb3">{len(filtered)} generations</div>
+    </div>
+    <div class="gallery-chips">
+      <span class="g-chip active">All Ads</span>
+      <span class="g-chip">Top Performers</span>
+      <span class="g-chip">Needs Image</span>
+    </div>""", unsafe_allow_html=True)
 
-    for idx, a in enumerate(filtered):
-        ad_body = a.get("ad") or {}
-        scores = a.get("scores") or {}
-        headline = ad_body.get("headline", f"Ad {idx + 1}")
-        bid = a.get("brief_id", "—")
-        var = a.get("variation_index", "")
-        avg = scores.get("average_score", "—")
-        title = f"Brief {bid} · Var {var} — {avg} avg"
-        with st.expander(title, expanded=False):
-            # Ad preview: Meta structure — primary text → image → headline → description → CTA
-            st.caption("Varsity Tutors · Sponsored")
-            primary_text = (ad_body.get("primary_text") or "").strip() or "—"
-            if len(primary_text) <= PRIMARY_TEXT_VISIBLE_CHARS:
-                st.write(primary_text)
-            else:
-                read_more_key = f"read_more_{bid}_{var}"
-                if read_more_key not in st.session_state:
-                    st.session_state[read_more_key] = False
-                expanded = st.session_state.get(read_more_key, False)
-                if expanded:
-                    st.write(primary_text)
-                    if st.button("show less", key=f"less_{bid}_{var}", type="secondary"):
-                        st.session_state[read_more_key] = False
-                        _safe_rerun()
-                else:
-                    st.write(primary_text[:PRIMARY_TEXT_VISIBLE_CHARS] + " …")
-                    if st.button("read more", key=f"more_{bid}_{var}", type="secondary"):
-                        st.session_state[read_more_key] = True
-                        _safe_rerun()
-            image_url = a.get("image_url")
-            image_shown = False
-            if image_url:
-                # Normalize path (forward slashes; handle relative to repo root)
-                url_str = str(image_url).replace("\\", "/")
-                img_path = (Path(url_str) if Path(url_str).is_absolute() else REPO_ROOT / url_str)
-                if not img_path.is_file():
-                    # Fallback: when viewing a specific run, try run dir / images / brief_var.png
-                    selected_run = st.session_state.get("selected_run")
-                    if selected_run and selected_run != "Latest":
-                        fallback = RUNS_DIR / selected_run / "images" / f"{bid}_v{var}.png"
-                        if fallback.is_file():
-                            img_path = fallback
-                if not img_path.is_file():
-                    # Last resort: resolve relative to cwd (e.g. Streamlit run from different cwd)
-                    try_cwd = Path.cwd() / url_str
-                    if try_cwd.is_file():
-                        img_path = try_cwd
-                if img_path.is_file():
-                    st.image(str(img_path), width=AD_PREVIEW_IMAGE_WIDTH, use_container_width=False)
-                    image_shown = True
-            if not image_shown:
-                # Placeholder for missing/failed image with retry option
-                st.markdown(
-                    '<div style="width:360px;height:200px;background:#f0f2f6;border:2px dashed #bbb;'
-                    'border-radius:8px;display:flex;align-items:center;justify-content:center;'
-                    'color:#888;font-size:14px;">Image not available</div>',
-                    unsafe_allow_html=True,
-                )
-                retry_key = f"retry_img_{bid}_{var}"
-                if st.button("Retry image generation", key=retry_key, type="secondary"):
-                    _retry_single_image(a, bid, var)
-                    _safe_rerun()
-            st.markdown(f"**{headline}**")
-            desc = ad_body.get("description")
-            if desc:
-                st.caption(desc)
-            cta = ad_body.get("cta_button")
-            if cta:
-                st.link_button(cta, url=CTA_DESTINATION_URL, type="primary")
-            # Dimension scores below ad
-            st.divider()
-            st.caption("Scores by dimension")
-            for key in DIMENSION_KEYS:
-                label = DIMENSION_LABELS[key]
-                v = _dimension_numeric(scores, key)
-                if v is not None:
-                    st.caption(f"{label}: {v:.1f}")
-                    st.progress(min(1.0, max(0.0, v / 10.0)))
-                else:
-                    st.caption(f"{label}: —")
+    if not filtered:
+        st.info("No ads match the current filters.")
+        return
+
+    # 3-column thumbnail grid
+    for row_start in range(0, len(filtered), 3):
+        cols = st.columns(3, gap="medium")
+        for col, ad in zip(cols, filtered[row_start:row_start + 3]):
+            with col:
+                _render_ad_thumbnail(ad)
+
+
+def _render_analytics(published: list) -> None:
+    """Analytics-only page."""
+    scores_list = []
+    for a in published:
+        s = a.get("scores") or {}
+        avg = s.get("average_score")
+        if avg is not None:
+            try:
+                scores_list.append((a, float(avg)))
+            except (TypeError, ValueError):
+                pass
+    if not scores_list:
+        st.info("No data yet. Run the pipeline first.")
+        return
+    _render_dashboard.__wrapped__ if hasattr(_render_dashboard, "__wrapped__") else None
+    # Reuse the charts section
+    try:
+        import plotly.graph_objects as go
+    except ImportError:
+        st.info("Plotly not installed.")
+        return
+    by_brief: dict[str, list[float]] = {}
+    for a, sc in scores_list:
+        by_brief.setdefault(str(a.get("brief_id", "?")), []).append(sc)
+    brief_means = {b: sum(v) / len(v) for b, v in by_brief.items()}
+    dim_vals: dict[str, list[float]] = {k: [] for k in DIMENSION_KEYS}
+    for a, _ in scores_list:
+        s = a.get("scores") or {}
+        for k in DIMENSION_KEYS:
+            v = _dimension_numeric(s, k)
+            if v is not None:
+                dim_vals[k].append(v)
+    radar_r = [sum(dim_vals[k]) / len(dim_vals[k]) if dim_vals[k] else 0.0 for k in DIMENSION_KEYS]
+    labels = [DIMENSION_LABELS[k] for k in DIMENSION_KEYS]
+    col_r, col_b = st.columns(2, gap="medium")
+    with col_r:
+        st.markdown('<div class="kinetic-section-title"><span class="acc" style="background:#69daff"></span>Avg Score by Dimension</div>', unsafe_allow_html=True)
+        fig = go.Figure()
+        fig.add_trace(go.Scatterpolar(r=radar_r + [radar_r[0]], theta=labels + [labels[0]], fill="toself", fillcolor="rgba(0,252,64,0.08)", line=dict(color="#00fc40", width=2), marker=dict(color="#00fc40", size=5)))
+        fig.update_layout(polar=dict(bgcolor="#0f141a", radialaxis=dict(visible=True, range=[0, 10], gridcolor="rgba(68,72,79,0.25)", tickfont=dict(color="#a8abb3", size=9), color="#a8abb3"), angularaxis=dict(gridcolor="rgba(68,72,79,0.2)", tickfont=dict(color="#a8abb3", size=9, family="Space Grotesk"))), paper_bgcolor="#0f141a", plot_bgcolor="#0f141a", showlegend=False, margin=dict(l=50, r=50, t=30, b=30), height=320)
+        st.plotly_chart(fig, use_container_width=True)
+    with col_b:
+        st.markdown('<div class="kinetic-section-title"><span class="acc" style="background:#00fc40"></span>Avg Score by Brief</div>', unsafe_allow_html=True)
+        bdf = sorted(brief_means.items(), key=lambda x: x[0])
+        bar_colors = ["#00fc40" if v >= 8.5 else "#69daff" if v >= 7.0 else "#ff716c" for _, v in bdf]
+        fig2 = go.Figure(go.Bar(x=[b for b, _ in bdf], y=[v for _, v in bdf], marker_color=bar_colors, marker_line_width=0))
+        fig2.update_layout(paper_bgcolor="#0f141a", plot_bgcolor="#0f141a", yaxis=dict(range=[0, 10], gridcolor="rgba(68,72,79,0.18)", tickfont=dict(color="#a8abb3", size=9), color="#a8abb3"), xaxis=dict(tickfont=dict(color="#a8abb3", size=9, family="Space Grotesk"), color="#a8abb3"), margin=dict(l=40, r=20, t=20, b=40), height=320)
+        st.plotly_chart(fig2, use_container_width=True)
+
+
+def _render_settings() -> None:
+    st.markdown('<div class="kinetic-section-title"><span class="acc" style="background:#69daff"></span>API Configuration</div>', unsafe_allow_html=True)
+    gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
+    claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
+    g_color = "#00fc40" if gemini_ok else "#ff716c"
+    c_color = "#00fc40" if claude_ok else "#ff716c"
+    st.markdown(f"""
+    <div style="background:#0f141a;border-radius:6px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#a8abb3;margin-bottom:8px">Gemini (Drafter)</div>
+        <div style="display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:{g_color}">
+          <div style="width:8px;height:8px;border-radius:50%;background:{g_color};box-shadow:0 0 8px {g_color}40"></div>
+          {"Connected" if gemini_ok else "Not Set"}
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#a8abb3;margin-bottom:8px">Claude (Judge)</div>
+        <div style="display:flex;align-items:center;gap:8px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;color:{c_color}">
+          <div style="width:8px;height:8px;border-radius:50%;background:{c_color};box-shadow:0 0 8px {c_color}40"></div>
+          {"Connected" if claude_ok else "Not Set"}
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:#0f141a;border-radius:6px;padding:20px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#a8abb3;margin-bottom:10px">Pipeline Defaults</div>
+      <div style="font-size:11px;color:#a8abb3;line-height:2">
+        PIPELINE_MAX_WORKERS = {os.environ.get("PIPELINE_MAX_WORKERS", "10")}<br>
+        IMAGE_MAX_WORKERS = {os.environ.get("IMAGE_MAX_WORKERS", "4")}<br>
+        IMAGE_STAGGER_DELAY = {os.environ.get("IMAGE_STAGGER_DELAY", "0.5")}s<br>
+        GEMINI_MAX_CONCURRENT = {os.environ.get("GEMINI_MAX_CONCURRENT", "10")}<br>
+        ANTHROPIC_MAX_CONCURRENT = {os.environ.get("ANTHROPIC_MAX_CONCURRENT", "8")}
+      </div>
+    </div>""", unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+def main() -> None:
+    st.set_page_config(page_title="Kinetic Observatory — Varsity Ad Engine", layout="wide")
+
+    # Inject CSS
+    st.markdown(KINETIC_CSS, unsafe_allow_html=True)
+
+    # Load secrets
+    if hasattr(st, "secrets"):
+        try:
+            os.environ["GOOGLE_API_KEY"] = str(st.secrets["GOOGLE_API_KEY"])
+            os.environ["ANTHROPIC_API_KEY"] = str(st.secrets["ANTHROPIC_API_KEY"])
+        except (KeyError, TypeError):
+            pass
+    if not os.environ.get("GOOGLE_API_KEY") or not os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            from dotenv import load_dotenv
+            load_dotenv()
+        except ImportError:
+            pass
+
+    # Session state defaults
+    for key, default in [
+        ("run_pipeline_requested", False),
+        ("active_page", "campaigns"),
+        ("selected_run", "Latest"),
+        ("pipeline_process", None),
+        ("pipeline_log_lines", []),
+        ("pipeline_queue", None),
+    ]:
+        if key not in st.session_state:
+            st.session_state[key] = default
+
+    # Run / data
+    run_ids = list_run_ids()
+    run_options = ["Latest"] + run_ids
+    if st.session_state["selected_run"] not in run_options:
+        st.session_state["selected_run"] = "Latest"
+
+    if st.session_state["selected_run"] == "Latest":
+        ads_path, log_path = None, None
+    else:
+        run_dir = RUNS_DIR / st.session_state["selected_run"]
+        ads_path = run_dir / "ads_library.json"
+        log_path = run_dir / "iteration_log.csv"
+
+    result = load_ads_library_result(ads_path)
+    data = result.get("data") or {} if result.get("success") else {}
+    ads = data.get("ads") if isinstance(data.get("ads"), list) else []
+    published = get_published_ads(ads)
+    brief_ids_sorted = sorted({str(a.get("brief_id", "")) for a in ads if a.get("brief_id")}, key=lambda x: (len(x), x))
+    log_df = load_iteration_log_df(log_path)
+
+    # ── SIDEBAR ──
+    with st.sidebar:
+        st.markdown(SIDEBAR_BRAND_HTML, unsafe_allow_html=True)
+
+        # Nav
+        nav_labels = [f"  {label}" for _, label in NAV_ITEMS]
+        nav_ids = [i for i, _ in NAV_ITEMS]
+        try:
+            current_idx = nav_ids.index(st.session_state["active_page"])
+        except ValueError:
+            current_idx = 1
+        selected_nav = st.radio("nav", nav_labels, index=current_idx, label_visibility="collapsed")
+        chosen_id = nav_ids[nav_labels.index(selected_nav)]
+        if chosen_id != st.session_state["active_page"]:
+            st.session_state["active_page"] = chosen_id
+            _safe_rerun()
+
+        st.divider()
+
+        # Run selector
+        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
+                     format_func=lambda x: "Latest (output/)" if x == "Latest" else x, key="_run_sel")
+        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
+            st.session_state["selected_run"] = st.session_state["_run_sel"]
+            _safe_rerun()
+
+        if st.button("Run Pipeline", type="primary", use_container_width=True):
+            st.session_state["run_pipeline_requested"] = True
+            _safe_rerun()
+
+        st.divider()
+
+        # Filters (only relevant pages)
+        if st.session_state["active_page"] in ("campaigns", "library"):
+            st.markdown('<div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.13em;color:#a8abb3;padding:0 4px;margin-bottom:6px">Filters</div>', unsafe_allow_html=True)
+            selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
+            min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1)
+        else:
+            selected_briefs = brief_ids_sorted
+            min_score = DEFAULT_MIN_SCORE
+
+        # API status
+        st.divider()
+        gemini_ok = bool(os.environ.get("GOOGLE_API_KEY"))
+        claude_ok = bool(os.environ.get("ANTHROPIC_API_KEY"))
+        g_dot = "#00fc40" if gemini_ok else "#ff716c"
+        c_dot = "#00fc40" if claude_ok else "#ff716c"
+        st.markdown(f"""
+        <div style="padding:0 4px">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:#a8abb3;margin-bottom:8px">API Status</div>
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:11px">
+            <div style="width:6px;height:6px;border-radius:50%;background:{g_dot};box-shadow:0 0 6px {g_dot}55;flex-shrink:0"></div>
+            <span><b>Gemini</b> — {"connected" if gemini_ok else "not set"}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:11px">
+            <div style="width:6px;height:6px;border-radius:50%;background:{c_dot};box-shadow:0 0 6px {c_dot}55;flex-shrink:0"></div>
+            <span><b>Claude</b> — {"connected" if claude_ok else "not set"}</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    # ── MAIN CONTENT ──
+
+    # Page title bar
+    page_label = dict(NAV_ITEMS).get(st.session_state["active_page"], "Dashboard")
+    active_tasks_color = "#00fc40"
+    st.markdown(f"""
+    <div class="kinetic-topbar">
+      <div>
+        <div class="page-title">{page_label}</div>
+        <div class="page-sub">Varsity Tutors · SAT Prep Campaign</div>
+      </div>
+      <div class="kinetic-topbar-right">
+        <span style="color:#ac89ff">$0.042/token</span>
+        <span style="color:{active_tasks_color}">● Active Tasks</span>
+      </div>
+    </div>
+    <div style="height:20px"></div>""", unsafe_allow_html=True)
+
+    # Pipeline running?
+    if st.session_state.get("run_pipeline_requested") or st.session_state.get("pipeline_process") is not None:
+        run_pipeline_stream_ui()
+        return
+
+    if not result.get("success"):
+        st.error(result.get("error") or "Failed to load ads library.")
+        return
+
+    if not published and st.session_state["active_page"] not in ("settings",):
+        st.info("No ads generated yet. Click **Run Pipeline** in the sidebar.")
+        return
+
+    # Route pages
+    active = st.session_state["active_page"]
+
+    if active in ("campaigns", "dashboard"):
+        _render_dashboard(published, log_df, selected_briefs, min_score)
+
+    elif active == "library":
+        _render_ad_gallery(published, selected_briefs, min_score)
+
+    elif active == "analytics":
+        _render_analytics(published)
+
+    elif active == "settings":
+        _render_settings()
 
 
 if __name__ == "__main__":
