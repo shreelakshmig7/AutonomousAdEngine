@@ -365,13 +365,13 @@ h1, h2, h3 {
 .ad-thumb-card:hover { border-color: rgba(105,218,255,0.25); }
 
 .ad-img-area {
-    width: 100%; height: 170px;
+    width: 100%;
     display: flex; align-items: center; justify-content: center;
     position: relative; overflow: hidden;
 }
-.ad-img-area img { width:100%; height:100%; object-fit:cover; }
+.ad-img-area img { width:100%; height:auto; display:block; }
 .ad-img-area.no-image {
-    background: var(--bg);
+    background: var(--bg); height: 170px;
     border-bottom: 2px dashed rgba(68,72,79,0.3);
     flex-direction: column; gap: 8px;
 }
