@@ -1524,6 +1524,8 @@ def main() -> None:
         ("run_pipeline_requested", False),
         ("active_page", "dashboard"),
         ("selected_run", "Latest"),
+        ("_run_sel", "Latest"),
+        ("_gallery_filter", "All Ads"),
         ("pipeline_process", None),
         ("pipeline_log_lines", []),
         ("pipeline_queue", None),
@@ -1531,31 +1533,11 @@ def main() -> None:
         if key not in st.session_state:
             st.session_state[key] = default
 
-    # Run / data
+    # Run options (data loaded after run selector widget)
     run_ids = list_run_ids()
     run_options = ["Latest"] + run_ids
     if st.session_state["selected_run"] not in run_options:
         st.session_state["selected_run"] = "Latest"
-
-    if st.session_state["selected_run"] == "Latest":
-        # Resolve to the most recent run directory (not the stale root output/)
-        if run_ids:
-            latest_dir = RUNS_DIR / run_ids[0]
-            ads_path = latest_dir / "ads_library.json"
-            log_path = latest_dir / "iteration_log.csv"
-        else:
-            ads_path, log_path = None, None  # fallback to root output/ if no runs exist
-    else:
-        run_dir = RUNS_DIR / st.session_state["selected_run"]
-        ads_path = run_dir / "ads_library.json"
-        log_path = run_dir / "iteration_log.csv"
-
-    result = load_ads_library_result(ads_path)
-    data = result.get("data") or {} if result.get("success") else {}
-    ads = data.get("ads") if isinstance(data.get("ads"), list) else []
-    published = get_published_ads(ads)
-    brief_ids_sorted = sorted({str(a.get("brief_id", "")) for a in ads if a.get("brief_id")}, key=lambda x: (len(x), x))
-    log_df = load_iteration_log_df(log_path)
 
     # ── SIDEBAR — brand + nav only ──
     nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
@@ -1609,11 +1591,32 @@ def main() -> None:
     if active not in ("settings",):
         sel_cols = st.columns([3, 9])
         with sel_cols[0]:
-            st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
-                         format_func=lambda x: "Latest" if x == "Latest" else x, key="_run_sel",
+            st.selectbox("Run", options=run_options, key="_run_sel",
+                         format_func=lambda x: "Latest" if x == "Latest" else x,
                          label_visibility="collapsed")
-            if st.session_state["_run_sel"] != st.session_state["selected_run"]:
-                st.session_state["selected_run"] = st.session_state["_run_sel"]
+        # Sync selected_run from widget state
+        st.session_state["selected_run"] = st.session_state["_run_sel"]
+
+    # ── Load data based on selected run (AFTER the selector widget) ──
+    selected_run = st.session_state["selected_run"]
+    if selected_run == "Latest":
+        if run_ids:
+            latest_dir = RUNS_DIR / run_ids[0]
+            ads_path = latest_dir / "ads_library.json"
+            log_path = latest_dir / "iteration_log.csv"
+        else:
+            ads_path, log_path = None, None
+    else:
+        run_dir = RUNS_DIR / selected_run
+        ads_path = run_dir / "ads_library.json"
+        log_path = run_dir / "iteration_log.csv"
+
+    result = load_ads_library_result(ads_path)
+    data = result.get("data") or {} if result.get("success") else {}
+    ads = data.get("ads") if isinstance(data.get("ads"), list) else []
+    published = get_published_ads(ads)
+    brief_ids_sorted = sorted({str(a.get("brief_id", "")) for a in ads if a.get("brief_id")}, key=lambda x: (len(x), x))
+    log_df = load_iteration_log_df(log_path)
 
     # Library filters
     if active == "library":
