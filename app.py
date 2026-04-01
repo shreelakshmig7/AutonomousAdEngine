@@ -409,18 +409,15 @@ h1, h2, h3 {
     font-size: 10px; color: var(--on-surface-var);
     line-height: 1.5; margin-bottom: 4px;
 }
-.ad-rm-toggle { display: none; }
-.ad-rm-toggle ~ .ad-pt-full { display: none; }
-.ad-rm-toggle ~ .ad-read-more .ad-rm-less { display: none; }
-.ad-rm-toggle:checked ~ .ad-pt-short { display: none; }
-.ad-rm-toggle:checked ~ .ad-pt-full { display: inline !important; }
-.ad-rm-toggle:checked ~ .ad-read-more .ad-rm-more { display: none; }
-.ad-rm-toggle:checked ~ .ad-read-more .ad-rm-less { display: inline; }
-.ad-read-more {
+.ad-details { margin-bottom: 4px; }
+.ad-details summary {
     color: #60a5fa; font-size: 10px; cursor: pointer;
-    padding: 0 0 6px; display: block;
+    list-style: none; display: inline;
 }
-.ad-read-more:hover { color: #93c5fd; text-decoration: underline; }
+.ad-details summary::-webkit-details-marker { display: none; }
+.ad-details summary::marker { display: none; content: ""; }
+.ad-details summary:hover { color: #93c5fd; text-decoration: underline; }
+.ad-details .ad-full-text { margin-top: 4px; }
 .ad-card-footer {
     display: flex; justify-content: space-between; align-items: center;
     padding: 8px 14px; border-top: 1px solid rgba(68,72,79,0.1);
@@ -972,16 +969,13 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
 
     if needs_expand:
         read_more_html = (
-            f'<input type="checkbox" id="{card_uid}_tog" class="ad-rm-toggle">'
-            f'<span class="ad-preview-text ad-pt-short">{pt_short}</span>'
-            f'<span class="ad-preview-text ad-pt-full">{pt_full}</span>'
-            f'<label for="{card_uid}_tog" class="ad-read-more">'
-            f'<span class="ad-rm-more">Read more ▾</span>'
-            f'<span class="ad-rm-less">Show less ▴</span>'
-            f'</label>'
+            f'<div class="ad-preview-text">{pt_short}'
+            f'<details class="ad-details"><summary>Read more ▾</summary>'
+            f'<div class="ad-full-text">{pt_full}</div>'
+            f'</details></div>'
         )
     else:
-        read_more_html = f'<span class="ad-preview-text">{pt_full}</span>'
+        read_more_html = f'<div class="ad-preview-text">{pt_full}</div>'
 
     card_html = (
         f'<div class="ad-thumb-card">'
