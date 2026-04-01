@@ -409,10 +409,16 @@ h1, h2, h3 {
     font-size: 10px; color: var(--on-surface-var);
     line-height: 1.5; margin-bottom: 4px;
 }
+.ad-rm-toggle { display: none; }
+.ad-rm-toggle ~ .ad-pt-full { display: none; }
+.ad-rm-toggle ~ .ad-read-more .ad-rm-less { display: none; }
+.ad-rm-toggle:checked ~ .ad-pt-short { display: none; }
+.ad-rm-toggle:checked ~ .ad-pt-full { display: inline !important; }
+.ad-rm-toggle:checked ~ .ad-read-more .ad-rm-more { display: none; }
+.ad-rm-toggle:checked ~ .ad-read-more .ad-rm-less { display: inline; }
 .ad-read-more {
-    background: none; border: none; color: #60a5fa;
-    font-size: 10px; cursor: pointer; padding: 0 0 6px;
-    font-family: inherit;
+    color: #60a5fa; font-size: 10px; cursor: pointer;
+    padding: 0 0 6px; display: block;
 }
 .ad-read-more:hover { color: #93c5fd; text-decoration: underline; }
 .ad-card-footer {
@@ -966,15 +972,13 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
 
     if needs_expand:
         read_more_html = (
-            f'<span class="ad-preview-text ad-pt-short" id="{card_uid}_short">{pt_short}</span>'
-            f'<span class="ad-preview-text ad-pt-full" id="{card_uid}_full" style="display:none">{pt_full}</span>'
-            f'<button class="ad-read-more" id="{card_uid}_btn" onclick="'
-            f"var s=document.getElementById('{card_uid}_short'),"
-            f"f=document.getElementById('{card_uid}_full'),"
-            f"b=document.getElementById('{card_uid}_btn');"
-            f"if(s.style.display!=='none'){{s.style.display='none';f.style.display='inline';b.textContent='Show less \\u25B4';}}"
-            f"else{{s.style.display='inline';f.style.display='none';b.textContent='Read more \\u25BE';}}"
-            f'">Read more ▾</button>'
+            f'<input type="checkbox" id="{card_uid}_tog" class="ad-rm-toggle">'
+            f'<span class="ad-preview-text ad-pt-short">{pt_short}</span>'
+            f'<span class="ad-preview-text ad-pt-full">{pt_full}</span>'
+            f'<label for="{card_uid}_tog" class="ad-read-more">'
+            f'<span class="ad-rm-more">Read more ▾</span>'
+            f'<span class="ad-rm-less">Show less ▴</span>'
+            f'</label>'
         )
     else:
         read_more_html = f'<span class="ad-preview-text">{pt_full}</span>'
