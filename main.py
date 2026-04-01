@@ -319,7 +319,7 @@ def run_pipeline_streaming(
                 "cycle": cycles_used,
                 "score": final_score,
                 "weakest_dimension": weakest,
-                "message": f"{brief.id} v{variation_index}: {status} (cycle {cycles_used})",
+                "message": f"{brief.id} v{variation_index}: {status} (cycle {cycles_used})" + (f" — {result.get('error')}" if status != "published" and result.get("error") else ""),
             }
 
             difficulty = getattr(brief, "difficulty", "medium")
