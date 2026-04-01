@@ -1161,7 +1161,7 @@ def _render_ad_gallery(published: list, selected_briefs: list, min_score: float)
     # Gallery filter mode
     gallery_mode = st.radio(
         "gallery_filter", ["All Ads", "Top Performers", "Needs Image"],
-        key="_gallery_filter", horizontal=True, label_visibility="collapsed",
+        horizontal=True, label_visibility="collapsed",
     )
 
     # Apply gallery filter on top of brief/score filters
@@ -1431,11 +1431,11 @@ def _render_pipeline_page(run_options: list[str]) -> None:
     # Controls row
     c1, c2, c3 = st.columns([3, 2, 7])
     with c1:
-        st.selectbox("Run", options=run_options, index=run_options.index(st.session_state["selected_run"]),
-                     format_func=lambda x: "Latest" if x == "Latest" else x, key="_run_sel",
+        cur_idx = run_options.index(st.session_state["selected_run"]) if st.session_state["selected_run"] in run_options else 0
+        chosen_run = st.selectbox("Run", options=run_options, index=cur_idx,
+                     format_func=lambda x: "Latest" if x == "Latest" else x,
                      label_visibility="collapsed")
-        if st.session_state["_run_sel"] != st.session_state["selected_run"]:
-            st.session_state["selected_run"] = st.session_state["_run_sel"]
+        st.session_state["selected_run"] = chosen_run
     with c2:
         is_running = st.session_state.get("pipeline_process") is not None
         btn_label = "⏳ Running..." if is_running else "▶  Start Pipeline"
@@ -1522,8 +1522,6 @@ def main() -> None:
         ("run_pipeline_requested", False),
         ("active_page", "dashboard"),
         ("selected_run", "Latest"),
-        ("_run_sel", "Latest"),
-        ("_gallery_filter", "All Ads"),
         ("pipeline_process", None),
         ("pipeline_log_lines", []),
         ("pipeline_queue", None),
@@ -1589,11 +1587,11 @@ def main() -> None:
     if active not in ("settings",):
         sel_cols = st.columns([3, 9])
         with sel_cols[0]:
-            st.selectbox("Run", options=run_options, key="_run_sel",
+            cur_idx = run_options.index(st.session_state["selected_run"]) if st.session_state["selected_run"] in run_options else 0
+            chosen_run = st.selectbox("Run", options=run_options, index=cur_idx,
                          format_func=lambda x: "Latest" if x == "Latest" else x,
                          label_visibility="collapsed")
-        # Sync selected_run from widget state
-        st.session_state["selected_run"] = st.session_state["_run_sel"]
+        st.session_state["selected_run"] = chosen_run
 
     # ── Load data based on selected run (AFTER the selector widget) ──
     selected_run = st.session_state["selected_run"]
