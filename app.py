@@ -51,7 +51,6 @@ NAV_ITEMS: list[tuple[str, str, str]] = [
     ("dashboard", "Dashboard", "📊"),
     ("library", "Library", "📁"),
     ("healing", "Self-Healing", "🔧"),
-    ("analytics", "Analytics", "📈"),
     ("pipeline", "Run Pipeline", "▶️"),
     ("settings", "Settings", "⚙️"),
 ]
@@ -408,10 +407,14 @@ h1, h2, h3 {
 }
 .ad-preview-text {
     font-size: 10px; color: var(--on-surface-var);
-    line-height: 1.5; margin-bottom: 8px;
-    overflow: hidden; display: -webkit-box;
-    -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    line-height: 1.5; margin-bottom: 4px;
 }
+.ad-read-more {
+    background: none; border: none; color: #60a5fa;
+    font-size: 10px; cursor: pointer; padding: 0 0 6px;
+    font-family: inherit;
+}
+.ad-read-more:hover { color: #93c5fd; text-decoration: underline; }
 .ad-card-footer {
     display: flex; justify-content: space-between; align-items: center;
     padding: 8px 14px; border-top: 1px solid rgba(68,72,79,0.1);
@@ -832,6 +835,12 @@ def _resolve_image_path(image_url: str) -> Path | None:
     return None
 
 
+def _ad_has_image(ad: dict[str, Any]) -> bool:
+    """Return True if the ad has a resolved image file on disk."""
+    image_url = (ad.get("ad") or {}).get("image_url", "")
+    return bool(image_url and _resolve_image_path(image_url))
+
+
 def _score_color(v: float) -> tuple[str, str]:
     """Return (text_color, bg_color) for a score value."""
     if v >= 8.5:
@@ -945,13 +954,30 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
         )
         has_image = False
 
-    # Truncate + HTML-escape ad copy so special chars don't break the markdown renderer
+    # HTML-escape ad copy so special chars don't break the markdown renderer
     import html as _html
     hl_raw = headline[:55] + "…" if len(headline) > 55 else headline
-    pt_raw = primary_text[:95] + "…" if len(primary_text) > 95 else primary_text
     hl_trunc = _html.escape(hl_raw)
-    pt_trunc = _html.escape(pt_raw)
+    pt_full = _html.escape(primary_text)
     cta_esc = _html.escape(cta)
+    card_uid = f"ad_{bid}_{var}"
+    needs_expand = len(primary_text) > 95
+    pt_short = _html.escape(primary_text[:95] + "…") if needs_expand else pt_full
+
+    if needs_expand:
+        read_more_html = (
+            f'<span class="ad-preview-text ad-pt-short" id="{card_uid}_short">{pt_short}</span>'
+            f'<span class="ad-preview-text ad-pt-full" id="{card_uid}_full" style="display:none">{pt_full}</span>'
+            f'<button class="ad-read-more" id="{card_uid}_btn" onclick="'
+            f"var s=document.getElementById('{card_uid}_short'),"
+            f"f=document.getElementById('{card_uid}_full'),"
+            f"b=document.getElementById('{card_uid}_btn');"
+            f"if(s.style.display!=='none'){{s.style.display='none';f.style.display='inline';b.textContent='Show less \\u25B4';}}"
+            f"else{{s.style.display='inline';f.style.display='none';b.textContent='Read more \\u25BE';}}"
+            f'">Read more ▾</button>'
+        )
+    else:
+        read_more_html = f'<span class="ad-preview-text">{pt_full}</span>'
 
     card_html = (
         f'<div class="ad-thumb-card">'
@@ -959,7 +985,7 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
         f'<div class="ad-card-inner">'
         f'<div class="ad-sponsor">Varsity Tutors · Sponsored</div>'
         f'<div class="ad-headline-text">{hl_trunc}</div>'
-        f'<div class="ad-preview-text">{pt_trunc}</div>'
+        f'{read_more_html}'
         f'</div>'
         f'<div class="ad-card-footer">'
         f'<div class="ad-cta-text">{cta_esc} &#x2192;</div>'
@@ -1134,20 +1160,29 @@ def _render_ad_gallery(published: list, selected_briefs: list, min_score: float)
             continue
         filtered.append(a)
 
-    # Header + filter chips
-    st.markdown(f"""
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-      <div class="kinetic-section-title" style="margin-bottom:0">
-        <span class="acc" style="background:#00fc40"></span>
-        Optimized Ad Gallery
-      </div>
-      <div style="font-family:'Space Grotesk',sans-serif;font-size:10px;color:#a8abb3">{len(filtered)} generations</div>
-    </div>
-    <div class="gallery-chips">
-      <span class="g-chip active">All Ads</span>
-      <span class="g-chip">Top Performers</span>
-      <span class="g-chip">Needs Image</span>
-    </div>""", unsafe_allow_html=True)
+    # Gallery filter mode
+    gallery_mode = st.radio(
+        "gallery_filter", ["All Ads", "Top Performers", "Needs Image"],
+        key="_gallery_filter", horizontal=True, label_visibility="collapsed",
+    )
+
+    # Apply gallery filter on top of brief/score filters
+    if gallery_mode == "Top Performers":
+        filtered = [a for a in filtered if float((a.get("scores") or {}).get("average_score", 0) or 0) >= 8.0]
+    elif gallery_mode == "Needs Image":
+        filtered = [a for a in filtered if not _ad_has_image(a)]
+
+    # Header
+    st.markdown(
+        f'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+        f'<div class="kinetic-section-title" style="margin-bottom:0">'
+        f'<span class="acc" style="background:#00fc40"></span>'
+        f'Optimized Ad Gallery'
+        f'</div>'
+        f'<div style="font-family:\'Space Grotesk\',sans-serif;font-size:10px;color:#a8abb3">{len(filtered)} generations</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
     if not filtered:
         st.info("No ads match the current filters.")
@@ -1607,9 +1642,6 @@ def main() -> None:
 
     elif active == "healing":
         _render_healing(log_df)
-
-    elif active == "analytics":
-        _render_analytics(published)
 
     elif active == "settings":
         _render_settings()
