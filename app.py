@@ -840,7 +840,7 @@ def _resolve_image_path(image_url: str) -> Path | None:
 
 def _ad_has_image(ad: dict[str, Any]) -> bool:
     """Return True if the ad has a resolved image file on disk."""
-    image_url = (ad.get("ad") or {}).get("image_url", "")
+    image_url = ad.get("image_url") or (ad.get("ad") or {}).get("image_url") or ""
     return bool(image_url and _resolve_image_path(image_url))
 
 
