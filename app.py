@@ -1614,16 +1614,8 @@ def main() -> None:
     brief_ids_sorted = sorted({str(a.get("brief_id", "")) for a in ads if a.get("brief_id")}, key=lambda x: (len(x), x))
     log_df = load_iteration_log_df(log_path)
 
-    # Library filters
-    if active == "library":
-        filt_cols = st.columns([5, 2])
-        with filt_cols[0]:
-            selected_briefs = st.multiselect("Brief IDs", options=brief_ids_sorted, default=brief_ids_sorted, placeholder="All briefs", label_visibility="collapsed")
-        with filt_cols[1]:
-            min_score = st.slider("Min Score", min_value=MIN_SCORE_SLIDER_MIN, max_value=MIN_SCORE_SLIDER_MAX, value=DEFAULT_MIN_SCORE, step=0.1, label_visibility="collapsed")
-    else:
-        selected_briefs = brief_ids_sorted
-        min_score = DEFAULT_MIN_SCORE
+    selected_briefs = brief_ids_sorted
+    min_score = DEFAULT_MIN_SCORE
 
     if not result.get("success"):
         st.error(result.get("error") or "Failed to load ads library.")
