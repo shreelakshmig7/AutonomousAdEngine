@@ -607,6 +607,12 @@ def list_run_ids() -> list[str]:
     return ids
 
 
+@st.cache_data(ttl=300)
+def _load_image_b64(path: str) -> str:
+    """Read an image file and return its base64-encoded string. Cached for 5 min."""
+    return base64.b64encode(Path(path).read_bytes()).decode()
+
+
 def _dimension_numeric(scores: dict[str, Any], key: str) -> float | None:
     val = scores.get(key)
     if val is None:
@@ -948,7 +954,7 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
     img_resolved = _resolve_image_path(image_url) if image_url else None
 
     if img_resolved:
-        img_b64 = base64.b64encode(img_resolved.read_bytes()).decode()
+        img_b64 = _load_image_b64(str(img_resolved))
         img_area = (
             f'<div class="ad-img-area has-image">'
             f'<img src="data:image/png;base64,{img_b64}" alt="">'
