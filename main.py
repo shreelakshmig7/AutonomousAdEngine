@@ -40,7 +40,7 @@ from iterate.controller import run_brief
 # Constants (PR4 briefing — do not import MIN_ADS_REQUIRED from rubrics)
 # -----------------------------------------------------------------------------
 MIN_ADS_REQUIRED: int = 50
-VARIATIONS_PER_BRIEF: int = 5
+VARIATIONS_PER_BRIEF: int = int(os.environ.get("VARIATIONS_PER_BRIEF", 3))
 ADS_LIBRARY_PATH: str = "output/ads_library.json"
 ITERATION_LOG_PATH: str = "output/iteration_log.csv"
 QUALITY_TRENDS_PATH: str = "output/quality_trends.png"
@@ -53,7 +53,7 @@ CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
 # Parallel execution — tuneable via env vars
 PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 10))
 IMAGE_MAX_WORKERS: int = int(os.environ.get("IMAGE_MAX_WORKERS", 4))
-IMAGE_STAGGER_DELAY: float = float(os.environ.get("IMAGE_STAGGER_DELAY", 0.5))  # seconds between submissions
+IMAGE_STAGGER_DELAY: float = float(os.environ.get("IMAGE_STAGGER_DELAY", 2.0))  # seconds between submissions
 
 # PR5 CSV columns — one row per evaluation event (includes ad copy per cycle for self-healing proof)
 CSV_FIELDNAMES: list[str] = [
