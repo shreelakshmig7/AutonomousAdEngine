@@ -113,18 +113,18 @@ footer { display: none !important; }
 [data-testid="stSidebarContent"] { padding: 0 !important; }
 
 /* ── Radio → nav items ── */
-div[data-testid="stSidebar"] [data-testid="stRadio"] {
+[data-testid="stSidebar"] [data-testid="stRadio"] {
     margin-top: 4px;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] > label {
+[data-testid="stSidebar"] [data-testid="stRadio"] > label {
     display: none;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
+[data-testid="stSidebar"] [data-testid="stRadio"] div[role="radiogroup"] {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"] {
+[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"] {
     display: flex !important;
     align-items: center !important;
     padding: 10px 20px !important;
@@ -138,22 +138,22 @@ div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]
     transition: all 0.15s !important;
     gap: 10px !important;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:hover {
+[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:hover {
     background: var(--surface) !important;
     color: var(--on-surface) !important;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) {
+[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"]:has(input:checked) {
     color: var(--secondary) !important;
     background: var(--surface-high) !important;
     border-right-color: var(--secondary) !important;
     font-weight: 700 !important;
 }
-div[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
+[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
     font-family: 'Space Grotesk', sans-serif !important;
     font-size: 13px !important;
 }
-/* Hide the radio circle dot */
-div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
+/* Hide the radio circle dot — globally (sidebar nav + gallery filter) */
+[data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
     display: none !important;
 }
 
