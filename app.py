@@ -1636,17 +1636,21 @@ def main() -> None:
         st.info("No ads generated yet. Go to **Run Pipeline** in the sidebar.")
         return
 
-    if active == "dashboard":
-        _render_dashboard(published, log_df)
+    # Wrap page content in a single container so Streamlit replaces it
+    # atomically on page switch (prevents stale ghost elements from old page).
+    page_container = st.container()
+    with page_container:
+        if active == "dashboard":
+            _render_dashboard(published, log_df)
 
-    elif active == "library":
-        _render_ad_gallery(published, selected_briefs, min_score)
+        elif active == "library":
+            _render_ad_gallery(published, selected_briefs, min_score)
 
-    elif active == "healing":
-        _render_healing(log_df)
+        elif active == "healing":
+            _render_healing(log_df)
 
-    elif active == "settings":
-        _render_settings()
+        elif active == "settings":
+            _render_settings()
 
 
 if __name__ == "__main__":
