@@ -153,7 +153,7 @@ div[data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownCon
     font-size: 13px !important;
 }
 /* Hide the radio circle dot */
-div[data-testid="stSidebar"] [data-testid="stRadio"] div[data-baseweb="radio"] {
+div[data-testid="stSidebar"] [data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
     display: none !important;
 }
 
@@ -570,6 +570,7 @@ def _safe_rerun() -> None:
 # ---------------------------------------------------------------------------
 # Helper: load ads library
 # ---------------------------------------------------------------------------
+@st.cache_data(ttl=30)
 def load_ads_library_result(path: Path | None = None) -> dict[str, Any]:
     p = path if path is not None else ADS_LIBRARY_PATH
     if not p.exists():
@@ -620,6 +621,7 @@ def _dimension_numeric(scores: dict[str, Any], key: str) -> float | None:
     return None
 
 
+@st.cache_data(ttl=30)
 def load_iteration_log_df(path: Path | None = None) -> pd.DataFrame | None:
     p = path if path is not None else ITERATION_LOG_PATH
     if not p.exists():
@@ -1548,11 +1550,13 @@ def main() -> None:
     nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
     nav_ids = [i for i, _, _ in NAV_ITEMS]
 
+    if "nav_radio" not in st.session_state:
+        st.session_state["nav_radio"] = nav_labels[nav_ids.index(st.session_state["active_page"])]
+
     with st.sidebar:
         st.markdown(SIDEBAR_BRAND_HTML, unsafe_allow_html=True)
-        chosen = st.radio("nav", nav_labels, index=nav_ids.index(st.session_state["active_page"]),
-                          label_visibility="collapsed")
-    st.session_state["active_page"] = nav_ids[nav_labels.index(chosen)]
+        st.radio("nav", nav_labels, key="nav_radio", label_visibility="collapsed")
+    st.session_state["active_page"] = nav_ids[nav_labels.index(st.session_state["nav_radio"])]
 
     # ── MAIN CONTENT ──
 
