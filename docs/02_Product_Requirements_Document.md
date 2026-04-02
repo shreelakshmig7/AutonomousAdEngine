@@ -37,7 +37,7 @@
 ## 3. Core Workflow
 
 ```
-INPUT: briefs.json + competitive_context.json + brand_guidelines.json + VARIATIONS_PER_BRIEF=3
+INPUT: briefs.json + competitive_context.json + brand_guidelines.json + VARIATIONS_PER_BRIEF=5
 
 FOR each brief:
   FOR each variation (1 to VARIATIONS_PER_BRIEF):
@@ -313,7 +313,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 | Variable | Value | Notes |
 | --- | --- | --- |
 | `STREAMLIT_VERSION` | 1.45.1 | Latest stable |
-| `VARIATIONS_PER_BRIEF` | 3 | Configurable via env var; generates 3 ad variations per brief |
+| `VARIATIONS_PER_BRIEF` | 5 | Configurable via env var; generates 5 ad variations per brief |
 | `MAX_CYCLES` | 3 | Iteration cap for self-healing loop |
 | `MAX_EVALUATION_CYCLES` | 3 | Must match MAX_CYCLES for consistency |
 | `IMAGE_STAGGER_DELAY` | 2.0 | Seconds between Gemini image generation calls |
@@ -451,7 +451,7 @@ The decision log is a core deliverable. It must show clear thinking — not just
 - Why 5 dimensions and not more or fewer — decomposition rationale
 - Why 7.0/10 threshold — what reasoning supports this bar
 - Why max 3 iteration cycles (MAX_CYCLES) — balances improvement potential with token cost; empirical findings on convergence
-- Why VARIATIONS_PER_BRIEF=3 — sufficient diversity without exploding token usage
+- Why VARIATIONS_PER_BRIEF=5 — maximizes creative diversity across 15 briefs (75 total variations)
 - Why IMAGE_STAGGER_DELAY=2.0s — prevents rate limiting on image generation; empirical discovery
 - Why st.radio with CSS-hidden dots — clean navigation UX; avoiding browser default form styling
 - Why @st.cache_data on data (ttl=30) and images (ttl=300) — balance between freshness and performance

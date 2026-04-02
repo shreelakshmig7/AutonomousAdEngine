@@ -715,3 +715,26 @@ Deleted Analytics page. Migrated all unique charts to Dashboard. Dashboard is no
 
 ### Confidence
 High. All Analytics functionality preserved in Dashboard; no user-facing data loss.
+
+---
+
+## Decision: VARIATIONS_PER_BRIEF Reverted to 5
+**Date:** 2026-04-02
+**Files affected:** `main.py`
+
+### What We Did
+Reverted `VARIATIONS_PER_BRIEF` default from 3 back to 5. The temporary reduction to 3 was for testing purposes only.
+
+### Root Cause
+The reduction to 3 was a temporary measure during feature testing (Streamlit upgrade, navigation fixes, caching). With performance optimizations now in place (image caching via `@st.cache_data`, page container wrapping), the original value of 5 is viable again.
+
+### Solution
+Changed the default in `main.py` from `int(os.environ.get("VARIATIONS_PER_BRIEF", 3))` to `int(os.environ.get("VARIATIONS_PER_BRIEF", 5))`. Still configurable via environment variable.
+
+### Impact
+- **Output:** 15 briefs × 5 variations = 75 ads per pipeline run.
+- **Quality:** Maximizes creative diversity across all briefs.
+- **Runtime:** Acceptable given pipeline and image caching optimizations.
+
+### Confidence
+High. This restores the original production configuration; all pipeline runs with 5 variations completed successfully.

@@ -40,7 +40,7 @@ from iterate.controller import run_brief
 # Constants (PR4 briefing — do not import MIN_ADS_REQUIRED from rubrics)
 # -----------------------------------------------------------------------------
 MIN_ADS_REQUIRED: int = 50
-VARIATIONS_PER_BRIEF: int = int(os.environ.get("VARIATIONS_PER_BRIEF", 3))
+VARIATIONS_PER_BRIEF: int = int(os.environ.get("VARIATIONS_PER_BRIEF", 5))
 ADS_LIBRARY_PATH: str = "output/ads_library.json"
 ITERATION_LOG_PATH: str = "output/iteration_log.csv"
 QUALITY_TRENDS_PATH: str = "output/quality_trends.png"

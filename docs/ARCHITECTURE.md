@@ -188,7 +188,7 @@ Inputs, in-memory structures, and outputs:
 ```mermaid
 flowchart LR
     subgraph in["Inputs"]
-        B[briefs.json\nAdBrief[]]
+        B["briefs.json<br/>AdBrief[]"]
         C[competitive_context.json]
         G[brand_guidelines.json]
     end
@@ -241,7 +241,7 @@ flowchart LR
 ## 7. Concurrency and Run Layout
 
 - **main.py** runs variations for a given brief in parallel via `ThreadPoolExecutor` with `PIPELINE_MAX_WORKERS = 10` (pipeline variations) and `IMAGE_MAX_WORKERS = 4` (image generation).
-- Variations per brief: `VARIATIONS_PER_BRIEF = 3` (configurable via environment variable).
+- Variations per brief: `VARIATIONS_PER_BRIEF = 5` (configurable via environment variable).
 - Each run gets a timestamped directory: `output/runs/YYYYMMDD_HHMMSS/`.
 - Under that directory: `ads_library.json`, `iteration_log.csv`, `quality_trends.png`, `images/`.
 - The latest run’s `ads_library.json` and `quality_trends.png` are also written to `output/` for convenience.
@@ -328,7 +328,7 @@ For product and evaluation criteria, see [docs/02_Product_Requirements_Document.
 ### Configuration Constants
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `VARIATIONS_PER_BRIEF` | 3 (configurable via env) | Number of variations per brief |
+| `VARIATIONS_PER_BRIEF` | 5 (configurable via env) | Number of variations per brief |
 | `IMAGE_STAGGER_DELAY` | 2.0 seconds | Delay between image generation starts |
 | `PIPELINE_MAX_WORKERS` | 10 | Max concurrent brief/variation workers |
 | `IMAGE_MAX_WORKERS` | 4 | Max concurrent image generation workers |

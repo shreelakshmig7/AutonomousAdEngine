@@ -21,7 +21,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
 | Human-in-the-Loop | Minimal — fully autonomous self-healing | System detects and fixes its own failures |
 | Iteration Cap | Max 5 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
-| Variations per Brief | 3 variations per brief | Locked generation constraint across all briefs |
+| Variations per Brief | 5 variations per brief | Locked generation constraint across all briefs |
 | PII Policy | Zero PII in any generated content | Hard constraint from project specification |
 | Reproducibility | Deterministic seeds on all generation calls | Required for testing and submission verification |
 
