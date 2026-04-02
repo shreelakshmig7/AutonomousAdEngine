@@ -24,7 +24,7 @@ tenacity==8.3.0                 # Exponential backoff + fallback model on rate l
 rich==13.7.1                    # Live pipeline progress for demo video
 
 # Streamlit Cloud
-streamlit==1.40.2               # app.py dashboard + pipeline runner
+streamlit==1.45.1               # app.py dashboard + pipeline runner (1.45.1 fixes SessionInfo race)
 plotly==5.24.1                  # Radar, bar, line charts in app.py (better than matplotlib in Streamlit)
 
 # Testing
