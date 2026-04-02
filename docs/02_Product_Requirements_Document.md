@@ -12,7 +12,7 @@
 
 > **Mission Statement**
 >
-> Build an autonomous, self-improving Facebook and Instagram ad generation engine for Varsity Tutors that reliably distinguishes excellent copy from mediocre copy, enforces a strict 7.0/10 quality threshold, generates companion ad creative images, and tracks performance-per-token ROI — with minimal human intervention and measurable quality improvement across up to 5 iteration cycles.
+> Build an autonomous, self-improving Facebook and Instagram ad generation engine for Varsity Tutors that reliably distinguishes excellent copy from mediocre copy, enforces a strict 7.0/10 quality threshold, generates companion ad creative images, and tracks performance-per-token ROI — with minimal human intervention and measurable quality improvement across up to 3 iteration cycles.
 
 ---
 
@@ -20,38 +20,42 @@
 
 | Feature | Description |
 | --- | --- |
-| Multi-Model Pipeline | Gemini 2.5 Flash drafts. Claude Sonnet 4.5 judges. Different capability tiers for different jobs. |
+| Multi-Model Pipeline | Gemini 2.5 Flash drafts. Claude Sonnet 4.5 judges. Claude Haiku 4.5 fallback. Gemini 2.5 Flash Image for creative. Different capability tiers for different jobs. |
 | 5-Dimension Evaluator | Every ad scored 1–10 on Clarity, Value Prop, CTA, Brand Voice, Emotional Resonance with written rationale. |
-| Self-Healing Loop | Identifies weakest dimension. Regenerates targeting only that weakness. Max 5 cycles. |
+| Self-Healing Loop | Identifies weakest dimension. Regenerates targeting only that weakness. Max 3 cycles. |
 | Competitive Intelligence | Princeton Review, Khan Academy, Kaplan, Chegg patterns injected into every generation prompt. |
-| Quality Trend Chart | Matplotlib chart showing average score rising across up to 5 iteration cycles. |
-| v2 Image Generation | Companion ad creative per passing ad via Gemini 2.5 Flash Image. |
+| Quality Trend Chart | Matplotlib chart showing average score rising across up to 3 iteration cycles. |
+| v2 Image Generation | Companion ad creative per passing ad via Gemini 2.5 Flash Image with 2.0s stagger delay. |
 | Performance-per-Token | Cost per publishable ad tracked. ROI documented in decision log. |
-| Failure Handling | After 5 cycles: `status = unresolvable`, logged, auto-continue. No human needed. |
+| Failure Handling | After 3 cycles: `status = unresolvable`, logged, auto-continue. No human needed. |
+| Streamlit Dashboard | 5-page UI: Dashboard, Library, Self-Healing, Run Pipeline, Settings with st.radio navigation and caching. |
+| Gallery Filtering | Filter ads by status: All Ads, Top Performers (score >= 8.0), Needs Image (missing image). |
+| UI Enhancements | Read more toggle using HTML `<details><summary>` tags. Full-height ad images with no cropping. |
 
 ---
 
 ## 3. Core Workflow
 
 ```
-INPUT: briefs.json + competitive_context.json + brand_guidelines.json
+INPUT: briefs.json + competitive_context.json + brand_guidelines.json + VARIATIONS_PER_BRIEF=3
 
 FOR each brief:
-  [Gemini 2.5 Flash]  ->  Generate Ad (primary_text, headline, description, cta_button, image_prompt)
-                          |
-  [Claude Sonnet 4.5] ->  Score 5 dimensions (1-10) + rationale JSON
-                          |
-                    average_score >= 7.0?
-                    YES  ->  Save to ads_library.json
-                         ->  [Gemini 2.5 Flash Image] Generate companion image
-                         ->  Log tokens + cost + cycle count
-                    NO   ->  Identify weakest_dimension (returned by judge)
-                         ->  Build targeted regeneration prompt
-                         ->  cycle_count += 1
-                         ->  cycle_count <= 5?  REPEAT from generation step
-                         ->  cycle_count >  5?  status = unresolvable
-                                                log failure_reason + all scores
-                                                CONTINUE to next brief
+  FOR each variation (1 to VARIATIONS_PER_BRIEF):
+    [Gemini 2.5 Flash]  ->  Generate Ad (primary_text, headline, description, cta_button, image_prompt)
+                            |
+    [Claude Sonnet 4.5] ->  Score 5 dimensions (1-10) + rationale JSON
+                            |
+                      average_score >= 7.0?
+                      YES  ->  Save to ads_library.json
+                           ->  [Gemini 2.5 Flash Image] Generate companion image (with 2.0s stagger)
+                           ->  Log tokens + cost + cycle count
+                      NO   ->  Identify weakest_dimension (returned by judge)
+                           ->  Build targeted regeneration prompt
+                           ->  cycle_count += 1
+                           ->  cycle_count <= 3?  REPEAT from generation step
+                           ->  cycle_count > 3?  status = unresolvable
+                                                  log failure_reason + all scores
+                                                  CONTINUE to next variation/brief
 
 OUTPUT: ads_library.json + iteration_log.csv + quality_trends.png
 ```
@@ -113,10 +117,10 @@ cta_button:   Learn More
 | --- | --- | --- |
 | Cycle 1 | Initial generation from brief + competitive context | `cycle: 1, scores: {...}, avg: X.X` |
 | Cycle 2 | Targeted regeneration: fix `weakest_dimension` only | `cycle: 2, weakest: value_proposition, improved: +1.2` |
-| Cycle 3–5 | Further targeted regenerations if still below 7.0 | `cycle: N, weakest: <dimension>, improved: +X.X` |
-| Unresolvable | After 5 cycles: flag + log + auto-continue | `status: unresolvable, reason: failed 5 cycles, brief_id: XXX` |
+| Cycle 3 | Further targeted regeneration if still below 7.0 | `cycle: 3, weakest: <dimension>, improved: +X.X` |
+| Unresolvable | After 3 cycles: flag + log + auto-continue | `status: unresolvable, reason: failed 3 cycles, brief_id: XXX` |
 
-Max 5 cycles (MAX_CYCLES in `evaluate/rubrics.py`) before giving up. This prevents infinite loops while allowing enough attempts to demonstrate measurable improvement. The `unresolvable` status provides honest documentation of system limitations.
+Max 3 cycles (MAX_CYCLES and MAX_EVALUATION_CYCLES in config) before giving up. This prevents infinite loops while allowing enough attempts to demonstrate measurable improvement. The `unresolvable` status provides honest documentation of system limitations.
 
 ### Context Window Management in the Loop
 
@@ -221,7 +225,7 @@ varsity-ad-engine/
 │
 ├── iterate/                    # Feedback loop controller
 │   ├── __init__.py
-│   └── controller.py           # 5-cycle limit (MAX_CYCLES) + unresolvable logic
+│   └── controller.py           # 3-cycle limit (MAX_CYCLES) + unresolvable logic
 │
 ├── images/                     # v2 image generation
 │   ├── __init__.py
@@ -282,7 +286,56 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ---
 
-## 9. Data Schemas
+## 9. Configuration & Runtime Environment
+
+### Streamlit UI (v1.45.1)
+
+**Pages (5 total):**
+- `Dashboard` — Real-time pipeline metrics, success rate, token cost tracking
+- `Library` — Browse all generated ads with filtering: "All Ads", "Top Performers" (score >= 8.0), "Needs Image" (missing image)
+- `Self-Healing` — Monitor iteration loops in real-time; watch weakest dimension targeting
+- `Run Pipeline` — Trigger manual runs; select briefs; set variations per brief
+- `Settings` — Configure API keys, model selection, cycle limits
+
+**Navigation:**
+- `st.radio(key="page_nav")` with CSS-hidden radio dots for clean UI
+- Cached data loading: `@st.cache_data(ttl=30)` for briefs and ad library
+- Cached image encoding: `@st.cache_data(ttl=300)` for image display optimization
+
+**UI Features:**
+- Read-more toggle: HTML `<details><summary>` tags for expandable ad copy
+- Ad images: Full-height display with no cropping (responsive to container width)
+- Gallery filters: Dynamically filtered by status
+- Image stagger delay: `IMAGE_STAGGER_DELAY=2.0` seconds between Gemini image calls
+
+### Configuration Variables
+
+| Variable | Value | Notes |
+| --- | --- | --- |
+| `STREAMLIT_VERSION` | 1.45.1 | Latest stable |
+| `VARIATIONS_PER_BRIEF` | 3 | Configurable via env var; generates 3 ad variations per brief |
+| `MAX_CYCLES` | 3 | Iteration cap for self-healing loop |
+| `MAX_EVALUATION_CYCLES` | 3 | Must match MAX_CYCLES for consistency |
+| `IMAGE_STAGGER_DELAY` | 2.0 | Seconds between Gemini image generation calls |
+| `PIPELINE_MAX_WORKERS` | 10 | Parallel workers for ad generation batch jobs |
+| `IMAGE_MAX_WORKERS` | 4 | Parallel workers for image generation batch jobs |
+
+### Model Stack
+
+| Role | Model | Notes |
+| --- | --- | --- |
+| Drafter | `gemini-2.5-flash` | Primary ad generation; fast, cost-effective |
+| Fallback | `claude-haiku-4-5-20251001` | Activated on rate limits or Gemini failures |
+| Judge | `claude-sonnet-4-5-20250514` | Final ad evaluation; highest quality scores |
+| Image Generator | `gemini-2.5-flash-image` | Companion image creation; uses image_prompt from drafter |
+
+**Deprecated Models (DO NOT USE):**
+- ~~`gemini-1.5-flash`~~ → Use `gemini-2.5-flash`
+- ~~`gemini-1.5-pro`~~ → Use `claude-sonnet-4-5` instead
+
+---
+
+## 10. Data Schemas
 
 ### `briefs.json` — Input Schema
 
@@ -343,7 +396,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ---
 
-## 10. Test Coverage Plan
+## 11. Test Coverage Plan
 
 | # | Test | File | What It Verifies |
 | --- | --- | --- | --- |
@@ -351,24 +404,24 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 | 2 | `test_poor_ad_scores_low` | `test_evaluator.py` | Poor ad scores <= 4.0 |
 | 3 | `test_threshold_triggers_regen` | `test_evaluator.py` | Score < 7.0 triggers regeneration |
 | 4 | `test_weakest_dimension_identified` | `test_evaluator.py` | Correct weakest dimension returned |
-| 5 | `test_iteration_cap_at_3` | `test_iteration_cap.py` | Loop stops after MAX_CYCLES (5) exactly |
-| 6 | `test_unresolvable_status_set` | `test_iteration_cap.py` | `status = unresolvable` after 5 failures |
+| 5 | `test_iteration_cap_at_3` | `test_iteration_cap.py` | Loop stops after MAX_CYCLES (3) exactly |
+| 6 | `test_unresolvable_status_set` | `test_iteration_cap.py` | `status = unresolvable` after 3 failures |
 | 7 | `test_json_output_schema` | `test_generator.py` | Output matches pydantic ad schema |
 | 8 | `test_csv_export_completeness` | `test_generator.py` | All 50+ ads have scores in CSV |
 | 9 | `test_seed_determinism` | `test_generator.py` | Same brief + seed = same output |
-| 10 | `test_fallback_activates` | `test_generator.py` | Gemini 2.5 Flash fires on rate limit |
+| 10 | `test_fallback_activates` | `test_generator.py` | Claude Haiku 4.5 fallback fires on rate limit |
 | 11 | `test_image_url_returned` | `test_generator.py` | Image URL present per passing ad |
 | 12 | `test_end_to_end_pipeline` | `test_integration.py` | Full brief → publishable ad flow works |
 
 ---
 
-## 11. Success Criteria
+## 12. Success Criteria
 
 | Area | Target | How We Achieve It |
 | --- | --- | --- |
 | Quality Measurement & Evaluation | Strong, consistent scoring | 5 dimensions + rationale + calibration + confidence + threshold |
 | System Design & Architecture | Robust, testable pipeline | Modular folders, failure detection, 12 tests, deterministic seeds |
-| Iteration & Improvement | Measurable improvement in copy | Up to 5 cycles (MAX_CYCLES), score gains documented, weakest-dimension targeting |
+| Iteration & Improvement | Measurable improvement in copy | Up to 3 cycles (MAX_CYCLES), score gains documented, weakest-dimension targeting |
 | Speed of Optimization | Efficient batch runs | Batch generation, minimal human input, smart Flash vs Pro usage |
 | Documentation & Thinking | Clear rationale for decisions | Decision log with WHY, honest failures, competitive intelligence |
 
@@ -376,7 +429,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ---
 
-## 12. Sprint Timeline
+## 13. Sprint Timeline
 
 | Day | Goal | Key Deliverable | Done When |
 | --- | --- | --- | --- |
@@ -388,17 +441,24 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 
 ---
 
-## 13. Decision Log Outline
+## 14. Decision Log Outline
 
 The decision log is a core deliverable. It must show clear thinking — not just what was built. Key decisions to document:
 
 - Why Gemini 2.5 Flash for drafting and Claude Sonnet 4.5 for judging — speed vs quality tradeoff
+- Why Claude Haiku 4.5 as fallback — cost-effective backup on rate limits
+- Why Gemini 2.5 Flash Image for companion creative — consistency with ad copy generation
 - Why 5 dimensions and not more or fewer — decomposition rationale
 - Why 7.0/10 threshold — what reasoning supports this bar
-- Why max 5 iteration cycles (MAX_CYCLES) — what happens if you allow infinite loops
+- Why max 3 iteration cycles (MAX_CYCLES) — balances improvement potential with token cost; empirical findings on convergence
+- Why VARIATIONS_PER_BRIEF=3 — sufficient diversity without exploding token usage
+- Why IMAGE_STAGGER_DELAY=2.0s — prevents rate limiting on image generation; empirical discovery
+- Why st.radio with CSS-hidden dots — clean navigation UX; avoiding browser default form styling
+- Why @st.cache_data on data (ttl=30) and images (ttl=300) — balance between freshness and performance
+- Gallery filters (All Ads, Top Performers >=8.0, Needs Image) — practical QA workflow
 - How competitive intelligence was gathered — Meta Ad Library methodology
 - What **failed** — ads that never passed, prompts that produced garbage, hard-to-improve dimensions
-- Performance-per-token findings — average cycles to 7.0+, cost per publishable ad
+- Performance-per-token findings — average cycles to 7.0+, cost per publishable ad, image generation cost
 - Limitations — what the system cannot do, edge cases, known weaknesses
 
 Every major choice needs a **WHY**, not just a WHAT. Honest failures and limitations are documented alongside successes. Write the log as you build — not only at the end.

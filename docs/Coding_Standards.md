@@ -74,9 +74,9 @@ Project: Varsity Ad Engine — Nerdy / Gauntlet AI Program
 """
 judge.py
 --------
-Varsity Ad Engine — Nerdy / Gauntlet — Gemini Pro 5-dimension ad evaluator
+Varsity Ad Engine — Nerdy / Gauntlet — Claude Sonnet 5-dimension ad evaluator
 ---------------------------------------------------------------------------
-Implements the LLM-as-Judge pattern using Gemini 1.5 Pro to score every
+Implements the LLM-as-Judge pattern using Claude Sonnet 4.5 to score every
 generated ad across five marketing dimensions. Returns a validated
 EvaluationReport with computed average_score, passes_threshold, and
 weakest_dimension — never trusting the LLM to calculate these itself.
@@ -119,7 +119,7 @@ def function_name(param1: str, param2: int) -> dict:
 ```python
 def draft_ad(brief: AdBrief, competitive_context: dict, seed: int = 42) -> dict:
     """
-    Generate a structured AdCopy from a brief using Gemini 1.5 Flash.
+    Generate a structured AdCopy from a brief using Gemini 2.5 Flash.
 
     Args:
         brief: AdBrief pydantic object with audience, goal, tone, hook_type.
@@ -174,7 +174,7 @@ Every function must handle failures gracefully. Raw exceptions must never reach 
 
 ```python
 def draft_ad(brief: AdBrief, competitive_context: dict) -> dict:
-    """Generate a structured AdCopy using Gemini 1.5 Flash."""
+    """Generate a structured AdCopy using Gemini 2.5 Flash."""
     try:
         ad = call_gemini_flash(brief, competitive_context)
         validated = AdCopy.model_validate(ad)
@@ -239,12 +239,12 @@ EXCELLENT_THRESHOLD: float = 7.5
 
 ```python
 # Primary models — never change without updating DECISION_LOG.md
-DRAFTER_MODEL: str = "gemini-1.5-flash"
-JUDGE_MODEL: str   = "gemini-1.5-pro"
+DRAFTER_MODEL: str = "gemini-2.5-flash"
+JUDGE_MODEL: str   = "claude-sonnet-4-5"
 
 # Fallback models — activated by tenacity on ResourceExhausted
-FALLBACK_DRAFTER_MODEL: str = "gemini-2.5-flash"
-FALLBACK_JUDGE_MODEL: str   = "gemini-2.5-pro"
+FALLBACK_DRAFTER_MODEL: str = "claude-haiku-4-5-20251001"
+FALLBACK_JUDGE_MODEL: str   = "claude-opus-4-1"
 
 # Generation seed — ensures reproducible outputs for testing
 DEFAULT_SEED: int = 42
@@ -292,7 +292,7 @@ QUALITY_CHART_PATH: str = "output/quality_trends.png"
 > ```python
 > if average_score >= 7.0:       # wrong — use QUALITY_THRESHOLD
 > if cycle_count > 3:            # wrong — use MAX_CYCLES
-> model = 'gemini-1.5-flash'     # wrong — use DRAFTER_MODEL
+> model = 'gemini-2.5-flash'     # wrong — use DRAFTER_MODEL
 > ```
 
 ---

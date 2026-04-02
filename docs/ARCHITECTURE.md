@@ -6,7 +6,7 @@ This document describes the multi-agent architecture of the Varsity Ad Engine: c
 
 ## 1. System Overview
 
-The system is a **multi-model pipeline** that turns ad briefs into publishable creative: a **Drafter** (Gemini) generates copy, a **Judge** (Claude) scores it on five dimensions, and a **Controller** runs up to 3 cycles of targeted regeneration until quality meets a 7.0/10 threshold. Passing ads get companion images from an **Image Generator** (Gemini Flash Image).
+The system is a **multi-model pipeline** that turns ad briefs into publishable creative: a **Drafter** (Gemini) generates copy, a **Judge** (Claude) scores it on five dimensions, and a **Controller** runs up to 3 cycles (MAX_EVALUATION_CYCLES = 3) of targeted regeneration until quality meets a 7.0/10 threshold. Passing ads get companion images from an **Image Generator** (Gemini Flash Image).
 
 ```mermaid
 flowchart TB
@@ -126,7 +126,7 @@ flowchart TB
 | **main.py** | Loads data, runs `run_pipeline_streaming()`, writes run dir (ads_library, iteration_log, quality_trends, images). |
 | **app.py** | Streamlit UI; runs `main.py` as subprocess, streams stdout, displays runs and metrics. |
 | **iterate/controller** | Runs the per–(brief, variation) loop: draft → safety scan → judge → regen or publish; enforces 3-cycle cap and `unresolvable` handling. |
-| **generate/drafter** | **Drafter agent.** Gemini 2.5 Flash (primary), Claude Haiku (fallback). Produces AdCopy (primary_text, headline, description, cta_button, image_prompt). |
+| **generate/drafter** | **Drafter agent.** Gemini 2.5 Flash (primary), Claude Haiku 4.5 (fallback on Gemini ResourceExhausted). Produces AdCopy (primary_text, headline, description, cta_button, image_prompt). |
 | **evaluate/judge** | **Judge agent.** Claude Sonnet 4.5. Scores AdCopy on 5 dimensions, returns EvaluationReport (scores, rationales, average_score, passes_threshold, weakest_dimension). |
 | **images/image_generator** | **Image agent.** Gemini 2.5 Flash Image. One image per passing ad from image_prompt; writes PNG under run’s `images/`. |
 | **evaluate/rubrics** | Shared constants (QUALITY_THRESHOLD, MAX_CYCLES), calibration anchors (GOLD_ANCHOR, POOR_ANCHOR), Pydantic schemas (AdCopy, EvaluationReport, AdBrief), `scan_output_safety()`. |
@@ -177,6 +177,7 @@ stateDiagram-v2
 - **Scan:** Optional safety check (e.g. competitor names, PII); failure can feed into regen rationale.
 - **Judge:** Produces scores and weakest dimension; `passes_threshold` (average ≥ 7.0) → publish; else → regen.
 - **Regen:** Controller builds a surgical prompt (preserve strong dimensions, fix weakest), calls Drafter again; on validation error or after 3 cycles without pass → unresolvable.
+- **Error reporting:** Failed variations include error reasons in pipeline output for visibility and debugging.
 
 ---
 
@@ -230,7 +231,7 @@ flowchart LR
 
 | Agent | Model(s) | Input | Output |
 |-------|----------|--------|--------|
-| **Drafter** | Gemini 2.5 Flash (primary), Claude Haiku (fallback) | AdBrief + competitive_context + brand_guidelines (or regen prompt) | AdCopy (JSON → Pydantic) or structured error with raw_draft/validation_errors |
+| **Drafter** | Gemini 2.5 Flash (primary), Claude Haiku 4.5 (fallback on Gemini ResourceExhausted) | AdBrief + competitive_context + brand_guidelines (or regen prompt) | AdCopy (JSON → Pydantic) or structured error with raw_draft/validation_errors |
 | **Judge** | Claude Sonnet 4.5 | AdCopy | EvaluationReport (scores, rationales, average_score, passes_threshold, weakest_dimension) |
 | **Controller** | — | AdBrief, variation_index, seed, context, brand_guidelines | Run state: draft → scan → judge → regen loop; returns published or unresolvable + iteration_log |
 | **Image Generator** | Gemini 2.5 Flash Image | image_prompt (from AdCopy) + ad_id | PNG path (saved under run’s images/) or error |
@@ -239,7 +240,8 @@ flowchart LR
 
 ## 7. Concurrency and Run Layout
 
-- **main.py** runs variations for a given brief in parallel via `ThreadPoolExecutor` (e.g. 5 workers for 5 variations).
+- **main.py** runs variations for a given brief in parallel via `ThreadPoolExecutor` with `PIPELINE_MAX_WORKERS = 10` (pipeline variations) and `IMAGE_MAX_WORKERS = 4` (image generation).
+- Variations per brief: `VARIATIONS_PER_BRIEF = 3` (configurable via environment variable).
 - Each run gets a timestamped directory: `output/runs/YYYYMMDD_HHMMSS/`.
 - Under that directory: `ads_library.json`, `iteration_log.csv`, `quality_trends.png`, `images/`.
 - The latest run’s `ads_library.json` and `quality_trends.png` are also written to `output/` for convenience.
@@ -277,3 +279,57 @@ flowchart TB
 | **data/loaders.py** | Load briefs, competitive context, brand guidelines. |
 
 For product and evaluation criteria, see [docs/02_Product_Requirements_Document.md](docs/02_Product_Requirements_Document.md). For design rationale and failures, see [Decision Log](docs/DECISION_LOG.md).
+
+---
+
+## 9. Streamlit UI (app.py)
+
+### Version and Architecture
+- **Streamlit version:** 1.45.1 (includes SessionInfo race condition fix)
+- **Theme:** "Kinetic Observatory" with dark palette:
+  - Background: `#0a0e14`
+  - Primary: `#69daff` (cyan)
+  - Secondary: `#00fc40` (bright green)
+  - Tertiary: `#ac89ff` (purple)
+- **Fonts:** Inter + Space Grotesk
+
+### Navigation and Layout
+- **Navigation:** `st.radio()` with `key=` parameter (no `index=`); CSS hides radio button dots
+- **Sidebar:** `<section>` element (Streamlit 1.45.1+) containing navigation and filters
+- **Page container:** All page content wrapped in `st.container()` for atomic DOM replacement on page switch
+- **Pages:**
+  - Dashboard (summary of all runs, quality trends chart)
+  - Library (gallery of generated ads)
+  - Self-Healing (detailed iteration logs and variant analysis)
+  - Run Pipeline (execute pipeline with progress streaming)
+  - Settings (UI preferences)
+  - *(Note: Analytics page was removed in current implementation)*
+
+### Gallery and Filtering
+- **Gallery filters:** `st.radio()` with options:
+  - "All Ads" (all variations)
+  - "Top Performers" (score ≥ 8.0)
+  - "Needs Image" (checks top-level `image_url` field)
+- **Ad images:** Base64-encoded inline with caching via `@st.cache_data(ttl=300)` on `_load_image_b64()`
+- **Image display:** CSS uses `height: auto` for responsive sizing (no fixed 170px with object-fit:cover)
+- **Read more toggle:** Uses `<details><summary>` HTML elements (not JavaScript onclick)
+
+### Caching Strategy
+- `@st.cache_data(ttl=30)` applied to:
+  - `load_ads_library_result()` — refreshes every 30 seconds
+  - `load_iteration_log_df()` — refreshes every 30 seconds
+- `@st.cache_data(ttl=300)` applied to:
+  - `_load_image_b64()` — image base64 encoding, 5-minute TTL
+
+### Data Loading
+- **Run selector:** Loads available runs AFTER widget renders using return value
+- **Asynchronous updates:** Uses streaming callbacks to display iteration progress in real-time
+
+### Configuration Constants
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| `VARIATIONS_PER_BRIEF` | 3 (configurable via env) | Number of variations per brief |
+| `IMAGE_STAGGER_DELAY` | 2.0 seconds | Delay between image generation starts |
+| `PIPELINE_MAX_WORKERS` | 10 | Max concurrent brief/variation workers |
+| `IMAGE_MAX_WORKERS` | 4 | Max concurrent image generation workers |
+| `MAX_EVALUATION_CYCLES` | 3 | Max iterations per variation (in rubrics.py) |

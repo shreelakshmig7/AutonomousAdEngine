@@ -562,3 +562,156 @@ The PRD calls for performance-per-token tracking and ROI to be documented in the
 ### Confidence
 
 High. The pipeline already records the needed fields; reporting is a matter of aggregating from `iteration_log.csv` and `ads_library.json` for any completed run.
+
+---
+
+## Decision: Streamlit Upgrade 1.40.2 → 1.45.1
+**Date:** 2026-03-20
+**Files affected:** `requirements.txt`, `app.py`, CSS selectors throughout
+
+### What We Did
+Upgraded Streamlit from 1.40.2 to 1.45.1 to fix a persistent websocket reconnection bug.
+
+### Root Cause
+Known Streamlit bug (streamlit/streamlit#9498): "Bad message format / SessionInfo before it was initialized" error appeared across all pages. Occurred on browser refresh or session timeout, blocking recovery until manual app restart.
+
+### Solution
+Upgraded to 1.45.1, which includes the websocket reconnection fix. This resolved the error entirely across the full demo flow.
+
+### Side Effect — CSS Selectors Broke
+Streamlit 1.45.1 changed the sidebar DOM structure from `<div data-testid="stSidebar">` to `<section data-testid="stSidebar">`. All 8 CSS selectors using `div[data-testid="stSidebar"]` failed silently.
+
+**Fixed by:** Removed the `div` prefix from all selectors. Now use `[data-testid="stSidebar"]` (tag-agnostic) across `app.py` and any CSS override files.
+
+### Confidence
+High. Upgrade eliminates the most disruptive runtime error; CSS fix is straightforward and verified on Streamlit Cloud.
+
+---
+
+## Decision: Nav Radio with key= Instead of index=
+**Date:** 2026-03-20
+**Files affected:** `app.py` (navigation logic)
+
+### What We Did
+Changed sidebar radio button from `index=nav_ids.index(st.session_state["active_page"])` to `key="nav_radio"` without an index parameter.
+
+### Root Cause
+Double-click required to navigate between pages. On the first rerun after a click:
+- Session state **had not yet caught up** — `active_page` still held the old value.
+- `index=` parameter evaluated to the old index and **won over the user's click**.
+- On second click (second rerun), session state was synced and navigation worked.
+
+### Solution
+Removed `index=` entirely. Use `key="nav_radio"` only, with one-time initialization:
+```python
+if "nav_radio" not in st.session_state:
+    st.session_state["nav_radio"] = active_page_id
+```
+
+This is safe on Streamlit 1.45.1 where the SessionInfo bug is fixed. The radio now respects user clicks on first run.
+
+### Confidence
+High. Pattern tested across all page transitions; no regressions.
+
+---
+
+## Decision: Image Base64 Caching
+**Date:** 2026-03-20
+**Files affected:** `app.py`, image loading function
+
+### What We Did
+Added `@st.cache_data(ttl=300)` to image base64 encoding function. Also added `@st.cache_data(ttl=30)` to data loading functions (briefs, library, etc.).
+
+### Root Cause
+Library page with 53 ads took 10–30 seconds to load. Every rerun read 53 images from disk and base64 encoded them (~10–25 MB of I/O). During page transitions, Streamlit diffs elements and old Dashboard charts lingered as "ghost" stale elements.
+
+### Solution
+Cache encoded images for 5 minutes. Cache other data (briefs, ads_library) for 30 seconds. This eliminates repeated disk reads and encoding on the same user session.
+
+### Confidence
+High. Load time reduced to 1–3 seconds on repeat visits. Cache invalidation (5 min) is longer than typical page-browse patterns but short enough for demo data updates.
+
+---
+
+## Decision: Page Content Container Wrapping
+**Date:** 2026-03-20
+**Files affected:** `app.py` (all page functions)
+
+### What We Did
+Wrapped all page content in `st.container()` for atomic DOM replacement.
+
+### Root Cause
+Dashboard charts appeared as "ghost" stale elements when switching to Library page. Streamlit diffs element-by-element; Dashboard had ~8 elements, Library had 60+. Old chart elements at positions 1–8 lingered until replaced.
+
+### Solution
+Wrap each page's entire content in a `st.container()` block. This makes the page a single atomic unit for Streamlit's diff algorithm, replacing all old elements at once instead of element-by-element.
+
+### Confidence
+High. Ghost elements eliminated; page transitions are now clean.
+
+---
+
+## Decision: VARIATIONS_PER_BRIEF Reduced from 5 to 3
+**Date:** 2026-03-20
+**Files affected:** `main.py`, `iterate/controller.py`, environment variables
+
+### What We Did
+Reduced `VARIATIONS_PER_BRIEF` from 5 to 3 and made it configurable via environment variable.
+
+### Root Cause
+Pipeline runtime exceeded 15 minutes. With 15 briefs × 5 variations = 75 variations, each requiring draft → judge → potential regeneration cycles, plus image generation, the pipeline became too slow for interactive demos.
+
+### Solution
+Reduced to 3 variations per brief (15 × 3 = 45 variations). This maintains creative diversity while reducing total iterations. Made configurable so Streamlit Cloud deployment can adjust based on timeout constraints.
+
+### Impact
+- **Demo run:** 45 variations instead of 75 → pipeline completes in ~8–12 minutes.
+- **Quality:** 3 variations per brief still provides adequate creative exploration without redundancy.
+
+### Confidence
+High. 45 variations sufficient for Gauntlet rubric (diversity, feedback loop visibility, threshold-passing ads).
+
+---
+
+## Decision: IMAGE_STAGGER_DELAY Increased from 0.5 to 2.0
+**Date:** 2026-03-20
+**Files affected:** `generate/drafter.py`, Gemini image generation calls
+
+### What We Did
+Increased stagger delay between image generation requests from 0.5 seconds to 2.0 seconds.
+
+### Root Cause
+Frequent 503 UNAVAILABLE errors from Gemini image API. Burst rate of one image request every 0.5s exceeded Gemini's infrastructure capacity.
+
+### Solution
+Increased delay to 2.0s between image requests. This brings the request rate into Gemini's acceptable range without sacrificing demo quality.
+
+### Impact
+- **Error rate:** 503 errors during image generation dropped to near zero.
+- **Wall clock time:** Image generation takes longer, but pipeline reliability improved significantly.
+
+### Confidence
+High. Tested across full 45-image generation batches with zero 503 errors on 2.0s stagger.
+
+---
+
+## Decision: Analytics Page Removed
+**Date:** 2026-03-20
+**Files affected:** `app.py` (NAV_ITEMS), navigation logic
+
+### What We Did
+Removed the Analytics page from navigation. Consolidated all metrics and charts into the Dashboard page.
+
+### Root Cause
+Analytics page was redundant with Dashboard. Both showed the same metrics (scores, cycle counts, cost) with different visualizations. Duplication added cognitive load and maintenance burden.
+
+### Solution
+Deleted Analytics page. Migrated all unique charts to Dashboard. Dashboard is now the single source of truth for performance metrics and iteration history.
+
+### Impact
+- **Navigation:** Cleaner sidebar with fewer options (6 pages instead of 7).
+- **Maintenance:** One less page to update when metrics change.
+- **User experience:** All insights available on one page; no context switching.
+
+### Confidence
+High. All Analytics functionality preserved in Dashboard; no user-facing data loss.

@@ -21,6 +21,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
 | Human-in-the-Loop | Minimal — fully autonomous self-healing | System detects and fixes its own failures |
 | Iteration Cap | Max 5 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
+| Variations per Brief | 3 variations per brief | Locked generation constraint across all briefs |
 | PII Policy | Zero PII in any generated content | Hard constraint from project specification |
 | Reproducibility | Deterministic seeds on all generation calls | Required for testing and submission verification |
 
@@ -94,16 +95,17 @@ All model choices were researched against cost, reliability, and project require
 
 | Role | Model | Justification | Est. Cost / 50 Ads |
 | --- | --- | --- | --- |
-| Drafter | Gemini 2.5 Flash | Fast structured JSON output. Primary text + image_prompt generation. Override via DRAFTER_MODEL in .env. | ~$0.00 free tier |
+| Drafter | Gemini 2.5 Flash (primary), Claude Haiku 4.5 (fallback on rate limit) | Fast structured JSON output. Primary text + image_prompt generation. Override via DRAFTER_MODEL in .env. | ~$0.00 free tier |
 | Judge | Claude Sonnet 4.5 (Anthropic) | Reliable 5-dimension scoring and rationale. Override via JUDGE_MODEL in .env. | Pay-as-you-go |
 | Images (v2) | Gemini 2.5 Flash Image | Native image generation from image_prompt. Override via IMAGE_GEN_MODEL in .env. | ~$0.04 per image |
 | Fallback Drafter | Claude Haiku 4.5 | Activates when Gemini rate-limits. Override via FALLBACK_DRAFTER_MODEL in .env. | Pay-as-you-go |
 
 > **Model choices**
 >
-> - **Drafter + Images:** Google (Gemini 2.5 Flash, Gemini 2.5 Flash Image) — single API key for generation.
-> - **Judge:** Anthropic (Claude Sonnet 4.5) — strong evaluator; JUDGE_MODEL in .env.
-> - **Fallback drafter:** Claude Haiku 4.5 on rate limit — FALLBACK_DRAFTER_MODEL in .env.
+> - **Drafter (primary):** Google Gemini 2.5 Flash — single API key for generation.
+> - **Drafter (fallback):** Anthropic Claude Haiku 4.5 — activates on Gemini rate limit.
+> - **Judge:** Anthropic Claude Sonnet 4.5 — strong evaluator; JUDGE_MODEL in .env.
+> - **Images:** Google Gemini 2.5 Flash Image — native image generation; 2.0s stagger delay between requests.
 >
 > Decision details in `docs/DECISION_LOG.md`.
 
