@@ -477,6 +477,37 @@ h1, h2, h3 {
     color: var(--secondary);
 }
 
+/* ── Sidebar nav buttons ── */
+.nav-item {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    margin: 2px 8px;
+    color: var(--on-surface-var);
+}
+.nav-active {
+    background: rgba(105,218,255,0.1);
+    color: #69daff;
+    font-weight: 600;
+}
+/* Style sidebar buttons to look like nav links */
+[data-testid="stSidebar"] button[kind="secondary"] {
+    background: transparent !important;
+    border: none !important;
+    color: #a8abb3 !important;
+    text-align: left !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    margin: 2px 0 !important;
+    border-radius: 6px !important;
+}
+[data-testid="stSidebar"] button[kind="secondary"]:hover {
+    background: rgba(105,218,255,0.05) !important;
+    color: #e0e0e0 !important;
+}
+
 /* ── Self-healing card ── */
 .sh-card {
     background: var(--surface-low);
@@ -1535,23 +1566,20 @@ def main() -> None:
     if st.session_state["selected_run"] not in run_options:
         st.session_state["selected_run"] = "Latest"
 
-    # ── SIDEBAR — brand + nav only ──
-    nav_labels = [f"{icon}  {label}" for _, label, icon in NAV_ITEMS]
-    nav_ids = [i for i, _, _ in NAV_ITEMS]
-
-    # Initialize the radio key to match active_page on first load
-    if "_nav_radio" not in st.session_state:
-        try:
-            st.session_state["_nav_radio"] = nav_labels[nav_ids.index(st.session_state["active_page"])]
-        except ValueError:
-            st.session_state["_nav_radio"] = nav_labels[0]
-
+    # ── SIDEBAR — brand + button nav ──
     with st.sidebar:
         st.markdown(SIDEBAR_BRAND_HTML, unsafe_allow_html=True)
-        st.radio("nav", nav_labels, key="_nav_radio", label_visibility="collapsed")
-
-    # Derive active_page from the radio widget's own state
-    st.session_state["active_page"] = nav_ids[nav_labels.index(st.session_state["_nav_radio"])]
+        for nav_id, label, icon in NAV_ITEMS:
+            is_active = st.session_state["active_page"] == nav_id
+            if is_active:
+                st.markdown(
+                    f'<div class="nav-item nav-active">{icon}  {label}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                if st.button(f"{icon}  {label}", key=f"nav_{nav_id}", use_container_width=True):
+                    st.session_state["active_page"] = nav_id
+                    _safe_rerun()
 
     # ── MAIN CONTENT ──
 
