@@ -1042,8 +1042,12 @@ def _render_dashboard(published: list, log_df: pd.DataFrame | None) -> None:
 
     total_pub = len(scores_list)
     avg_all = sum(x[1] for x in scores_list) / total_pub
-    passed = sum(1 for a, _ in scores_list if (a.get("scores") or {}).get("passes_threshold") is True)
-    pass_rate = (passed / total_pub * 100) if total_pub else 0.0
+
+    # Pass rate = published / total attempted (from iteration log)
+    total_attempted = 0
+    if log_df is not None and not log_df.empty and "brief_id" in log_df.columns and "variation" in log_df.columns:
+        total_attempted = log_df.groupby(["brief_id", "variation"]).ngroups
+    pass_rate = (total_pub / total_attempted * 100) if total_attempted else 0.0
     by_brief: dict[str, list[float]] = {}
     for a, sc in scores_list:
         by_brief.setdefault(str(a.get("brief_id", "?")), []).append(sc)
