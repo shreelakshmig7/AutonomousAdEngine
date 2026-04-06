@@ -1,7 +1,7 @@
 """
 test_parallel_execution.py
 --------------------------
-Varsity Ad Engine — Mock tests for parallel execution optimization.
+Shreelakshmi Ad Engine — Mock tests for parallel execution optimization.
 -------------------------------------------------------------------
 Validates:
   1. Global bounded thread pool runs all brief×variation jobs concurrently

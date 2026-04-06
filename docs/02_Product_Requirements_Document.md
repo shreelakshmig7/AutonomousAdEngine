@@ -1,10 +1,10 @@
 # PRD — Product Requirements Document
 
-**Varsity Ad Engine — Autonomous Ad Generation System for Varsity Tutors**
+**Shreelakshmi Ad Engine — Autonomous Ad Generation System for Shreelakshmi Tutors**
 
 | Project | Client | Scope | Deadline |
 | --- | --- | --- | --- |
-| Nerdy / Gauntlet | Varsity Tutors (SAT Prep) | v1 (text) + v2 (images) | Thursday |
+| Shree / Gauntlet | Shreelakshmi Tutors (SAT Prep) | v1 (text) + v2 (images) | Thursday |
 
 ---
 
@@ -12,7 +12,7 @@
 
 > **Mission Statement**
 >
-> Build an autonomous, self-improving Facebook and Instagram ad generation engine for Varsity Tutors that reliably distinguishes excellent copy from mediocre copy, enforces a strict 7.0/10 quality threshold, generates companion ad creative images, and tracks performance-per-token ROI — with minimal human intervention and measurable quality improvement across up to 3 iteration cycles.
+> Build an autonomous, self-improving Facebook and Instagram ad generation engine for Shreelakshmi Tutors that reliably distinguishes excellent copy from mediocre copy, enforces a strict 7.0/10 quality threshold, generates companion ad creative images, and tracks performance-per-token ROI — with minimal human intervention and measurable quality improvement across up to 3 iteration cycles.
 
 ---
 
@@ -67,9 +67,9 @@ OUTPUT: ads_library.json + iteration_log.csv + quality_trends.png
 | Dimension | Score 10 — Excellent | Score 1 — Fail | Feedback Loop Trigger |
 | --- | --- | --- | --- |
 | Clarity | Crystal clear single takeaway under 3 seconds | Confusing, competing messages everywhere | Simplify hook, reduce copy length, one message only |
-| Value Proposition | Specific differentiated benefit (200+ point improvement) | Generic feature list ("we have tutors") | Add specific outcome numbers + Varsity differentiator |
+| Value Proposition | Specific differentiated benefit (200+ point improvement) | Generic feature list ("we have tutors") | Add specific outcome numbers + Shreelakshmi differentiator |
 | Call to Action | Specific, urgent, low-friction ("Start free assessment") | No CTA or buried and vague | Rewrite CTA to match funnel stage, add urgency word |
-| Brand Voice | Distinctly empowering, knowledgeable, approachable | Generic — could be any tutoring brand | Rewrite with Varsity voice markers and outcome focus |
+| Brand Voice | Distinctly empowering, knowledgeable, approachable | Generic — could be any tutoring brand | Rewrite with Shreelakshmi voice markers and outcome focus |
 | Emotional Resonance | Taps directly into parent anxiety or student ambition | Flat, purely transactional copy | Add emotional hook — fear, hope, relief, or aspiration |
 
 > **Quality Threshold Enforcement**
@@ -87,7 +87,7 @@ The following gold and poor anchor examples must be hardcoded directly into `rub
 
 ```
 primary_text: Is your child's SAT score standing between them and their dream school?
-              Students working with a top-matched Varsity Tutors expert improve an average of 200+ points.
+              Students working with a top-matched Shreelakshmi Tutors expert improve an average of 200+ points.
               Unlike one-size-fits-all courses, we match your child with a tutor in the top 5% —
               based on their exact weak areas. Over 3.4 million learner sessions rated. Start free.
 headline:     Your Child's Score Can Improve 200+ Points
@@ -100,7 +100,7 @@ cta_button:   Start Free Assessment
 **POOR ANCHOR — Score 1–4**
 
 ```
-primary_text: Varsity Tutors offers SAT tutoring services. We have experienced tutors
+primary_text: Shreelakshmi Tutors offers SAT tutoring services. We have experienced tutors
               who can help your student prepare for the SAT exam. Sign up today.
 headline:     SAT Tutoring Available Now
 description:  Contact us to learn more about our tutoring options.
@@ -144,7 +144,7 @@ Max 3 cycles (MAX_CYCLES and MAX_EVALUATION_CYCLES in config) before giving up. 
 ### Drafter Prompt — Gemini 2.5 Flash
 
 ```
-You are an elite direct-response copywriter for Varsity Tutors (a Nerdy business).
+You are an elite direct-response copywriter for Shreelakshmi Tutors (a Shree business).
 Generate high-converting Facebook and Instagram ad copy.
 
 BRAND VOICE: Empowering, knowledgeable, approachable, results-focused.
@@ -159,7 +159,7 @@ AD ANATOMY — generate ALL five components:
 5. image_prompt: A specific, visual UGC-style image generation prompt aligned to the ad.
    Format: [Subject] + [Setting] + [Emotion] + [Brand signal] + [Style: authentic/UGC]
    Example: Parent and teen at kitchen table, teen smiling at laptop showing SAT results,
-            relief and pride visible, Varsity Tutors brand colors subtly present,
+            relief and pride visible, Shreelakshmi Tutors brand colors subtly present,
             authentic UGC style, warm natural lighting, not stock photo
 
 RULES:
@@ -178,7 +178,7 @@ RESPOND ONLY with valid JSON:
 ### Judge Prompt — Claude Sonnet 4.5
 
 ```
-You are a rigorous Marketing QA Judge for Varsity Tutors. Most ads fail.
+You are a rigorous Marketing QA Judge for Shreelakshmi Tutors. Most ads fail.
 Ruthlessly filter mediocre content. Publishable bar: 7.0/10 average.
 
 SCORE each dimension 1-10:
@@ -211,7 +211,7 @@ RESPOND ONLY with valid JSON:
 ## 7. Repository Structure
 
 ```
-varsity-ad-engine/
+Shreelakshmi-ad-engine/
 │
 ├── generate/                   # Drafter agent
 │   ├── __init__.py
@@ -239,7 +239,7 @@ varsity-ad-engine/
 ├── data/
 │   ├── briefs.json             # 10+ ad briefs (audience, goal, tone, hook_type)
 │   ├── competitive_context.json  # Meta Ad Library insights
-│   └── brand_guidelines.json   # Varsity Tutors voice rules
+│   └── brand_guidelines.json   # Shreelakshmi Tutors voice rules
 │
 ├── docs/
 │   └── DECISION_LOG.md         # YOUR thinking — WHY, failures, limits
@@ -377,7 +377,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
         "headline": "Raise Your SAT Score 200+ Points",
         "description": "Matched with a top 5% tutor in 24 hours.",
         "cta_button": "Start Free Assessment",
-        "image_prompt": "Parent and teen at kitchen table, teen smiling at laptop showing SAT score improvement, relief and pride on parent face, Varsity Tutors brand colors subtly present, authentic UGC style, warm natural kitchen lighting, not stock photo"
+        "image_prompt": "Parent and teen at kitchen table, teen smiling at laptop showing SAT score improvement, relief and pride on parent face, Shreelakshmi Tutors brand colors subtly present, authentic UGC style, warm natural kitchen lighting, not stock photo"
       },
       "scores": {
         "clarity":           { "score": 8, "rationale": "..." },
@@ -465,4 +465,4 @@ Every major choice needs a **WHY**, not just a WHAT. Honest failures and limitat
 
 ---
 
-*End of Product Requirements Document | Varsity Ad Engine | Nerdy / Gauntlet 2026*
+*End of Product Requirements Document | Shreelakshmi Ad Engine | Gauntlet 2026*

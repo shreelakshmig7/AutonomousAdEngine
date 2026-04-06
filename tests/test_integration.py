@@ -1,7 +1,7 @@
 """
 test_integration.py
 -------------------
-Varsity Ad Engine — Nerdy / Gauntlet — Pipeline integration tests (PR4)
+Shreelakshmi Ad Engine — Shree / Gauntlet — Pipeline integration tests (PR4)
 -----------------------------------------------------------------------
 TDD: 2 tests for run_pipeline_streaming(), output files, and progress yields.
 Mocks run_brief so tests run fully offline.

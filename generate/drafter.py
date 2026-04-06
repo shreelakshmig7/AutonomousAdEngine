@@ -1,7 +1,7 @@
 """
 drafter.py
 ----------
-Varsity Ad Engine — Nerdy / Gauntlet — Gemini Flash ad drafter + Claude fallback
+Shreelakshmi Ad Engine — Shree / Gauntlet — Gemini Flash ad drafter + Claude fallback
 ----------------------------------------------------------------------------------
 AdDrafter calls Gemini 2.5 Flash first; on ResourceExhausted falls back to Claude Haiku
 (gemini-2.0-flash has free-tier limit 0). Pipeline gates unchanged.

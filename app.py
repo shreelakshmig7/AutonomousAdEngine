@@ -34,7 +34,7 @@ MAIN_SCRIPT: Path = REPO_ROOT / "main.py"
 DEFAULT_MIN_SCORE: float = 7.0
 MIN_SCORE_SLIDER_MIN: float = 5.0
 MIN_SCORE_SLIDER_MAX: float = 10.0
-CTA_DESTINATION_URL: str = "https://www.varsitytutors.com/"
+CTA_DESTINATION_URL: str = "https://autonomousadengine-tqujd9x5ndqhxzwfqscxjr.streamlit.app/"
 
 DIMENSION_KEYS: list[str] = [
     "clarity", "value_proposition", "call_to_action", "brand_voice", "emotional_resonance",
@@ -998,7 +998,7 @@ def _render_ad_thumbnail(ad: dict[str, Any]) -> None:
         f'<div class="ad-thumb-card">'
         f'{img_area}'
         f'<div class="ad-card-inner">'
-        f'<div class="ad-sponsor">Varsity Tutors · Sponsored</div>'
+        f'<div class="ad-sponsor">Shreelakshmi Tutors · Sponsored</div>'
         f'<div class="ad-headline-text">{hl_trunc}</div>'
         f'{read_more_html}'
         f'</div>'
@@ -1519,7 +1519,7 @@ def _render_settings() -> None:
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
-    st.set_page_config(page_title="Kinetic Observatory — Varsity Ad Engine", layout="wide")
+    st.set_page_config(page_title="Kinetic Observatory — Shreelakshmi Ad Engine", layout="wide")
 
     # Inject CSS
     st.markdown(KINETIC_CSS, unsafe_allow_html=True)
@@ -1580,7 +1580,7 @@ def main() -> None:
         f'<div class="kinetic-topbar">'
         f'<div>'
         f'<div class="page-title">{page_label}</div>'
-        f'<div class="page-sub">Varsity Tutors · SAT Prep Campaign</div>'
+        f'<div class="page-sub">Shreelakshmi Tutors · SAT Prep Campaign</div>'
         f'</div>'
         f'<div class="kinetic-topbar-right">'
         f'<span style="display:flex;align-items:center;gap:5px"><span style="width:6px;height:6px;border-radius:50%;background:{g_dot};display:inline-block"></span> Gemini</span>'

@@ -1,7 +1,7 @@
 """
 images/
 -------
-Varsity Ad Engine — Nerdy / Gauntlet — v2 Image generation package
+Shreelakshmi Ad Engine — Shree / Gauntlet — v2 Image generation package
 -------------------------------------------------------------------
 Contains the image generator that produces companion ad creatives
 for every passing ad using the image_prompt field from AdCopy.

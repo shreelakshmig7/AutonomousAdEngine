@@ -1,4 +1,4 @@
-# Submission Package — Varsity Ad Engine
+# Submission Package — Shreelakshmi Ad Engine
 
 Use this checklist to prepare the final submission (PR7 task 7.5).
 
@@ -10,7 +10,7 @@ Use this checklist to prepare the final submission (PR7 task 7.5).
    - [ ] Add your repo URL here: `https://github.com/<yourname>/AutonomousAdEngine` (or actual repo name)
 
 2. **Streamlit app URL**  
-   - [ ] Add your deployed app URL: `https://[yourname]-varsity-ad-engine.streamlit.app`  
+   - [ ] Add your deployed app URL: `https://autonomousadengine-tqujd9x5ndqhxzwfqscxjr.streamlit.app/`  
    - (Deployment done per 7.3)
 
 3. **Demo video**  

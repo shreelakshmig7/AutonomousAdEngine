@@ -1,6 +1,6 @@
-# Varsity Ad Engine
+# Shreelakshmi Ad Engine
 
-Autonomous ad generation system for Varsity Tutors (Nerdy). Generates Facebook/Instagram ad copy from briefs, scores it on five dimensions (clarity, value proposition, call-to-action, brand voice, emotional resonance), and iterates up to 3 cycles until copy meets a 7.0/10 quality threshold. Passing ads get companion images and all runs are logged for quality trends and cost tracking.
+Autonomous ad generation system for Shreelakshmi Tutors. Generates Facebook/Instagram ad copy from briefs, scores it on five dimensions (clarity, value proposition, call-to-action, brand voice, emotional resonance), and iterates up to 3 cycles until copy meets a 7.0/10 quality threshold. Passing ads get companion images and all runs are logged for quality trends and cost tracking.
 
 ---
 
@@ -123,4 +123,4 @@ pytest tests/ -v --tb=short 2>&1 | tee tests/results/run_$(date +%Y%m%d).txt
 
 ## License and attribution
 
-Varsity Ad Engine — Nerdy / Gauntlet. See repository and `docs/` for full context.
+Shreelakshmi Ad Engine — Gauntlet. See repository and `docs/` for full context.

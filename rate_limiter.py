@@ -1,7 +1,7 @@
 """
 rate_limiter.py
 ---------------
-Varsity Ad Engine — Shared concurrency controls for API rate limiting.
+Shreelakshmi Ad Engine — Shared concurrency controls for API rate limiting.
 ----------------------------------------------------------------------
 Module-level semaphores that gate concurrent API calls to Gemini and
 Anthropic. Import and use as context managers around actual HTTP calls

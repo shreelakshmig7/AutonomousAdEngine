@@ -1,7 +1,7 @@
 """
 generate/
 ---------
-Varsity Ad Engine — Nerdy / Gauntlet — Ad Drafter package
+Shreelakshmi Ad Engine — Shree / Gauntlet — Ad Drafter package
 ----------------------------------------------------------
 Contains the Drafter agent (Gemini 2.5 Flash), guardrails, and
 prompt templates used to generate ad copy from briefs.

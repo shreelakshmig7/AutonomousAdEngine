@@ -1,7 +1,7 @@
 """
 judge.py
 --------
-Varsity Ad Engine — Nerdy / Gauntlet — Claude Sonnet 4.5 ad evaluator
+Shreelakshmi Ad Engine — Shree / Gauntlet — Claude Sonnet 4.5 ad evaluator
 ------------------------------------------------------------------------
 Implements the LLM-as-Judge pattern using Anthropic Claude to score every
 generated ad across five marketing dimensions. Returns a validated
@@ -17,8 +17,8 @@ Key classes / functions:
   evaluate_ad()  — Scores one AdCopy, returns structured dict (sync, no async)
   build_prompt() — Injects GOLD/POOR from rubrics into prompt
 
-Author: Varsity Ad Engine
-Project: Varsity Ad Engine — Nerdy / Gauntlet AI Program
+Author: Shreelakshmi Ad Engine
+Project: Shreelakshmi Ad Engine — Shree / Gauntlet AI Program
 """
 
 from __future__ import annotations
@@ -106,7 +106,7 @@ class AdJudge:
             f"description: {ad.description}\n"
             f"cta_button: {ad.cta_button}"
         )
-        return f"""You are a rigorous Marketing QA Judge for Varsity Tutors. Most ads fail.
+        return f"""You are a rigorous Marketing QA Judge for Shreelakshmi Tutors. Most ads fail.
 Ruthlessly filter mediocre content. Publishable bar: 7.0/10 average.
 
 SCORE each dimension 1.0–10.0 (decimals allowed, e.g. 7.5, 8.2):

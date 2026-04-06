@@ -1,7 +1,7 @@
 """
 test_image_generator.py
 -----------------------
-Varsity Ad Engine — PR5 — AdImageGenerator TDD
+Shreelakshmi Ad Engine — PR5 — AdImageGenerator TDD
 -----------------------------------------------
 Tests mock _invoke_model so no network. Asserts structured return and file write.
 """

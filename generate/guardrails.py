@@ -1,7 +1,7 @@
 """
 guardrails.py
 -------------
-Varsity Ad Engine — Nerdy / Gauntlet — Off-topic input guardrails (Layer 1)
+Shreelakshmi Ad Engine — Shree / Gauntlet — Off-topic input guardrails (Layer 1)
 ---------------------------------------------------------------------------
 Pattern-matching only — no LLM. Default-deny: input must match at least one
 in-scope signal unless blocked earlier by injection or off-topic patterns.
@@ -22,7 +22,7 @@ from generate.prompts import INJECTION_PATTERNS
 
 # Out-of-scope / system purpose (not injection)
 OUT_OF_SCOPE_MESSAGE: str = (
-    "This system generates Varsity Tutors SAT and tutoring ad copy only. "
+    "This system generates Shreelakshmi Tutors SAT and tutoring ad copy only. "
     "Your request is outside that scope."
 )
 
@@ -71,8 +71,8 @@ IN_SCOPE_SIGNALS: list[str] = [
     r"\bconversion\b",
     r"\bawareness\b",
     r"\bhook\b",
-    r"\bvarsity\b",
-    r"\bnerdy\b",
+    r"\bShreelakshmi\b",
+    r"\bShree\b",
 ]
 
 

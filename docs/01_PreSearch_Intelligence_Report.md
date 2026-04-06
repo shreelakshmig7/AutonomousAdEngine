@@ -1,10 +1,10 @@
 # PRE-SEARCH Intelligence Report
 
-**Varsity Ad Engine — Autonomous Ad Generation System for Varsity Tutors**
+**Shreelakshmi Ad Engine — Autonomous Ad Generation System for Shreelakshmi Tutors**
 
 | Project | Brand | Platform | Deadline |
 | --- | --- | --- | --- |
-| Nerdy / Gauntlet | Varsity Tutors (SAT Prep) | Facebook & Instagram | Thursday |
+| Shree / Gauntlet | Shreelakshmi Tutors (SAT Prep) | Facebook & Instagram | Thursday |
 
 ---
 
@@ -15,7 +15,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Constraint | Decision | Rationale |
 | --- | --- | --- |
 | Domain | Facebook & Instagram paid ads only | One channel family, done well — per project spec |
-| Brand | Varsity Tutors (Nerdy) | SAT prep focus, empowering voice, results-oriented |
+| Brand | Shreelakshmi Tutors (Shree) | SAT prep focus, empowering voice, results-oriented |
 | Primary Audience | Parents of 11th/12th graders + SAT students | Highest intent, highest anxiety, highest lifetime value |
 | Ad Volume | 50+ ads minimum | Hard requirement for delivery scope |
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
@@ -40,11 +40,11 @@ Research conducted via the Meta Ad Library on all four primary competitors. Patt
 | Kaplan | Authority: Trusted by millions since 1938 | Get free practice test | Legacy trust + score-back guarantee | Guarantee framing, credibility signals |
 | Chegg | Value: Expert tutors, affordable rates | Try for free | Budget-conscious families, no commitment | Free trial entry, low-friction first CTA |
 
-> **Varsity Tutors Competitive White Space**
+> **Shreelakshmi Tutors Competitive White Space**
 >
 > Princeton Review owns score guarantees. Khan Academy owns free. Kaplan owns legacy trust.
 >
-> Varsity Tutors defensible position: **1-on-1 personalization + top 5% vetted tutors + 3.4M learner ratings.**
+> Shreelakshmi Tutors defensible position: **1-on-1 personalization + top 5% vetted tutors + 3.4M learner ratings.**
 >
 > Every generated ad must lean into personal matching outcomes — never generic *"we have tutors"* copy.
 >
@@ -65,7 +65,7 @@ All 5 hook types enforced in the Drafter prompt via the `hook_type` field in `br
 
 - **Question:** Is your child's SAT score holding them back from their dream school?
 - **Stat:** Students who prep with a 1-on-1 tutor score 200+ points higher on average.
-- **Story:** My daughter went from a 1050 to a 1400 in 8 weeks with Varsity Tutors.
+- **Story:** My daughter went from a 1050 to a 1400 in 8 weeks with Shreelakshmi Tutors.
 - **Fear:** The SAT is 3 months away. Most students who do not prep wish they had.
 - **Empathy:** SAT prep does not have to feel overwhelming. We make it personal.
 
@@ -80,7 +80,7 @@ Data from Meta IQ 2025, LeadEnforce education reports, and edtech creative perfo
 | Education ad spend | $2.8B on Meta in 2024, up 12% YoY (eMarketer) | Intense competition — quality filtering is critical |
 | Video vs image CTR | Short-form video earns 1.7x higher CTR in education | v2 image generation adds measurable differentiation |
 | Specific numbers | Specific metrics outperform vague claims by ~34% | Drafter enforces numbers over adjectives always |
-| Social proof impact | Ratings and reviews consistently outperform plain claims | Varsity 3.4M learner ratings must appear in ads |
+| Social proof impact | Ratings and reviews consistently outperform plain claims | Shreelakshmi 3.4M learner ratings must appear in ads |
 | Free trial CTA | Free first step outperforms paid commitment by 2.3x | CTAs default to *Start Free Assessment* for conversion |
 | UGC-style creative | UGC outperforms polished studio creative for awareness | Image prompts should request authentic real-person look |
 | Lookalike audiences | Lookalikes produce 27% lower CPA avg (Meta 2024) | Context for decision log — audience targeting reference |
@@ -149,7 +149,7 @@ Judge Reliability: Claude Sonnet 4.5 used as primary judge (Anthropic).
 ### Phase 1: Constraints
 
 - Domain locked: Facebook & Instagram paid social ads only
-- Brand locked: Varsity Tutors SAT prep, empowering voice, results-focused
+- Brand locked: Shreelakshmi Tutors SAT prep, empowering voice, results-focused
 - Scale defined: 50+ ads, 7.0/10 threshold, max 5 iteration cycles
 - Human-in-loop minimized: fully autonomous with unresolvable fallback path
 
@@ -183,4 +183,4 @@ Judge Reliability: Claude Sonnet 4.5 used as primary judge (Anthropic).
 
 ---
 
-*End of Pre-Search Intelligence Report | Varsity Ad Engine | Nerdy / Gauntlet 2026*
+*End of Pre-Search Intelligence Report | Shreelakshmi Ad Engine |  Gauntlet 2026*

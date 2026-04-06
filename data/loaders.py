@@ -1,7 +1,7 @@
 """
 loaders.py
 ----------
-Varsity Ad Engine — Nerdy / Gauntlet — Load briefs and config JSON
+Shreelakshmi Ad Engine — Shree / Gauntlet — Load briefs and config JSON
 ------------------------------------------------------------------
 Single place for loading briefs, competitive context, and brand guidelines.
 Used by manual smoke test, main.py, and app.py. Access named keys only —

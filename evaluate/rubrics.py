@@ -1,7 +1,7 @@
 """
 rubrics.py
 ----------
-Varsity Ad Engine — Nerdy / Gauntlet — Scoring constants, anchors, and schemas
+Shreelakshmi Ad Engine — Shree / Gauntlet — Scoring constants, anchors, and schemas
 --------------------------------------------------------------------------------
 Quality constants, GOLD/POOR calibration anchors, AdCopy and EvaluationReport
 Pydantic schemas. scan_output_safety() runs before scoring. All anchors and
@@ -15,8 +15,8 @@ Key constants / classes:
   AdBrief, AdCopy, DimensionScore, EvaluationReport
   scan_output_safety()
 
-Author: Varsity Ad Engine
-Project: Varsity Ad Engine — Nerdy / Gauntlet AI Program
+Author: Shreelakshmi Ad Engine
+Project: Shreelakshmi Ad Engine — Shree / Gauntlet AI Program
 """
 
 from __future__ import annotations
@@ -120,7 +120,7 @@ class AdBrief(BaseModel):
 GOLD_ANCHOR: dict = {
     "primary_text": (
         "Is your child's SAT score standing between them and their dream school? "
-        "Students working with a top-matched Varsity Tutors expert improve an average of 200+ points. "
+        "Students working with a top-matched Shreelakshmi Tutors expert improve an average of 200+ points. "
         "Unlike one-size-fits-all courses, we match your child with a tutor in the top 5% — "
         "based on their exact weak areas. Over 3.4 million learner sessions rated. Start free."
     ),
@@ -132,7 +132,7 @@ GOLD_ANCHOR: dict = {
 
 POOR_ANCHOR: dict = {
     "primary_text": (
-        "Varsity Tutors offers SAT tutoring services. We have experienced tutors "
+        "Shreelakshmi Tutors offers SAT tutoring services. We have experienced tutors "
         "who can help your student prepare for the SAT exam. Sign up today. "
         "Contact us for more information about our programs and pricing."
     ),

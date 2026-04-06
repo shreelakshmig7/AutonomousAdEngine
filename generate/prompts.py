@@ -1,7 +1,7 @@
 """
 prompts.py
 ----------
-Varsity Ad Engine — Nerdy / Gauntlet — Drafter prompts, constants, sanitization
+Shreelakshmi Ad Engine — Shree / Gauntlet — Drafter prompts, constants, sanitization
 -------------------------------------------------------------------------------
 System prompt builder and injection sanitizer. Imports shared constants from
 evaluate/rubrics.py; defines generation-specific constants and all 6 drafter rules.
@@ -247,7 +247,7 @@ BAD: "Jackson's parents knew his strong grades should translate..." ✗
         if getattr(brief, "id", "") == "brief_010":
             story_hook_section += "For brief_010 (early researcher 10th grade parent): keep the story to ONE sentence under 100 chars. No long lead-in.\n"
 
-    return f"""You are an elite direct-response copywriter for Varsity Tutors (a Nerdy business).
+    return f"""You are an elite direct-response copywriter for Shreelakshmi Tutors (a Shree business).
 Generate high-converting Facebook and Instagram ad copy.{variation_instruction}
 
 BRAND VOICE: Empowering, knowledgeable, approachable, results-focused.
@@ -261,7 +261,7 @@ AD ANATOMY — generate ALL five components:
 5. image_prompt: Describe ONE of these ad image styles (match to your headline/stat):
    - Infographic: Split-panel illustration. Left = student success (grades, progress report, trophy). Right = same student stressed (SAT score on screen, e.g. 1180). Center banner with the key question or stat (e.g. "3.8 GPA But 1180 SAT?"). Clean cartoon/educational style, blue accents, no photorealism.
    - Before/after: Realistic photo. Person (e.g. young woman or student) holding two SAT score reports side by side — one "Before" (e.g. 1170), one "After" (e.g. 1410). Natural lighting, home or study setting. Headline can appear below the image in the ad; image focuses on the score comparison.
-   - Text hero: Minimal background (soft grey or lavender). Bold headline and 2–4 short stat/benefit lines (e.g. "8 weeks away.", "200+ points.", "Start this week."). Checkmark or bullet accents. Brand "Varsity Tutors" at bottom. Modern, high-contrast text, no photo.
+   - Text hero: Minimal background (soft grey or lavender). Bold headline and 2–4 short stat/benefit lines (e.g. "8 weeks away.", "200+ points.", "Start this week."). Checkmark or bullet accents. Brand "Shreelakshmi Tutors" at bottom. Modern, high-contrast text, no photo.
    Include the exact headline or key stat/CTA to be shown in the image so the layout is clear.
 
 RULE 1 — HOOK POSITION (first {HOOK_MAX_CHARS} characters):

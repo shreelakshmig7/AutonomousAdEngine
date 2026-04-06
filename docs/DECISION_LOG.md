@@ -1,5 +1,5 @@
 # DECISION LOG
-## Varsity Ad Engine — Nerdy / Gauntlet AI Program
+## Shreelakshmi Ad Engine — Shree / Gauntlet AI Program
 
 ---
 
@@ -207,7 +207,7 @@ High. All architectural decisions locked before first line of code written.
 ### What We Did
 Chose Streamlit + Streamlit Cloud as the deployment target.
 Submission will include a persistent public URL at
-[name]-varsity-ad-engine.streamlit.app.
+[name]-Shreelakshmi-ad-engine.streamlit.app.
 
 ### Options Evaluated
 - Local + GitHub: rejected — no persistent URL for Gauntlet submission
@@ -365,7 +365,7 @@ Replaced allow-by-default Gate 1 logic with **default-deny**: input must match a
 All rejects return **`success: False`** and **`error`** set so `draft_ad()` Gate 1 stops before any LLM call.
 
 ### Why
-Allow-by-default let through "Tell me a joke" and similar — not injection, but out of scope. Blocklisting every off-topic phrase is endless. **Require in-scope signals** (SAT, tutor, prep, campaign, brief, audience, conversion, awareness, hook, varsity, nerdy, etc.) catches jokes, poems, general chat, and random tasks with one rule.
+Allow-by-default let through "Tell me a joke" and similar — not injection, but out of scope. Blocklisting every off-topic phrase is endless. **Require in-scope signals** (SAT, tutor, prep, campaign, brief, audience, conversion, awareness, hook, Shreelakshmi, Shree, etc.) catches jokes, poems, general chat, and random tasks with one rule.
 
 ### What We Removed
 - **Length heuristic** (e.g. len > 20) — length is not a proxy for scope. Short valid briefs exist; short junk exists too. Signal check handles both.

@@ -1,7 +1,7 @@
 """
 main.py
 -------
-Varsity Ad Engine — Nerdy / Gauntlet — Pipeline entrypoint (PR4 + PR5)
+Shreelakshmi Ad Engine — Gauntlet — Pipeline entrypoint (PR4 + PR5)
 -----------------------------------------------------------------------
 run_pipeline_streaming() is a generator that yields progress for each
 brief+variation; writes ads_library.json, iteration_log.csv (one row per

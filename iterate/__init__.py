@@ -1,7 +1,7 @@
 """
 iterate/
 --------
-Varsity Ad Engine — Nerdy / Gauntlet — Feedback loop package
+Shreelakshmi Ad Engine — Shree / Gauntlet — Feedback loop package
 -------------------------------------------------------------
 Contains the Controller that orchestrates the 3-cycle self-healing
 loop between the Drafter and Judge, handles unresolvable failures,

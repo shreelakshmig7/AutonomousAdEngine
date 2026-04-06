@@ -1,7 +1,7 @@
 """
 test_generator.py
 -----------------
-Varsity Ad Engine — Nerdy / Gauntlet — Drafter + prompts tests
+Shreelakshmi Ad Engine — Shree / Gauntlet — Drafter + prompts tests
 ---------------------------------------------------------------
 TDD: 5 tests for AdDrafter, build_drafter_prompt, sanitize_for_injection.
 All API calls mocked via AdDrafter._call_model — tests run fully offline.
@@ -17,7 +17,7 @@ from evaluate.rubrics import AdBrief, AdCopy
 
 # Minimal competitive context and brand guidelines for tests (must include BRAND_DIFFERENTIATORS content)
 SAMPLE_CONTEXT: dict = {
-    "varsity_tutors_position": {
+    "Shreelakshmi_tutors_position": {
         "key_differentiators": [
             "200+ point average score improvement",
             "Top 5% vetted tutors",

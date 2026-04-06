@@ -1,7 +1,7 @@
 """
 image_generator.py
 ------------------
-Varsity Ad Engine — PR5 — Companion ad image generation (Nano Banana)
+Shreelakshmi Ad Engine — PR5 — Companion ad image generation (Nano Banana)
 ----------------------------------------------------------------------
 Uses google-genai SDK only for this module (Gemini 2.5 Flash Image).
 Model default matches Google blog sample: gemini-2.5-flash-image-preview.

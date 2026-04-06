@@ -1,4 +1,4 @@
-# Task List — Varsity Ad Engine
+# Task List — Shreelakshmi Ad Engine
 ### Based on: `docs/02_Product_Requirements_Document.md` + `docs/Coding_Standards.md`
 
 ---
@@ -10,7 +10,7 @@
 - `.gitignore` - Ensures .env, output/, __pycache__ are excluded
 - `data/briefs.json` - 10+ ad briefs covering all 5 hook types
 - `data/competitive_context.json` - Competitor patterns from Meta Ad Library
-- `data/brand_guidelines.json` - Varsity Tutors voice, differentiators, fear hook boundaries (Edge Case 5), banned patterns
+- `data/brand_guidelines.json` - Shreelakshmi Tutors voice, differentiators, fear hook boundaries (Edge Case 5), banned patterns
 - `evaluate/__init__.py` - Package init
 - `evaluate/rubrics.py` - Constants + calibration anchors (GOLD/POOR) + Pydantic schemas
 - `evaluate/judge.py` - Gemini Pro 5-dimension scorer
@@ -61,7 +61,7 @@
 10. main.py                     ← build as GENERATOR (run_pipeline_streaming); yields progress
 11. images/image_generator.py   ← v2
 12. app.py                      ← Streamlit UI; calls run_pipeline_streaming(), displays live
-13. Deploy to Streamlit Cloud   ← [yourname]-varsity-ad-engine.streamlit.app
+13. Deploy to Streamlit Cloud   ← [yourname]-Shreelakshmi-ad-engine.streamlit.app
 ```
 
 **main.py:** Must yield progress (e.g. `{"status": "drafting", "brief_id": ...}`) so Streamlit can stream live. Do not build as a function that returns only at the end.
@@ -83,7 +83,7 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
   - [x] 1.3 Create `.env.example` with `GOOGLE_API_KEY=your_key_here` placeholder
   - [x] 1.4 Create `data/briefs.json` with 10+ briefs covering all 5 hook types (question, stat, story, fear, empathy), both goals (awareness, conversion)
   - [x] 1.5 Create `data/competitive_context.json` with Princeton Review, Khan Academy, Kaplan, Chegg patterns from pre-search intelligence
-  - [x] 1.6 Create `data/brand_guidelines.json` with Varsity Tutors voice rules, differentiators, banned patterns
+  - [x] 1.6 Create `data/brand_guidelines.json` with Shreelakshmi Tutors voice rules, differentiators, banned patterns
   - [x] 1.7 Create all `__init__.py` files for `generate/`, `evaluate/`, `iterate/`, `images/` packages
   - [x] 1.8 Create `output/` and `tests/results/` directories with `.gitkeep`
 
@@ -146,6 +146,6 @@ Building with synthetic data now. Real data swap requires **zero code changes** 
 - [ ] 7.0 PR7 — Streamlit UI & Deployment
   - [x] 7.1 Create `app.py` — Streamlit UI that calls `run_pipeline_streaming()`, displays each yielded progress update live; does not modify pipeline logic
   - [x] 7.2 Add `streamlit` to `requirements.txt`
-  - [x] 7.3 Deploy to Streamlit Cloud — submission URL: `[yourname]-varsity-ad-engine.streamlit.app`
+  - [x] 7.3 Deploy to Streamlit Cloud — submission URL: `[yourname]-Shreelakshmi-ad-engine.streamlit.app`
   - [x] 7.4 Record demo video — screen recording of Streamlit run
   - [ ] 7.5 Submission package: GitHub repo URL + Streamlit app URL + demo video; commit output files to repo as fallback (app may sleep on free tier). See `SUBMISSION.md`.

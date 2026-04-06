@@ -1,7 +1,7 @@
 """
 evaluate/
 ---------
-Varsity Ad Engine — Nerdy / Gauntlet — Ad Judge package
+Shreelakshmi Ad Engine — Gauntlet — Ad Judge package
 --------------------------------------------------------
 Contains the Judge agent (Gemini 1.5 Pro), all Pydantic schemas,
 scoring constants, and calibration anchors.

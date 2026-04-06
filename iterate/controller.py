@@ -1,7 +1,7 @@
 """
 controller.py
 -------------
-Varsity Ad Engine — Nerdy / Gauntlet — Iteration controller (PR4)
+Shreelakshmi Ad Engine — Shree / Gauntlet — Iteration controller (PR4)
 -------------------------------------------------------------------
 run_brief() orchestrates draft → pre-judge repair cap (schema/safety) → judge →
 quality regen. Logged cycle 1..N is the Nth judge evaluation only (not repair

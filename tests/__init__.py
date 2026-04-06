@@ -1,7 +1,7 @@
 """
 tests/
 ------
-Varsity Ad Engine — Nerdy / Gauntlet — Test suite
+Shreelakshmi Ad Engine — Shree / Gauntlet — Test suite
 --------------------------------------------------
 Contains all 12 required test cases. All API calls are mocked
 via pytest-mock — the full suite runs fully offline.

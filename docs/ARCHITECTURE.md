@@ -1,6 +1,6 @@
-# Agent Architecture — Varsity Ad Engine
+# Agent Architecture — Shreelakshmi Ad Engine
 
-This document describes the multi-agent architecture of the Varsity Ad Engine: components, data flow, and how the pipeline orchestrates drafting, evaluation, and self-healing iteration.
+This document describes the multi-agent architecture of the Shreelakshmi Ad Engine: components, data flow, and how the pipeline orchestrates drafting, evaluation, and self-healing iteration.
 
 ---
 

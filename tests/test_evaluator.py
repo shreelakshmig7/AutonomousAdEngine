@@ -1,7 +1,7 @@
 """
 test_evaluator.py
 -----------------
-Varsity Ad Engine — Nerdy / Gauntlet — Evaluator (Judge + Rubrics) tests
+Shreelakshmi Ad Engine — Shree / Gauntlet — Evaluator (Judge + Rubrics) tests
 --------------------------------------------------------------------------------
 TDD: 4 tests for gold/poor calibration, threshold, weakest dimension.
 All API calls mocked via AdJudge._call_model — tests run fully offline.
@@ -12,8 +12,8 @@ Tests:
   test_threshold_triggers_regen  — Score < 7.0 => passes_threshold False
   test_weakest_dimension_identified — Tie-break returns correct dimension per DIMENSION_PRIORITY
 
-Author: Varsity Ad Engine
-Project: Varsity Ad Engine — Nerdy / Gauntlet AI Program
+Author: Shreelakshmi Ad Engine
+Project: Shreelakshmi Ad Engine — Shree / Gauntlet AI Program
 """
 
 import json

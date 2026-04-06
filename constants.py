@@ -1,7 +1,7 @@
 """
 constants.py
 ------------
-Varsity Ad Engine — Pipeline and timeout constants.
+Shreelakshmi Ad Engine — Pipeline and timeout constants.
 --------------------------------------------------
 Shared constants for main pipeline (e.g. variation run timeout).
 """

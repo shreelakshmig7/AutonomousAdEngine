@@ -1,7 +1,7 @@
 """
 conftest.py
 -----------
-Varsity Ad Engine — Nerdy / Gauntlet — Pytest fixtures and mocks
+Shreelakshmi Ad Engine — Shree / Gauntlet — Pytest fixtures and mocks
 ----------------------------------------------------------------
 Mocks Anthropic API key for evaluator tests so they run fully offline.
 Judge uses Claude (Anthropic); Drafter uses Gemini (Google).

@@ -1,7 +1,7 @@
 """
 test_iteration_cap.py
 ---------------------
-Varsity Ad Engine — Nerdy / Gauntlet — Iteration controller tests (PR4)
+Shreelakshmi Ad Engine — Shree / Gauntlet — Iteration controller tests (PR4)
 ------------------------------------------------------------------------
 TDD: 5 tests for AdController, run_brief(), build_regeneration_prompt().
 All API calls mocked — tests run fully offline.

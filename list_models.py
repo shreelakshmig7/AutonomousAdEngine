@@ -1,7 +1,7 @@
 """
 list_models.py
 --------------
-Varsity Ad Engine — List Gemini models available for your Google API key
+Shreelakshmi Ad Engine — List Gemini models available for your Google API key
 -----------------------------------------------------------------
 Run: python list_models.py
 Shows model names for the Drafter (Generate). Judge uses Claude — set JUDGE_MODEL in .env.

@@ -1,7 +1,7 @@
 """
 test_guardrails.py
 ------------------
-Varsity Ad Engine — Nerdy / Gauntlet — Guardrails (default-deny) tests
+Shreelakshmi Ad Engine — Shree / Gauntlet — Guardrails (default-deny) tests
 -----------------------------------------------------------------------
 validate_free_text: injection first, off-topic second, default-deny third.
 """
@@ -129,7 +129,7 @@ def test_guardrails_passes_brief_style_inputs() -> None:
     valid_inputs = [
         "Parents of 11th graders, SAT tutoring, conversion goal",
         "Write an ad for students preparing for college admissions",
-        "Varsity Tutors campaign brief for Southeast audience",
+        "Shreelakshmi Tutors campaign brief for Southeast audience",
         "SAT prep ad targeting parents in Texas",
         "High school student audience, awareness campaign",
     ]
