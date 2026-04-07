@@ -35,7 +35,7 @@ STRONG_DIMENSION_THRESHOLD: float = 8.0
 # Max judge evaluations per brief×variation (cycle 1 = first score, then up to 2 more if below threshold)
 MAX_EVALUATION_CYCLES: int = 3
 # Max editor-regeneration attempts to fix schema/validation/safety before any judge (cumulative per variation)
-MAX_PRE_JUDGE_REPAIR_ATTEMPTS: int = 2
+MAX_PRE_JUDGE_REPAIR_ATTEMPTS: int = 3
 # Max full-draft retries when schema error yields no minimal AdCopy (avoids infinite loop)
 MAX_DRAFT_RETRIES_NO_MINIMAL: int = 2
 # Backward-compatible alias — same as MAX_EVALUATION_CYCLES

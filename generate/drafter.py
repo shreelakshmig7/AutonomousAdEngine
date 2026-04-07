@@ -295,19 +295,35 @@ class AdDrafter:
                 ad = AdCopy.model_validate(parsed)
             except ValidationError as ve:
                 errors = ve.errors()
-                is_length_error = any(
-                    e.get("type") == "string_too_long"
-                    and any(
-                        loc_item == "primary_text"
-                        for loc_item in (e.get("loc") or ())
-                    )
-                    for e in errors
-                )
-                if is_length_error:
+                # Build targeted retry instructions for fixable validation errors
+                retry_instructions = []
+                for e in errors:
+                    loc = e.get("loc") or ()
+                    err_type = e.get("type", "")
+                    field = loc[0] if loc else ""
+                    if field == "primary_text" and err_type == "string_too_long":
+                        retry_instructions.append(
+                            f"primary_text is too long ({len(parsed.get('primary_text', ''))}"
+                            " chars). Rewrite it to be under 500 characters. Keep the hook,"
+                            " key stat, and CTA intent intact. Cut the weakest sentence."
+                        )
+                    elif field == "image_prompt" and err_type == "string_too_long":
+                        retry_instructions.append(
+                            f"image_prompt is too long ({len(parsed.get('image_prompt', ''))}"
+                            " chars). Shorten it to under 450 characters. Keep the scene"
+                            " description and emotional tone."
+                        )
+                    elif field == "headline" and err_type == "value_error":
+                        word_count = len(parsed.get("headline", "").split())
+                        retry_instructions.append(
+                            f"headline has {word_count} words. It must be exactly 5-8 words."
+                            " Rewrite it to be 5-8 words while keeping the same benefit."
+                        )
+                if retry_instructions:
+                    fix_block = "\n".join(f"- {instr}" for instr in retry_instructions)
                     retry_prompt = (
-                        "Your previous primary_text was too long. "
-                        "Rewrite primary_text to be under 500 characters. "
-                        "Keep the hook, the key stat, and the CTA intent intact. "
+                        f"Your previous ad had validation errors:\n{fix_block}\n\n"
+                        "Fix ONLY the fields listed above. Keep everything else unchanged.\n"
                         "Return only valid JSON with all 5 fields — no markdown.\n\n"
                         f"Previous output:\n{json.dumps(parsed, indent=2)}"
                     )

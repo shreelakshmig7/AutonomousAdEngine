@@ -64,6 +64,57 @@ DIMENSION_FIX_STRATEGIES: dict[str, str] = {
 }
 
 
+def _is_validation_error(error: str | None) -> bool:
+    """True if the error string describes a Pydantic validation failure (length, word count, etc.)."""
+    if not error:
+        return False
+    err_lower = error.lower()
+    return any(kw in err_lower for kw in [
+        "string_too_long", "too long", "characters", "word count", "5-8 words",
+        "validation error for adcopy", "value_error",
+    ])
+
+
+def _build_validation_fix_prompt(current_ad: "AdCopy", error: str) -> str:
+    """
+    Build a short, targeted prompt to fix validation errors (length, word count).
+
+    Unlike build_regeneration_prompt() which is designed for quality improvement,
+    this produces a minimal instruction to fix a mechanical constraint violation.
+    """
+    ad_block = json.dumps(current_ad.model_dump(), indent=2)
+    fix_instructions = []
+    err_lower = error.lower()
+    if "primary_text" in err_lower and ("too long" in err_lower or "500" in err_lower or "string_too_long" in err_lower):
+        fix_instructions.append(
+            "primary_text exceeds 500 characters. Shorten it to under 500 characters. "
+            "Cut the weakest sentence — keep the hook and CTA intact."
+        )
+    if "image_prompt" in err_lower and ("too long" in err_lower or "450" in err_lower or "string_too_long" in err_lower):
+        fix_instructions.append(
+            "image_prompt exceeds 450 characters. Shorten it to under 450 characters. "
+            "Keep the scene description and emotional tone."
+        )
+    if "headline" in err_lower and ("word" in err_lower or "5-8" in err_lower):
+        fix_instructions.append(
+            "headline must be exactly 5-8 words. Rewrite it to be 5-8 words "
+            "while keeping the same benefit."
+        )
+    if not fix_instructions:
+        return ""  # Not a fixable validation error — caller should use full regen
+    fixes = "\n".join(f"- {f}" for f in fix_instructions)
+    return f"""Fix the validation errors listed below. Change ONLY the fields that need fixing.
+Keep all other fields exactly the same.
+
+Errors to fix:
+{fixes}
+
+Current ad:
+{ad_block}
+
+Return ONLY valid JSON with all 5 fields (primary_text, headline, description, cta_button, image_prompt). No markdown."""
+
+
 def _is_schema_validation_draft_error(error: str | None) -> bool:
     """True if draft failed due to schema/validation (recoverable by retry or regen)."""
     if not error:
@@ -265,7 +316,9 @@ def build_regeneration_prompt(
         voice = (brand_guidelines or {}).get("voice") or {}
         forbidden_list = voice.get("forbidden_words_and_phrases") or []
         forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
-        return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+        return f"""CRITICAL: primary_text must be at most 500 characters. image_prompt must be at most 450 characters. Exceeding these limits will reject the ad.
+
+Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
 The ad FAILED because every dimension must score >= 7.0. Current average: {report.average_score:.1f}/10.
 
@@ -306,7 +359,9 @@ Return valid JSON only, with this exact structure:
     forbidden_list = voice.get("forbidden_words_and_phrases") or []
     forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
     strategy_line = f"\nFIX STRATEGY: {strategy}" if strategy else ""
-    return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+    return f"""CRITICAL: primary_text must be at most 500 characters. image_prompt must be at most 450 characters. Exceeding these limits will reject the ad.
+
+Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
 {audience_line}
 {tone_line}
@@ -464,16 +519,19 @@ def run_brief(
                     base = current_ad
                     if base is None:
                         return False, rationale
-                    rp = build_regeneration_prompt(
-                        base,
-                        brand_guidelines,
-                        brief.goal,
-                        brief.hook_type,
-                        single_weak_dimension="brand_voice",
-                        single_rationale=rationale,
-                        brief_audience=brief.audience,
-                        brief_tone=brief.tone,
-                    )
+                    # Use targeted fix for validation errors, full regen for others
+                    rp = _build_validation_fix_prompt(base, rationale) if _is_validation_error(rationale) else ""
+                    if not rp:
+                        rp = build_regeneration_prompt(
+                            base,
+                            brand_guidelines,
+                            brief.goal,
+                            brief.hook_type,
+                            single_weak_dimension="brand_voice",
+                            single_rationale=rationale,
+                            brief_audience=brief.audience,
+                            brief_tone=brief.tone,
+                        )
                     rr2 = _editor_regen(drafter, rp)
                     _regen_cost_update()
                     if rr2.get("success"):
@@ -509,16 +567,19 @@ def run_brief(
                         if pre_judge_repairs_used >= MAX_PRE_JUDGE_REPAIR_ATTEMPTS:
                             return False, f"schema_validation_exhausted:{err}"
                         pre_judge_repairs_used += 1
-                        regen_prompt = build_regeneration_prompt(
-                            minimal_ad,
-                            brand_guidelines,
-                            brief.goal,
-                            brief.hook_type,
-                            single_weak_dimension="brand_voice",
-                            single_rationale=err,
-                            brief_audience=brief.audience,
-                            brief_tone=brief.tone,
-                        )
+                        # Use targeted fix for validation errors, full regen for others
+                        regen_prompt = _build_validation_fix_prompt(minimal_ad, err) if _is_validation_error(err) else ""
+                        if not regen_prompt:
+                            regen_prompt = build_regeneration_prompt(
+                                minimal_ad,
+                                brand_guidelines,
+                                brief.goal,
+                                brief.hook_type,
+                                single_weak_dimension="brand_voice",
+                                single_rationale=err,
+                                brief_audience=brief.audience,
+                                brief_tone=brief.tone,
+                            )
                         rr = _editor_regen(drafter, regen_prompt)
                         _regen_cost_update()
                         if not rr.get("success"):
