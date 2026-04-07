@@ -54,6 +54,15 @@ DIMENSION_TO_GUIDELINE_KEY: dict[str, list[str]] = {
 REASONABLE_RATIONALE_MAX_CHARS: int = 200
 # When multiple weak dimensions, cap rationale length so prompt stays bounded
 
+# Dimension-specific rewriting strategies — concrete guidance for the Drafter
+DIMENSION_FIX_STRATEGIES: dict[str, str] = {
+    "clarity": "Simplify sentence structure. Use short declarative sentences (under 15 words). Replace abstract claims with one concrete number or specific example. Remove jargon.",
+    "value_proposition": "Lead with the strongest measurable outcome (score improvement, time saved, success rate). Make the unique benefit obvious in the first sentence.",
+    "call_to_action": "Make the CTA specific and action-oriented. Replace generic CTAs ('Learn More') with benefit-driven ones ('Start Your 200-Point Plan'). Match CTA to the campaign goal.",
+    "brand_voice": "Match the tone specified in the brief exactly. Remove any words from the forbidden list. Ensure the ad sounds like the brand, not a generic ad template.",
+    "emotional_resonance": "Add a specific, relatable scenario the audience would recognize. Use second person ('your child') and reference a real pain point or aspiration from the brief's audience description.",
+}
+
 
 def _is_schema_validation_draft_error(error: str | None) -> bool:
     """True if draft failed due to schema/validation (recoverable by retry or regen)."""
@@ -196,6 +205,8 @@ def build_regeneration_prompt(
     report: EvaluationReport | None = None,
     single_weak_dimension: str | None = None,
     single_rationale: str | None = None,
+    brief_audience: str = "",
+    brief_tone: str = "",
 ) -> str:
     """
     Build a surgical regeneration prompt: targeted optimizations on failed dimensions only.
@@ -214,11 +225,15 @@ def build_regeneration_prompt(
         report: Full EvaluationReport when available; used to derive weak/strong and rationales.
         single_weak_dimension: Used when report is None (e.g. scan fail).
         single_rationale: Judge or scan rationale when report is None.
+        brief_audience: Target audience description from the brief.
+        brief_tone: Tone direction from the brief.
 
     Returns:
         str: Prompt string for the drafter.
     """
     ad_block = json.dumps(current_ad.model_dump(), indent=2)
+    audience_line = f"TARGET AUDIENCE: {brief_audience}" if brief_audience else ""
+    tone_line = f"REQUIRED TONE: {brief_tone}" if brief_tone else ""
     context_line = f"BRIEF CONTEXT (do not change): goal={brief_goal}, hook_type={brief_hook_type}. CTA must still match goal."
 
     if report is not None:
@@ -230,13 +245,17 @@ def build_regeneration_prompt(
         required_fixes: list[str] = []
         for dim in weak_dims:
             ds = getattr(report, dim, None)
+            score = getattr(ds, "score", 0) if ds else 0
             rationale = (getattr(ds, "rationale", "") or "")[:max_rationale].strip()
             keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
             guideline_slice = _get_guideline_slice(brand_guidelines, keys)
             display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
-            fix_block = f"For {display}: Judge feedback — {rationale}"
+            strategy = DIMENSION_FIX_STRATEGIES.get(dim, "")
+            fix_block = f"For {display} (scored {score:.1f}/10, needs 7.0): Judge feedback — {rationale}"
+            if strategy:
+                fix_block += f". FIX STRATEGY: {strategy}"
             if guideline_slice:
-                fix_block += f". Use brand rules: {guideline_slice[:300]}"
+                fix_block += f". Brand rules: {guideline_slice[:300]}"
             required_fixes.append(fix_block)
         preserve_line = ""
         if strong_dims:
@@ -246,23 +265,24 @@ def build_regeneration_prompt(
         voice = (brand_guidelines or {}).get("voice") or {}
         forbidden_list = voice.get("forbidden_words_and_phrases") or []
         forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
-        return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
-CRITICAL: headline must be exactly 5-8 words. Count the words.
+        return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
-Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+The ad FAILED because every dimension must score >= 7.0. Current average: {report.average_score:.1f}/10.
+
+{audience_line}
+{tone_line}
+{context_line}
 
 Inputs:
 1) The Original Ad Copy (below).
-2) Scores and rationales: the ad failed on the dimension(s) listed under Required Fixes.
+2) Scores with specific fix strategies for each weak dimension.
 3) Weak dimensions (score < 7) to fix: {', '.join(DIMENSION_DISPLAY_NAMES.get(d, d) for d in weak_dims)}.
 
 Constraints:
 • Preservation: Do NOT change dimensions that scored 8 or higher.
 • Fixation: Focus 100% of your creative energy on rewriting only the specific Weak Dimensions.
-• Lengths: primary_text at most 500 characters; image_prompt at most 450 characters.{forbidden_line}
+• Lengths: primary_text at most 500 characters, hook sentence must end with . ? or ! before character 100; headline 5-8 words; image_prompt at most 450 characters.{forbidden_line}
 • JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<display name>", "action": "<short description of what you changed>"}}).
-
-{context_line}
 
 CURRENT AD:
 {ad_block}
@@ -281,25 +301,26 @@ Return valid JSON only, with this exact structure:
     keys = DIMENSION_TO_GUIDELINE_KEY.get(dim, [])
     guideline_slice = _get_guideline_slice(brand_guidelines, keys)
     display = DIMENSION_DISPLAY_NAMES.get(dim, dim)
+    strategy = DIMENSION_FIX_STRATEGIES.get(dim, "")
     voice = (brand_guidelines or {}).get("voice") or {}
     forbidden_list = voice.get("forbidden_words_and_phrases") or []
     forbidden_line = "\n• FORBIDDEN — do not use these words/phrases in optimized_ad: " + ", ".join(f'"{w}"' for w in forbidden_list) + "." if forbidden_list else ""
-    return f"""CRITICAL: primary_text hook must end with . ? or ! before character 100. One sentence only.
-CRITICAL: headline must be exactly 5-8 words. Count the words.
+    strategy_line = f"\nFIX STRATEGY: {strategy}" if strategy else ""
+    return f"""Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
 
-Act as a Senior Ad Copy Editor. Your job is to perform Targeted Optimizations on failed ad drafts.
+{audience_line}
+{tone_line}
+{context_line}
 
 Inputs:
 1) The Original Ad Copy (below).
 2) Weak dimension to fix: {display}.
-3) Feedback: {rationale}
+3) Feedback: {rationale}{strategy_line}
 
 Constraints:
 • Fixation: Focus 100% on rewriting only the parts that affect {display}.{forbidden_line}
-• Lengths: primary_text at most 500 characters; image_prompt at most 450 characters.
+• Lengths: primary_text at most 500 characters, hook sentence must end with . ? or ! before character 100; headline 5-8 words; image_prompt at most 450 characters.
 • JSON Output: Return a single JSON object with "optimized_ad" (same 5 fields) and "changes_made" (list of {{"dimension": "<name>", "action": "<short description>"}}).
-
-{context_line}
 
 CURRENT AD:
 {ad_block}
@@ -450,6 +471,8 @@ def run_brief(
                         brief.hook_type,
                         single_weak_dimension="brand_voice",
                         single_rationale=rationale,
+                        brief_audience=brief.audience,
+                        brief_tone=brief.tone,
                     )
                     rr2 = _editor_regen(drafter, rp)
                     _regen_cost_update()
@@ -493,6 +516,8 @@ def run_brief(
                             brief.hook_type,
                             single_weak_dimension="brand_voice",
                             single_rationale=err,
+                            brief_audience=brief.audience,
+                            brief_tone=brief.tone,
                         )
                         rr = _editor_regen(drafter, regen_prompt)
                         _regen_cost_update()
@@ -530,6 +555,8 @@ def run_brief(
                     brief.hook_type,
                     single_weak_dimension="brand_voice",
                     single_rationale=rationale,
+                    brief_audience=brief.audience,
+                    brief_tone=brief.tone,
                 )
                 rr = _editor_regen(drafter, rp)
                 _regen_cost_update()
@@ -550,6 +577,8 @@ def run_brief(
                 brief.goal,
                 brief.hook_type,
                 report=current_report,
+                brief_audience=brief.audience,
+                brief_tone=brief.tone,
             )
             ok, acq_err = acquire_valid_safe_ad(pjg)
 
