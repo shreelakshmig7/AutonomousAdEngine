@@ -235,13 +235,14 @@ def run_pipeline_streaming(
     run_log_path = run_dir / "iteration_log.csv"
     run_trends_path = run_dir / "quality_trends.png"
 
+    # Image generation disabled while debugging pipeline quality.
+    # Re-enable by uncommenting the block below.
     image_generator = None
-    try:
-        from images.image_generator import AdImageGenerator
-
-        image_generator = AdImageGenerator(output_dir=str(images_dir))
-    except Exception:
-        pass
+    # try:
+    #     from images.image_generator import AdImageGenerator
+    #     image_generator = AdImageGenerator(output_dir=str(images_dir))
+    # except Exception:
+    #     pass
 
     # Build brief lookup for resolving brief from (brief_id, variation_index)
     brief_by_id: dict[str, AdBrief] = {b.id: b for b in briefs}
