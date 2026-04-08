@@ -325,6 +325,11 @@ AD BRIEF:
 
 {tone_section}{length_section}
 
+HARD LIMITS — CHECK BEFORE YOU OUTPUT (violations will be rejected):
+- primary_text: MUST be 500 characters or fewer
+- image_prompt: MUST be 450 characters or fewer
+- headline: MUST be exactly {HEADLINE_MIN_WORDS}-{HEADLINE_MAX_WORDS} words (count them)
+
 OUTPUT FORMAT:
 Return ONLY valid JSON. No markdown. No code fences. No explanation.
 Exactly these 5 fields:

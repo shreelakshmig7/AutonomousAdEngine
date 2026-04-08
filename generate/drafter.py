@@ -250,7 +250,7 @@ class AdDrafter:
 
         # Temperature 0 for determinism (PRD: reproducible seeds; test_drafter_enforces_seed_determinism)
         generation_config = {
-            "temperature": 0,
+            "temperature": 0.7,
             "candidate_count": 1,
             "response_mime_type": "application/json",
         }

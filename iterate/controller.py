@@ -179,7 +179,7 @@ def _editor_regen(drafter: AdDrafter, regen_prompt: str) -> dict[str, Any]:
             raw = drafter._call_gemini(
                 regen_prompt,
                 drafter._model_name,
-                {"temperature": 0.5, "response_mime_type": "application/json"},
+                {"temperature": 0.7, "response_mime_type": "application/json"},
             )
             cleaned = drafter._clean_json_response(raw)
             parsed = json.loads(cleaned)
