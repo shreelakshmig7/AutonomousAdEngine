@@ -23,7 +23,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GEMINI_MAX_CONCURRENT: int = int(os.environ.get("GEMINI_MAX_CONCURRENT", 5))
-ANTHROPIC_MAX_CONCURRENT: int = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 5))
+ANTHROPIC_MAX_CONCURRENT: int = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 2))
+
+# Delay (seconds) after each Anthropic API call to stay within token-per-minute limits.
+# Anthropic Tier 1: Sonnet 30K TPM / Haiku 50K TPM / all models 50 RPM.
+ANTHROPIC_CALL_DELAY: float = float(os.environ.get("ANTHROPIC_CALL_DELAY", 2.0))
 
 gemini_semaphore: threading.Semaphore = threading.Semaphore(GEMINI_MAX_CONCURRENT)
 anthropic_semaphore: threading.Semaphore = threading.Semaphore(ANTHROPIC_MAX_CONCURRENT)

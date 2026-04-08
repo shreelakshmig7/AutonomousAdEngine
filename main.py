@@ -51,7 +51,7 @@ GEMINI_FLASH_COST_PER_1K_TOKENS: float = 0.000075
 CLAUDE_SONNET_COST_PER_1K_TOKENS: float = 0.003
 
 # Parallel execution — tuneable via env vars
-PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 10))
+PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 5))
 IMAGE_MAX_WORKERS: int = int(os.environ.get("IMAGE_MAX_WORKERS", 4))
 IMAGE_STAGGER_DELAY: float = float(os.environ.get("IMAGE_STAGGER_DELAY", 2.0))  # seconds between submissions
 

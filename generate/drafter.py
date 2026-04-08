@@ -36,7 +36,7 @@ from tenacity import (
 
 from evaluate.rubrics import AdCopy, AdBrief
 from generate.guardrails import validate_free_text
-from rate_limiter import gemini_semaphore, anthropic_semaphore
+from rate_limiter import gemini_semaphore, anthropic_semaphore, ANTHROPIC_CALL_DELAY
 from generate.prompts import (
     DEFAULT_SEED,
     DRAFTER_MODEL,
@@ -114,8 +114,8 @@ class AdDrafter:
 
     @retry(
         retry=retry_if_exception_type(google.api_core.exceptions.ResourceExhausted),
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10),
+        stop=stop_after_attempt(5),
+        wait=wait_exponential(multiplier=1, min=2, max=15),
     )
     def _call_gemini(
         self,
@@ -164,6 +164,7 @@ class AdDrafter:
                 return "{}"
             return response.content[0].text.strip()
         finally:
+            time.sleep(ANTHROPIC_CALL_DELAY)
             anthropic_semaphore.release()
 
     def _call_model(

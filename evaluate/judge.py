@@ -26,6 +26,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 from typing import Any
 
 from pydantic import ValidationError
@@ -36,7 +37,7 @@ from evaluate.rubrics import (
     AdCopy,
     EvaluationReport,
 )
-from rate_limiter import anthropic_semaphore
+from rate_limiter import ANTHROPIC_CALL_DELAY, anthropic_semaphore
 
 # Judge: Claude (Anthropic). Override via JUDGE_MODEL in .env.
 JUDGE_MODEL: str = "claude-sonnet-4-5"
@@ -158,6 +159,7 @@ Scores are floats in 1.0–10.0 (e.g. 7.5, 8.2). average_score will be computed 
                 return "{}"
             return response.content[0].text.strip()
         finally:
+            time.sleep(ANTHROPIC_CALL_DELAY)
             anthropic_semaphore.release()
 
     def evaluate_ad(self, ad: AdCopy) -> dict[str, Any]:
