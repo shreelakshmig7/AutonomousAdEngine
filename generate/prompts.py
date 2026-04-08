@@ -143,7 +143,6 @@ def build_drafter_prompt(
     differentiators_block = "\n".join(f"- {d}" for d in BRAND_DIFFERENTIATORS)
     forbidden_block = ", ".join(FORBIDDEN_WORDS_IN_PROMPT)
     context_str = json.dumps(competitive_context, indent=2) if competitive_context else "{}"
-    guidelines_str = json.dumps(brand_guidelines, indent=2) if brand_guidelines else "{}"
     brief_str = brief.model_dump_json(indent=2)
 
     """variation_instruction = ""

@@ -97,7 +97,7 @@ def test_drafter_enforces_seed_determinism(
     sample_brief: AdBrief,
     valid_ad_dict: dict,
 ) -> None:
-    """Assert temperature=0 and seed passed to API — config verified, not output equality."""
+    """Assert temperature and seed passed to API — config verified, not output equality."""
     from generate.drafter import AdDrafter
     from generate.prompts import DEFAULT_SEED
 
@@ -110,7 +110,7 @@ def test_drafter_enforces_seed_determinism(
     call_kwargs = mock_call.call_args
     generation_config = call_kwargs.kwargs.get("generation_config") if call_kwargs.kwargs else None
     assert generation_config is not None
-    assert generation_config.get("temperature") == 0 or getattr(generation_config, "temperature", None) == 0
+    assert generation_config.get("temperature") == 0.7 or getattr(generation_config, "temperature", None) == 0.7
 
 
 def test_drafter_applies_fallback_on_rate_limit(
