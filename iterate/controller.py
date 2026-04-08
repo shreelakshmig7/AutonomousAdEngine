@@ -472,12 +472,6 @@ def run_brief(
     model_used: str | None = None
     total_cost = 0.0
 
-    _tag = f"{brief.id} v{variation_index}"
-
-    def _dbg(msg: str) -> None:
-        """Print a debug line tagged with brief+variation."""
-        print(f"  [{_tag}] {msg}", flush=True)
-
     # Cost estimation (same logic as main.py so we can sum later)
     def _estimate_cost(tokens: int, model: str | None) -> float:
         if not model:
@@ -561,7 +555,6 @@ def run_brief(
                     err = draft_result.get("error")
                     if not err:
                         err = "Draft failed (primary and fallback exhausted or validation failed)."
-                    _dbg(f"DRAFT FAILED: {err}")
                     if _is_schema_validation_draft_error(err):
                         raw_draft = draft_result.get("raw_draft")
                         validation_errors = draft_result.get("validation_errors") or []
@@ -605,17 +598,12 @@ def run_brief(
                     total_tokens += draft_result.get("tokens_used", 0)
                     model_used = draft_result.get("model_used") or model_used
                     total_cost += _estimate_cost(draft_result.get("tokens_used", 0), model_used)
-                    _dbg(f"DRAFT OK: primary_text={len(getattr(current_ad, 'primary_text', '') or '')}ch, "
-                         f"headline={len((getattr(current_ad, 'headline', '') or '').split())}w, "
-                         f"image_prompt={len(getattr(current_ad, 'image_prompt', '') or '')}ch")
 
             scan_result = scan_output_safety(current_ad, forbidden_phrases=forbidden_phrases)
             if scan_result.get("safe", True):
-                _dbg("SAFETY SCAN: passed")
                 return True, None
 
             rationale = (scan_result.get("error") or "Safety violations.").strip()
-            _dbg(f"SAFETY SCAN FAILED: {rationale}")
             fixed_scan = False
             while not fixed_scan:
                 if pre_judge_repairs_used >= MAX_PRE_JUDGE_REPAIR_ATTEMPTS:
@@ -644,7 +632,6 @@ def run_brief(
         if evaluation_cycles_completed == 0:
             ok, acq_err = acquire_valid_safe_ad(None)
         else:
-            _dbg(f"REGEN: weakest={current_report.weakest_dimension}, rebuilding ad...")
             pjg = build_regeneration_prompt(
                 current_ad,
                 brand_guidelines,
@@ -657,7 +644,6 @@ def run_brief(
             ok, acq_err = acquire_valid_safe_ad(pjg)
 
         if not ok:
-            _dbg(f"ACQUIRE FAILED at cycle {evaluation_cycles_completed}: {acq_err}")
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -744,19 +730,6 @@ def run_brief(
         total_tokens += 1500
         total_cost += _estimate_cost(1500, getattr(judge, "_model_name", "claude-sonnet-4-5"))
 
-        # Debug: show all dimension scores for this cycle
-        _scores = {
-            "clarity": getattr(getattr(report, "clarity", None), "score", "?"),
-            "value_prop": getattr(getattr(report, "value_proposition", None), "score", "?"),
-            "cta": getattr(getattr(report, "call_to_action", None), "score", "?"),
-            "brand_voice": getattr(getattr(report, "brand_voice", None), "score", "?"),
-            "emotional": getattr(getattr(report, "emotional_resonance", None), "score", "?"),
-        }
-        _fails = [f"{k}={v}" for k, v in _scores.items() if isinstance(v, (int, float)) and v < 7.0]
-        _dbg(f"JUDGE cycle {ev_cycle_num}: avg={report.average_score:.1f} | "
-             f"{' | '.join(f'{k}={v}' for k, v in _scores.items())}"
-             f"{' | BELOW 7: ' + ', '.join(_fails) if _fails else ' | ALL PASS'}")
-
         def _dim_score(name: str) -> float | None:
             ds = getattr(report, name, None)
             if ds is None or not hasattr(ds, "score"):
@@ -783,7 +756,6 @@ def run_brief(
         iteration_log.append(log_entry)
 
         if report.passes_threshold:
-            _dbg(f"PUBLISHED at cycle {ev_cycle_num}: avg={report.average_score:.1f}")
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
@@ -801,8 +773,6 @@ def run_brief(
             }
 
         if evaluation_cycles_completed >= MAX_EVALUATION_CYCLES:
-            _dbg(f"EXHAUSTED {MAX_EVALUATION_CYCLES} cycles: avg={report.average_score:.1f}, "
-                 f"weakest={report.weakest_dimension}")
             return {
                 "brief_id": brief.id,
                 "variation_index": variation_index,
