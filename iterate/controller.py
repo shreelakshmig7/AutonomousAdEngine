@@ -59,7 +59,7 @@ DIMENSION_FIX_STRATEGIES: dict[str, str] = {
     "clarity": "Simplify sentence structure. Use short declarative sentences (under 15 words). Replace abstract claims with one concrete number or specific example. Remove jargon.",
     "value_proposition": "Lead with the strongest measurable outcome (score improvement, time saved, success rate). Make the unique benefit obvious in the first sentence.",
     "call_to_action": "Make the CTA specific and action-oriented. Replace generic CTAs ('Learn More') with benefit-driven ones ('Start Your 200-Point Plan'). Match CTA to the campaign goal.",
-    "brand_voice": "Match the tone specified in the brief exactly. Remove any words from the forbidden list. Ensure the ad sounds like the brand, not a generic ad template.",
+    "brand_voice": "Say 'your child' NOT 'your student'. Say 'SAT tutoring' NOT 'SAT prep'. Say 'raise your child's score' NOT 'unlock potential'. Lead with outcomes (what the child gains), not features (what we offer). Use specific numbers ('200+ points', '3.4 million sessions') instead of vague adjectives. Use plain, direct speech — no marketing jargon. NEVER use as empty adjectives: personalized, expert, data-driven, tailored, custom. Remove any forbidden words.",
     "emotional_resonance": "Add a specific, relatable scenario the audience would recognize. Use second person ('your child') and reference a real pain point or aspiration from the brief's audience description.",
 }
 

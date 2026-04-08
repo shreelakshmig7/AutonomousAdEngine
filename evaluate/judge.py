@@ -113,7 +113,7 @@ SCORE each dimension 1.0–10.0 (decimals allowed, e.g. 7.5, 8.2):
 clarity             | 10=clear in <3s  | 7=mostly clear | 4=re-reading needed | 1=confusing
 value_proposition   | 10=specific outcome | 7=decent | 4=generic | 1=feature-only
 call_to_action      | 10=specific+urgent | 7=clear | 4=vague | 1=missing
-brand_voice         | 10=distinctly VT | 7=on-brand | 4=neutral | 1=generic
+brand_voice         | 10=distinctly Shreelakshmi (says 'your child' not 'your student', leads with outcomes not features, uses plain direct speech, specific numbers not vague adjectives) | 7=mostly on-brand with minor generic phrases | 4=sounds like any tutoring company | 1=corporate template
 emotional_resonance | 10=real motivation | 7=some | 4=rational | 1=flat
 
 CALIBRATION — Gold (8-10):
