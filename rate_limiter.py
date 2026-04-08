@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-GEMINI_MAX_CONCURRENT: int = int(os.environ.get("GEMINI_MAX_CONCURRENT", 10))
-ANTHROPIC_MAX_CONCURRENT: int = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 8))
+GEMINI_MAX_CONCURRENT: int = int(os.environ.get("GEMINI_MAX_CONCURRENT", 7))
+ANTHROPIC_MAX_CONCURRENT: int = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 5))
 
 gemini_semaphore: threading.Semaphore = threading.Semaphore(GEMINI_MAX_CONCURRENT)
 anthropic_semaphore: threading.Semaphore = threading.Semaphore(ANTHROPIC_MAX_CONCURRENT)
