@@ -549,10 +549,10 @@ h1, h2, h3 {
 SIDEBAR_BRAND_HTML = """
 <div style="padding:22px 22px 16px;">
   <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;
-              color:#00fc40;letter-spacing:-0.03em;">KINETIC</div>
+              color:#00fc40;letter-spacing:-0.03em;">Autonomous</div>
   <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;color:#a8abb3;
               text-transform:uppercase;letter-spacing:0.2em;margin-top:4px;">
-    Observatory v1.0
+    Ad Engine
   </div>
 </div>
 """
