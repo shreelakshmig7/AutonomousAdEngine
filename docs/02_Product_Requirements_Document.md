@@ -250,7 +250,7 @@ Shreelakshmi-ad-engine/
 │   ├── test_iteration_cap.py
 │   └── test_integration.py
 │
-├── .env                        # API keys (NEVER commit)
+├── .env                        # API keys 
 ├── main.py                     # One-command entry point
 ├── requirements.txt
 └── README.md
@@ -274,10 +274,10 @@ matplotlib>=3.7.0               # Quality trend charts
 seaborn>=0.12.0                 # Polished chart styling
 
 # Resilience
-tenacity>=8.2.0                 # Retry on rate limits — critical for demo stability
+tenacity>=8.2.0                 # Retry on rate limits — critical for  stability
 
 # CLI Output
-rich>=13.0.0                    # Live pipeline visibility for demo video
+rich>=13.0.0                    # Live pipeline visibility 
 
 # Testing
 pytest>=7.4.0
@@ -317,7 +317,7 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 | `MAX_CYCLES` | 3 | Iteration cap for self-healing loop |
 | `MAX_EVALUATION_CYCLES` | 3 | Must match MAX_CYCLES for consistency |
 | `IMAGE_STAGGER_DELAY` | 2.0 | Seconds between Gemini image generation calls |
-| `PIPELINE_MAX_WORKERS` | 10 | Parallel workers for ad generation batch jobs |
+| `PIPELINE_MAX_WORKERS` | 5 | Parallel workers for ad generation batch jobs |
 | `IMAGE_MAX_WORKERS` | 4 | Parallel workers for image generation batch jobs |
 
 ### Model Stack
