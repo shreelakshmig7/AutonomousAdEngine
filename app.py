@@ -151,7 +151,7 @@ footer { display: none !important; }
 [data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
     font-family: 'Space Grotesk', sans-serif !important;
     font-size: 13px !important;
-    color: #00fc40 !important;
+    color: #00fc40ab !important;
 }
 /* Hide the radio circle dot — globally (sidebar nav + gallery filter) */
 [data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
