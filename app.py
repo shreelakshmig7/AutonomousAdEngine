@@ -151,6 +151,7 @@ footer { display: none !important; }
 [data-testid="stSidebar"] [data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
     font-family: 'Space Grotesk', sans-serif !important;
     font-size: 13px !important;
+    color: #00fc40 !important;
 }
 /* Hide the radio circle dot — globally (sidebar nav + gallery filter) */
 [data-testid="stRadio"] label[data-baseweb="radio"] > div:first-child {
@@ -550,8 +551,8 @@ SIDEBAR_BRAND_HTML = """
 <div style="padding:22px 22px 16px;">
   <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;
               color:#00fc40;letter-spacing:-0.03em;">Autonomous</div>
-  <div style="font-family:'Space Grotesk',sans-serif;font-size:9px;color:#a8abb3;
-              text-transform:uppercase;letter-spacing:0.2em;margin-top:4px;">
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;
+              color:#00fc40;letter-spacing:-0.03em;">
     Ad Engine
   </div>
 </div>
@@ -1519,7 +1520,7 @@ def _render_settings() -> None:
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
-    st.set_page_config(page_title="Kinetic Observatory — Shreelakshmi Ad Engine", layout="wide")
+    st.set_page_config(page_title="Autonomous Ad Engine", layout="wide")
 
     # Inject CSS
     st.markdown(KINETIC_CSS, unsafe_allow_html=True)
