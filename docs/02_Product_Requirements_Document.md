@@ -25,7 +25,7 @@
 | Self-Healing Loop | Identifies weakest dimension. Regenerates targeting only that weakness. Max 3 cycles. |
 | Competitive Intelligence | Princeton Review, Khan Academy, Kaplan, Chegg patterns injected into every generation prompt. |
 | Quality Trend Chart | Matplotlib chart showing average score rising across up to 3 iteration cycles. |
-| v2 Image Generation | Companion ad creative per passing ad via Gemini 2.5 Flash Image with 2.0s stagger delay. |
+| v2 Image Generation | Companion ad creative per passing ad via Gemini 2.5 Flash Image ("Nano Banana"). Runs as a Phase 2 pass after the quality loop, with `IMAGE_STAGGER_DELAY = 2.0s` between submissions to avoid burst rate-limit hits. |
 | Performance-per-Token | Cost per publishable ad tracked. ROI documented in decision log. |
 | Failure Handling | After 3 cycles: `status = unresolvable`, logged, auto-continue. No human needed. |
 | Streamlit Dashboard | 5-page UI: Dashboard, Library, Self-Healing, Run Pipeline, Settings . |
@@ -141,39 +141,56 @@ Max 3 cycles (MAX_CYCLES and MAX_EVALUATION_CYCLES in config) before giving up. 
 
 ## 6. Finalized System Prompts
 
-### Drafter Prompt — Gemini 2.5 Flash
+### Drafter Prompt — Gemini 2.5 Flash (with Claude Haiku fallback)
+
+The Drafter prompt is constructed in `generate/prompts.py` using a **bookended structure** that counteracts the Lost-in-the-Middle failure mode. The live source is authoritative; the shape below reflects the current implementation.
 
 ```
-You are an elite direct-response copywriter for Shreelakshmi Tutors (a Shree business).
-Generate high-converting Facebook and Instagram ad copy.
+[ TOP BOOKEND — critical constraints stated upfront ]
+CRITICAL RULES (will be checked again at the bottom):
+  - Say "your child" NOT "your student"
+  - Say "SAT tutoring" NOT "SAT prep"
+  - Lead with outcomes (what the child gains), not features (what we offer)
+  - Use specific numbers ("200+ points", "3.4 million sessions") — not vague adjectives
+  - Plain direct speech — no marketing jargon
+  - NEVER use as empty adjectives: personalized, expert, data-driven, tailored, custom
+  - Forbidden words list: {forbidden_words}
 
-BRAND VOICE: Empowering, knowledgeable, approachable, results-focused.
-Lead with outcomes, not features. Confident but not arrogant. Expert but not elitist.
-
-AD ANATOMY — generate ALL five components:
-1. primary_text: Main copy. Scroll-stopping hook in FIRST LINE.
-   Use one of: Question | Stat | Story | Fear | Empathy hook
-2. headline: 5-8 words max. Benefit-driven.
-3. description: One sentence max. Secondary reinforcement.
-4. cta_button: Learn More (awareness) | Sign Up / Start Free Assessment (conversion)
-5. image_prompt: A specific, visual UGC-style image generation prompt aligned to the ad.
-   Format: [Subject] + [Setting] + [Emotion] + [Brand signal] + [Style: authentic/UGC]
-   Example: Parent and teen at kitchen table, teen smiling at laptop showing SAT results,
-            relief and pride visible, Shreelakshmi Tutors brand colors subtly present,
-            authentic UGC style, warm natural lighting, not stock photo
-
-RULES:
-- Specific numbers over vague claims: "200+ point improvement" not "better scores"
-- Lead with outcomes, never features
-- No PII in generated content
-- image_prompt must enable UGC-style creative — no polished studio look
-
+[ CONTEXT BLOCK ]
+BRIEF: {brief}
 COMPETITIVE INTELLIGENCE: {competitive_context}
-AD BRIEF: {brief}
 
+[ FEW-SHOT EXAMPLES — show voice concretely rather than describing it ]
+GOOD example:
+  headline:     "Your Child Can Improve 200 Plus Points"
+  primary_text: "Is your child's SAT score standing between them and their dream school? ..."
+  (why it scores high: specific fear hook + stat + differentiator + low-friction CTA)
+
+BAD example:
+  headline:     "SAT Tutoring Available Now"
+  primary_text: "Shreelakshmi Tutors offers SAT tutoring services. We have experienced tutors..."
+  (why it scores low: generic, feature-first, no hook, no outcome, no differentiation)
+
+[ AD ANATOMY — five components ]
+1. primary_text: scroll-stopping hook in first line (Question | Stat | Story | Fear | Empathy)
+2. headline:     5–8 words, benefit-driven
+3. description:  one sentence, secondary reinforcement
+4. cta_button:   from the allowed CTA list
+5. image_prompt: [Subject] + [Setting] + [Emotion] + [Brand signal] + [UGC/authentic style]
+
+[ OUTPUT FORMAT ]
 RESPOND ONLY with valid JSON:
 {"primary_text":"...","headline":"...","description":"...","cta_button":"...","image_prompt":"..."}
+
+[ BOTTOM BOOKEND — same critical constraints restated ]
+REMEMBER — the rules above are non-negotiable. In particular:
+  - Say "your child" NOT "your student"
+  - Lead with outcomes, not features
+  - No empty adjectives (personalized, expert, data-driven, tailored, custom)
+  - Forbidden words list enforced at output-scan time
 ```
+
+**Why this shape:** early experiments with a traditional "one-pass" prompt (rules at top, examples optional) produced ~77% brand_voice failures. Adding few-shot `GOOD`/`BAD` pairs and duplicating the critical rules at the tail dropped failures to near zero and raised average scores to ~8.8 across published ads. See DECISION_LOG entry "Drafter Prompt Restructure — Bookended Constraints and Few-Shot Examples" for details.
 
 ### Judge Prompt — Claude Sonnet 4.5
 
@@ -316,9 +333,13 @@ pytest-mock>=3.11.0             # Mock API calls — all tests run offline
 | `VARIATIONS_PER_BRIEF` | 5 | Configurable via env var; generates 5 ad variations per brief |
 | `MAX_CYCLES` | 3 | Iteration cap for self-healing loop |
 | `MAX_EVALUATION_CYCLES` | 3 | Must match MAX_CYCLES for consistency |
-| `IMAGE_STAGGER_DELAY` | 2.0 | Seconds between Gemini image generation calls |
-| `PIPELINE_MAX_WORKERS` | 5 | Parallel workers for ad generation batch jobs |
-| `IMAGE_MAX_WORKERS` | 4 | Parallel workers for image generation batch jobs |
+| `QUALITY_THRESHOLD` | 7.0 | Judge average-score bar for publish |
+| `PIPELINE_MAX_WORKERS` | 5 | Parallel workers for the per-(brief, variation) pipeline. Reduced from 10 after rate-limit analysis — see DECISION_LOG entry "Rate Limit Throttling". |
+| `GEMINI_MAX_CONCURRENT` | 5 | Semaphore cap on simultaneous Gemini API calls (`rate_limiter.py`). Gemini Paid Tier 2 has 2K RPM headroom so this is intentionally loose. |
+| `ANTHROPIC_MAX_CONCURRENT` | 2 | Semaphore cap on simultaneous Anthropic API calls. Tightest gate in the system; Tier 1 allows only 50 RPM across all models and Sonnet 30K TPM. |
+| `ANTHROPIC_CALL_DELAY` | 2.0 | Seconds of `time.sleep()` inside the `finally:` block of every Anthropic call, before the semaphore is released. Paces token consumption to stay under 30K TPM. |
+| `IMAGE_MAX_WORKERS` | 4 | Parallel workers for the Phase 2 image generation pass. |
+| `IMAGE_STAGGER_DELAY` | 2.0 | Seconds between Gemini image generation submissions to avoid burst 429s on the image model. |
 
 ### Model Stack
 
@@ -457,6 +478,11 @@ The decision log is a core deliverable. It must show clear thinking — not just
 - Why @st.cache_data on data (ttl=30) and images (ttl=300) — balance between freshness and performance
 - Gallery filters (All Ads, Top Performers >=8.0, Needs Image) — practical QA workflow
 - How competitive intelligence was gathered — Meta Ad Library methodology
+- Why the Drafter prompt is **bookended** — top and bottom repetition of critical constraints to counter Lost-in-the-Middle; few-shot GOOD/BAD examples over abstract rules for style dimensions
+- Why `DIMENSION_FIX_STRATEGIES` uses say-X-not-Y rules — surgical regen prompts per weakest dimension, particularly effective for `brand_voice`
+- Why `PIPELINE_MAX_WORKERS` was reduced 10 → 5 and `ANTHROPIC_CALL_DELAY` was introduced — Anthropic Tier 1 TPM pressure, empirical rate-limit analysis
+- Why the Anthropic delay lives inside `finally:` holding the semaphore — ensures effective throttling; a sleep outside the semaphore would be bypassed by concurrent threads
+- Why image generation is a Phase 2 pass after the quality loop — decouples text cost from image cost, and lets the quality loop iterate quickly without paying for images on rejected drafts
 - What **failed** — ads that never passed, prompts that produced garbage, hard-to-improve dimensions
 - Performance-per-token findings — average cycles to 7.0+, cost per publishable ad, image generation cost
 - Limitations — what the system cannot do, edge cases, known weaknesses

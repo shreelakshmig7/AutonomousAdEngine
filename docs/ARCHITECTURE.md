@@ -6,7 +6,7 @@ This document describes the multi-agent architecture of the Shreelakshmi Ad Engi
 
 ## 1. System Overview
 
-The system is a **multi-model pipeline** that turns ad briefs into publishable creative: a **Drafter** (Gemini) generates copy, a **Judge** (Claude) scores it on five dimensions, and a **Controller** runs up to 3 cycles (MAX_EVALUATION_CYCLES = 3) of targeted regeneration until quality meets a 7.0/10 threshold. Passing ads get companion images from an **Image Generator** (Gemini Flash Image).
+The system is a **multi-model pipeline** that turns ad briefs into publishable creative: a **Drafter** (Gemini, Claude fallback) generates copy, a **Judge** (Claude Sonnet) scores it on five dimensions, and a **Controller** runs up to 3 cycles (MAX_EVALUATION_CYCLES = 3) of targeted regeneration until quality meets a 7.0/10 threshold. Passing ads receive companion images from an **Image Generator** (Gemini 2.5 Flash Image, a.k.a. "Nano Banana"), which runs as a Phase 2 pass after the quality loop completes.
 
 ```mermaid
 flowchart TB
@@ -174,9 +174,11 @@ stateDiagram-v2
 
 - **Gates 1–2:** Guardrails and sanitization; on failure the brief is not sent to the Drafter.
 - **Draft:** First cycle uses the full brief; later cycles use a targeted regeneration prompt.
-- **Scan:** Optional safety check (e.g. competitor names, PII); failure can feed into regen rationale.
+- **Scan:** Safety check (competitor names, PII patterns, forbidden words); failure can feed into regen rationale.
 - **Judge:** Produces scores and weakest dimension; `passes_threshold` (average ≥ 7.0) → publish; else → regen.
-- **Regen:** Controller builds a surgical prompt (preserve strong dimensions, fix weakest), calls Drafter again; on validation error or after 3 cycles without pass → unresolvable.
+- **Regen:** Controller builds a surgical prompt using `DIMENSION_FIX_STRATEGIES` — a per-dimension playbook of concrete "say X not Y" rewriting instructions. For example, when `brand_voice` is weakest, the strategy says things like "Say 'your child' NOT 'your student'; say 'SAT tutoring' NOT 'SAT prep'; lead with outcomes, not features; never use empty adjectives like 'personalized' or 'data-driven'." The Drafter is told to preserve the strong dimensions and only rewrite the weakest one.
+- **Fallback during regen:** If `_call_gemini` raises `ResourceExhausted` after all Tenacity retries, `_call_claude` (Haiku) is invoked as a drafter fallback using the same prompt.
+- **Termination:** On Pydantic `ValidationError` or after 3 cycles without passing → `unresolvable`, logged with full diagnostic data.
 - **Error reporting:** Failed variations include error reasons in pipeline output for visibility and debugging.
 
 ---
@@ -227,6 +229,22 @@ flowchart LR
 
 ---
 
+## 5a. Drafter Prompt Structure — Bookended Constraints
+
+The Drafter prompt in `generate/prompts.py` is structured to counter the **"Lost in the Middle"** failure mode, where LLMs reliably attend to the start and end of a prompt but drop instructions placed in the middle. The prompt shape is:
+
+1. **Top bookend** — Critical constraints and forbidden words stated upfront (before any context).
+2. **Context block** — Brief, competitive context, brand guidelines.
+3. **Few-shot examples** — Paired `GOOD` and `BAD` ad examples that show the voice concretely rather than describing it abstractly. This is far more effective than rule enumeration for style dimensions like `brand_voice`.
+4. **Output format** — JSON schema the Drafter must return.
+5. **Bottom bookend** — The *same* critical constraints restated immediately before generation. Not a stylistic duplicate; attention weight at the tail of the prompt is high, and duplicating is the cheapest reliable way to hold the model to them.
+
+The brand voice fix work specifically leaned on the bottom bookend plus the few-shot examples. Abstract rules like "avoid generic marketing language" consistently failed; a concrete `GOOD`/`BAD` pair made the model produce the right voice on first draft, and the bookends held the line on forbidden words.
+
+See the DECISION_LOG entry "Drafter Prompt Restructure — Bookended Constraints and Few-Shot Examples" for the rationale.
+
+---
+
 ## 6. Agent Roles Summary
 
 | Agent | Model(s) | Input | Output |
@@ -238,13 +256,31 @@ flowchart LR
 
 ---
 
-## 7. Concurrency and Run Layout
+## 7. Concurrency, Rate Limiting, and Run Layout
 
-- **main.py** runs variations for a given brief in parallel via `ThreadPoolExecutor` with `PIPELINE_MAX_WORKERS = 10` (pipeline variations) and `IMAGE_MAX_WORKERS = 4` (image generation).
-- Variations per brief: `VARIATIONS_PER_BRIEF = 5` (configurable via environment variable).
+Concurrency is a two-tier model: a thread pool that dispatches pipeline work, plus **per-provider semaphores** that gate the actual API calls underneath it. This separation lets us parallelize orchestration without overrunning provider rate limits.
+
+**Layer 1 — Pipeline thread pool (`main.py`)**
+- Variations are dispatched via `ThreadPoolExecutor` with `PIPELINE_MAX_WORKERS = 5` (reduced from 10 after rate-limit analysis — see DECISION_LOG entry "Rate Limit Throttling").
+- `IMAGE_MAX_WORKERS = 4` for the Phase 2 image generation pool (runs after the quality loop).
+- Variations per brief: `VARIATIONS_PER_BRIEF = 5` (env var).
+
+**Layer 2 — API semaphores (`rate_limiter.py`)**
+- `GEMINI_MAX_CONCURRENT = 5` — acquired inside `drafter._call_gemini()` before every Gemini call.
+- `ANTHROPIC_MAX_CONCURRENT = 2` — acquired inside `drafter._call_claude()` and `judge.evaluate_ad()` before every Anthropic call. This is the tightest gate in the system; Anthropic Tier 1 only allows 50 RPM across all models and Sonnet only 30K TPM.
+- `ANTHROPIC_CALL_DELAY = 2.0` seconds — `time.sleep()` inside the `finally:` block of every Anthropic call, *before* the semaphore is released. This paces token consumption to stay under 30K TPM regardless of how fast threads queue up.
+
+**Why the delay lives inside `finally:`, not around the call**
+If the sleep ran outside the semaphore, N threads could all fire Anthropic requests simultaneously and then sleep in parallel — the delay would have no throttling effect. By holding the semaphore across the sleep, effective TPM is bounded by `ANTHROPIC_MAX_CONCURRENT / (call_duration + ANTHROPIC_CALL_DELAY)`.
+
+**Retry strategy**
+- Gemini: `@retry(retry_if_exception_type(ResourceExhausted), stop_after_attempt(5), wait_exponential(multiplier=1, min=2, max=15))` on `_call_gemini`. Previously `stop_after_attempt(3)` with narrower backoff — widened after observing transient 429s on brief_007.
+- Anthropic: No explicit retry decorator on Claude calls — the semaphore + delay combination is sufficient at current volume. If this assumption breaks at higher volumes, add `@retry` on `_call_claude` with the same signature.
+
+**Run layout (unchanged)**
 - Each run gets a timestamped directory: `output/runs/YYYYMMDD_HHMMSS/`.
 - Under that directory: `ads_library.json`, `iteration_log.csv`, `quality_trends.png`, `images/`.
-- The latest run’s `ads_library.json` and `quality_trends.png` are also written to `output/` for convenience.
+- The latest run's `ads_library.json` and `quality_trends.png` are also written to `output/` for convenience.
 
 ```mermaid
 flowchart TB
@@ -328,8 +364,12 @@ For product and evaluation criteria, see [docs/02_Product_Requirements_Document.
 ### Configuration Constants
 | Constant | Value | Purpose |
 |----------|-------|---------|
-| `VARIATIONS_PER_BRIEF` | 5 (configurable via env) | Number of variations per brief |
-| `IMAGE_STAGGER_DELAY` | 2.0 seconds | Delay between image generation starts |
-| `PIPELINE_MAX_WORKERS` | 10 | Max concurrent brief/variation workers |
-| `IMAGE_MAX_WORKERS` | 4 | Max concurrent image generation workers |
-| `MAX_EVALUATION_CYCLES` | 3 | Max iterations per variation (in rubrics.py) |
+| `VARIATIONS_PER_BRIEF` | 5 (env) | Number of variations per brief |
+| `PIPELINE_MAX_WORKERS` | 5 (env) | Max concurrent brief/variation workers (was 10; reduced to ease rate pressure) |
+| `GEMINI_MAX_CONCURRENT` | 5 (env) | Semaphore cap on simultaneous Gemini calls (`rate_limiter.py`) |
+| `ANTHROPIC_MAX_CONCURRENT` | 2 (env) | Semaphore cap on simultaneous Anthropic calls (tightest gate) |
+| `ANTHROPIC_CALL_DELAY` | 2.0 seconds (env) | Sleep inside `finally:` of every Anthropic call, holding the semaphore — paces token consumption to stay under 30K TPM |
+| `IMAGE_MAX_WORKERS` | 4 | Max concurrent image generation workers for the Phase 2 image pass |
+| `IMAGE_STAGGER_DELAY` | 2.0 seconds | Delay between image generation starts to avoid burst rate-limit hits on the image model |
+| `MAX_EVALUATION_CYCLES` | 3 | Max iterations per variation (in `rubrics.py`) |
+| `QUALITY_THRESHOLD` | 7.0 | Judge average-score bar for publish (`rubrics.py`) |

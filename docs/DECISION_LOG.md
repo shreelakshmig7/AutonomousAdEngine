@@ -738,3 +738,199 @@ Changed the default in `main.py` from `int(os.environ.get("VARIATIONS_PER_BRIEF"
 
 ### Confidence
 High. This restores the original production configuration; all pipeline runs with 5 variations completed successfully.
+
+---
+
+## Decision: Drafter Prompt Restructure — Bookended Constraints and Few-Shot Examples
+**Date:** 2026-04-09
+**Files affected:** `generate/prompts.py`, `iterate/controller.py` (DIMENSION_FIX_STRATEGIES), `tests/test_generator.py`
+
+### Problem
+The first full-volume run produced **77% brand_voice failures**. The Judge was consistently penalizing generic marketing language — "unlock your potential," "personalized learning experience," "data-driven approach" — even when the rest of the ad was strong. Average brand_voice scores were hovering around 5.5 on first draft, and regen cycles weren't lifting them reliably; the regen prompt was too vague to actually change the model's behavior.
+
+### Root Cause — Two Compounding Failures
+1. **Lost in the Middle.** The Drafter prompt had its critical constraints (voice rules, forbidden words, platform limits) placed in the middle of the prompt, between the brief block and the output format block. LLMs reliably attend to the start and end of a prompt and systematically drop attention on the middle. The brand voice rules were being read but not followed because of where they sat.
+2. **Abstract rules are weaker than concrete examples for style.** Telling the model "use an empowering, outcome-first voice" does not land. The model has no grounding for what "empowering" means in the Shreelakshmi Tutors context. It needs to *see* the voice, not hear it described.
+
+### What We Did — Two Interventions
+
+**(1) Bookended prompt structure in `generate/prompts.py`**
+
+The prompt is now split into five zones:
+1. **Top bookend** — critical constraints stated upfront, before any context. Includes the forbidden words list and the key say-X-not-Y rules.
+2. **Context block** — brief + competitive intelligence + brand guidelines.
+3. **Few-shot examples** — paired `GOOD` and `BAD` ad examples with a one-line "why" for each.
+4. **Output format** — JSON schema.
+5. **Bottom bookend** — the *same* critical constraints restated immediately before the model starts generating.
+
+Duplicating the constraints at the top and bottom is not a stylistic fluff. It is the cheapest reliable way to hold attention at the tail of the prompt where generation actually starts.
+
+**(2) `DIMENSION_FIX_STRATEGIES["brand_voice"]` rewritten**
+
+The previous regen strategy string for brand_voice was vague ("rewrite with stronger brand voice"). It was replaced with a concrete say-X-not-Y playbook:
+
+```python
+"brand_voice": (
+    "Say 'your child' NOT 'your student'. "
+    "Say 'SAT tutoring' NOT 'SAT prep'. "
+    "Say 'raise your child's score' NOT 'unlock potential'. "
+    "Lead with outcomes (what the child gains), not features (what we offer). "
+    "Use specific numbers ('200+ points', '3.4 million sessions') instead of vague adjectives. "
+    "Use plain, direct speech — no marketing jargon. "
+    "NEVER use as empty adjectives: personalized, expert, data-driven, tailored, custom. "
+    "Remove any forbidden words."
+),
+```
+
+This gives the Drafter a deterministic transformation — find/replace-level specificity — rather than a vibes-based instruction.
+
+### Results
+- Brand voice failure rate: **77% → near zero** on first draft.
+- Average brand_voice score: **5.5 → 8.5–10.0** on most published ads.
+- Overall published average score: **8.83** across the final run.
+- Published-ad count crossed the 50+ target (latest run: **52 out of 75**).
+
+### Why Not Ask the Model to Count Its Own Word Usage?
+Considered and rejected. Models are unreliable at self-counting, and even a correct count after the fact doesn't change the draft. The discipline has to be imposed at generation time, which means constraints in the prompt structure itself, not post-hoc checks.
+
+### What We Removed in the Process
+- Dead `guidelines_str` variable in `prompts.py` that was computed but never used after the restructure.
+- Detailed `_dbg()` debug logging from `controller.py` — kept during the fix cycle for visibility, removed once the target was hit.
+
+### Tests Updated
+- `test_drafter_enforces_seed_determinism` updated to match new temperature (0.7, previously asserted 0).
+
+### Confidence
+High. The pattern is well-documented in the prompt engineering literature (Lost in the Middle, Liu et al. 2023; few-shot examples for style transfer) and the empirical result is unambiguous.
+
+---
+
+## Decision: Rate Limit Throttling — Concurrency Cut and Anthropic Call Delay
+**Date:** 2026-04-09
+**Files affected:** `rate_limiter.py`, `main.py`, `generate/drafter.py`, `evaluate/judge.py`, `.env`, `.env.example`
+
+### Problem
+After the brand voice fix, the pipeline was producing high-quality drafts but finishing with an ugly split: ~40 published, ~35 unresolvable, where the unresolvables were almost entirely rate-limit failures, not quality failures. Anthropic was the bottleneck — specifically, Sonnet TPM (30K tokens per minute on Tier 1).
+
+### Rate Limit Landscape (Tier currently in use)
+
+| Provider | Tier | RPM | TPM | Notes |
+| --- | --- | --- | --- | --- |
+| Anthropic | Tier 1 | 50 across all models | Sonnet 30K / Haiku 50K | Tightest gate |
+| Gemini 2.5 Flash | Paid Tier 2 | ~2,000 | ~3M | Effectively unlimited at our volume |
+
+Gemini was running at ~98 RPM — nowhere near its ceiling. Anthropic was saturating both RPM and TPM during the bursty early phase of the run.
+
+### Changes Made
+
+```python
+# main.py
+PIPELINE_MAX_WORKERS: int = int(os.environ.get("PIPELINE_MAX_WORKERS", 5))  # was 10
+
+# rate_limiter.py
+GEMINI_MAX_CONCURRENT: int    = int(os.environ.get("GEMINI_MAX_CONCURRENT", 5))
+ANTHROPIC_MAX_CONCURRENT: int = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 2))  # was 5
+ANTHROPIC_CALL_DELAY: float   = float(os.environ.get("ANTHROPIC_CALL_DELAY", 2.0))  # new
+```
+
+Plus: added `time.sleep(ANTHROPIC_CALL_DELAY)` inside the `finally:` block of `_call_claude()` (drafter fallback) and `evaluate_ad()` (judge), *before* the semaphore is released.
+
+And: fixed `.env` which was overriding the new code defaults with old values (`GEMINI_MAX_CONCURRENT=10`, `ANTHROPIC_MAX_CONCURRENT=8`). Synced `.env` and `.env.example` with the new defaults.
+
+### Why the Delay Lives Inside `finally:` Holding the Semaphore
+
+If the delay ran *after* the semaphore release, N threads could fire simultaneously and then all sleep in parallel — the delay would have zero throttling effect. By keeping the sleep inside the `finally:` block, the semaphore is held across the sleep, and effective TPM is bounded by:
+
+```
+effective_TPM ≈ ANTHROPIC_MAX_CONCURRENT * avg_tokens_per_call * (60 / (avg_call_duration + ANTHROPIC_CALL_DELAY))
+```
+
+At the current values (2 concurrent, ~2s call, 2s delay, ~2K tokens per call), this comes out to around **60K TPM theoretical ceiling, ~30K effective** — right under the Sonnet limit with margin for burst.
+
+### Options Rejected
+- **Anthropic Batch API** — discussed separately. Asynchronous, breaks the feedback loop (each cycle depends on the previous Judge output), and would require hundreds of lines of refactoring. Not viable for this pipeline shape. Revisit if volume grows ~10x.
+- **Raise Anthropic tier** — real solution but requires billing setup; throttling is the cheap fix first.
+- **Tenacity retry on Claude calls** — considered. Current combo of semaphore + delay is sufficient at our volume. Add later if 429s reappear at higher volumes.
+
+### Results
+- Published ads: **40 → 52** (crossed the 50+ target).
+- `DRAFT FAILED` events: present in prior runs → **zero** in the final run.
+- Run duration: still inside the 15-minute window.
+- Remaining failures are content-related (brief_007 contains "Khan Academy" in the brief text itself — an unresolvable prompting problem, not a rate problem).
+
+### Confidence
+High. Empirically validated on multiple runs. The semaphore + delay pattern is standard for TPM compliance on tiered APIs.
+
+---
+
+## Decision: Gemini Retry Tuning — Wider Backoff, More Attempts
+**Date:** 2026-04-09
+**Files affected:** `generate/drafter.py`
+
+### What We Did
+Updated the Tenacity decorator on `_call_gemini`:
+
+```python
+@retry(
+    retry=retry_if_exception_type(google.api_core.exceptions.ResourceExhausted),
+    stop=stop_after_attempt(5),                                    # was 3
+    wait=wait_exponential(multiplier=1, min=2, max=15),            # was min=4, max=10
+)
+```
+
+### Why
+The earlier configuration (`stop_after_attempt(3)`, `max=10`) was producing intermittent `DRAFT FAILED` events on the harder briefs during burst periods. Widening to 5 attempts with `max=15` gave enough headroom to ride out transient 429s without blocking the pipeline on any one call. `min=2` (down from 4) accelerates the first retry where a short-lived 429 would otherwise cost us 4+ seconds of idle time.
+
+### Tradeoff
+Tail latency on a single variation can grow to 15+ seconds on a bad backoff chain. This is fine — it's the tail of the distribution and the pipeline has headroom. Never raise `max` above 30 without re-checking total run time.
+
+### Confidence
+High. Observed zero `DRAFT FAILED` events in the final run.
+
+---
+
+## Decision: Image Generation as Phase 2 Pass — Decouple Text and Image Budgets
+**Date:** 2026-04-09
+**Files affected:** `main.py`, `images/image_generator.py`
+
+### What We Did
+Structured image generation as an independent **Phase 2** pass that runs after the quality loop has produced a final `ads_library`. The Phase 2 loop walks the list of published ads, takes the `image_prompt` from each, and submits one Gemini 2.5 Flash Image call per ad, staggered by `IMAGE_STAGGER_DELAY = 2.0s`.
+
+### Why Phase 2, Not Inline With Drafting
+Inline image generation (generate an image as soon as each ad passes) has two problems:
+1. **Cost on rejected drafts.** If images generated during cycle 1 are thrown away when the ad is rejected and regenerated in cycle 2, you're paying Nano Banana twice for the same final ad.
+2. **Rate-limit interleaving.** Gemini text and Gemini image share a quota at the project level. Inline generation makes the text drafter compete with itself for Gemini headroom.
+
+Phase 2 separation means: quality loop pays for text only, image pass pays for images only, and rate limits are cleanly scoped.
+
+### Why We Briefly Disabled Images During Iteration
+During the brand voice + rate limit debugging cycles, image generation was commented out in `main.py` to keep cost predictable while we were running the pipeline 10+ times per hour. Once quality stabilized, image generation was re-enabled. Both states are now clearly reversible by a single block in `main.py`.
+
+### Image Prompt Schema
+The Drafter outputs an `image_prompt` field as part of `AdCopy` (see `rubrics.py` schema). The field is constrained to visual descriptions only — no text, no logos, no signs rendered in the image (Nano Banana's weakness with embedded text is well-known). Format: `[Subject] + [Setting] + [Emotion] + [Brand signal] + [UGC/authentic style]`.
+
+### Confidence
+High. The decoupling is a simple refactor and keeps the two spend categories legible.
+
+---
+
+## Decision: Debug Logging Cleanup Post-Stabilization
+**Date:** 2026-04-09
+**Files affected:** `iterate/controller.py`
+
+### What We Did
+Removed the `_dbg()` helper function and all `_tag` prefixes that were added during the brand voice + rate limit debugging cycles. Specifically: `DRAFT OK`, `DRAFT FAILED`, `SAFETY SCAN`, `JUDGE` cycle prints with full `_scores`/`_fails` dictionaries, `REGEN`, `ACQUIRE FAILED`, `PUBLISHED`, and `EXHAUSTED` prints. Total: 30 lines removed.
+
+### Why
+These were high-signal during the fix cycle — they let us see exactly which briefs were failing which dimensions on which cycles. Once the target was hit (52 published, zero draft failures) and stability held across multiple runs, they became noise on the Run Pipeline page. The streaming status events (yielded from `run_pipeline_streaming()`) already provide the user-facing view.
+
+### What We Kept
+- The structured yield events (`brief_id`, `variation_index`, `status`, `message`, scores) — these drive the Streamlit UI and are not debug output.
+- The `iteration_log.csv` row-per-event — this is durable history, not console noise.
+- Error messages on unresolvable paths — these carry real signal.
+
+### Rule for Future Debug Loops
+Add debug logging freely during a fix cycle, but tag it with a clearly searchable prefix (e.g. `_dbg(`) so it can be stripped in a single grep once stable. Commit the cleanup as a separate commit from the functional fix so it's reviewable independently.
+
+### Confidence
+High. All 16 tests green after cleanup; no user-facing regression.

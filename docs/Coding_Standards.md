@@ -39,7 +39,7 @@ test_unresolvable_status_set      — status = unresolvable after 3 failures
 test_json_output_schema           — output validates against pydantic AdCopy schema
 test_csv_export_completeness      — all 50+ ads have scores in CSV
 test_seed_determinism             — same brief + seed = same output
-test_fallback_activates           — Gemini 2.5 Flash fires on rate limit
+test_fallback_activates           — Claude Haiku 4.5 drafter fallback fires on Gemini rate limit
 test_image_url_returned           — image_url present per passing ad
 test_end_to_end_pipeline          — full brief to publishable ad flow completes
 ```
@@ -666,6 +666,108 @@ logger.error(f"Rate limit hit: switching to fallback model")
 # logger.info(f"API key: {GOOGLE_API_KEY}")        <- exposes key
 # logger.error(f"Validation error: {str(e)}")      <- may expose raw LLM output
 ```
+
+---
+
+## 14. Rate Limiting & Throttling Patterns
+
+The pipeline calls two providers with very different rate limit shapes. Both must be gated inside the code, not assumed away.
+
+### 14.1 Provider Caps (as of Tier currently in use)
+
+| Provider | Tier | RPM | TPM | Notes |
+| --- | --- | --- | --- | --- |
+| Anthropic | Tier 1 | 50 across all models | Sonnet 30K / Haiku 50K | Tightest gate; Sonnet TPM is the bottleneck |
+| Gemini | Paid Tier 2 | ~2,000 (Gemini 2.5 Flash) | ~3M | Effectively unlimited at our volume |
+
+### 14.2 The Two-Tier Concurrency Model
+
+Pipeline concurrency is separated from API concurrency. This is deliberate:
+
+1. **Thread pool (`PIPELINE_MAX_WORKERS`)** — dispatches pipeline jobs (one per (brief, variation)).
+2. **Per-provider semaphores** (`rate_limiter.py`) — gate actual API calls.
+
+The thread pool can be larger than the semaphore limit because most of each job is non-API work (schema validation, regen prompt building, logging). Semaphores ensure that even if all N threads race to call an API, only M of them will be in flight at once.
+
+```python
+# rate_limiter.py
+from threading import Semaphore
+
+GEMINI_MAX_CONCURRENT: int      = int(os.environ.get("GEMINI_MAX_CONCURRENT", 5))
+ANTHROPIC_MAX_CONCURRENT: int   = int(os.environ.get("ANTHROPIC_MAX_CONCURRENT", 2))
+ANTHROPIC_CALL_DELAY: float     = float(os.environ.get("ANTHROPIC_CALL_DELAY", 2.0))
+
+gemini_semaphore    = Semaphore(GEMINI_MAX_CONCURRENT)
+anthropic_semaphore = Semaphore(ANTHROPIC_MAX_CONCURRENT)
+```
+
+### 14.3 Token-Per-Minute Pacing Pattern — `finally` Block
+
+If the Anthropic call delay were applied *outside* the semaphore, N threads could each hit the API in the same second, then sleep 2 seconds in parallel — the delay would provide zero throttling. The correct pattern holds the semaphore across the sleep:
+
+```python
+# Correct — sleep inside finally, BEFORE release
+def _call_claude(self, prompt: str) -> dict:
+    anthropic_semaphore.acquire()
+    try:
+        response = client.messages.create(...)
+        return {"success": True, "data": response}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+    finally:
+        time.sleep(ANTHROPIC_CALL_DELAY)  # held under semaphore
+        anthropic_semaphore.release()
+```
+
+```python
+# Wrong — sleep after release; concurrent threads bypass it
+def _call_claude_wrong(self, prompt: str) -> dict:
+    anthropic_semaphore.acquire()
+    try:
+        response = client.messages.create(...)
+        return {"success": True, "data": response}
+    finally:
+        anthropic_semaphore.release()
+    time.sleep(ANTHROPIC_CALL_DELAY)  # too late — another thread is already in the API
+```
+
+Effective TPM is bounded by:
+
+```
+effective_TPM ≈ ANTHROPIC_MAX_CONCURRENT * avg_tokens_per_call * (60 / (avg_call_duration + ANTHROPIC_CALL_DELAY))
+```
+
+Tune `ANTHROPIC_CALL_DELAY` upward if you see 429s; tune down (toward 0) as you move up tiers.
+
+### 14.4 Retry Strategy — Tenacity Decorators
+
+Transient `ResourceExhausted` errors from Gemini are handled with exponential backoff. Anthropic calls do not currently carry a `@retry` decorator; at our volume, the semaphore + delay is enough.
+
+```python
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+import google.api_core.exceptions
+
+@retry(
+    retry=retry_if_exception_type(google.api_core.exceptions.ResourceExhausted),
+    stop=stop_after_attempt(5),
+    wait=wait_exponential(multiplier=1, min=2, max=15),
+)
+def _call_gemini(self, prompt: str) -> dict:
+    gemini_semaphore.acquire()
+    try:
+        return self.client.generate_content(prompt)
+    finally:
+        gemini_semaphore.release()
+```
+
+Why these specific numbers: `stop_after_attempt(5)` is enough headroom to ride out a short burst of 429s without blocking the pipeline; `max=15` seconds keeps the tail latency bounded. Earlier configuration (`stop_after_attempt(3)`, `max=10`) was too tight and produced `DRAFT FAILED` events on the harder briefs. See DECISION_LOG entry "Gemini Retry Tuning".
+
+### 14.5 Rules of Thumb
+
+- **Never remove a semaphore to "go faster."** If you think the limit is too low, raise the env var — do not delete the gating.
+- **Never move a throttling sleep outside the semaphore.** Always use `try/finally` with the sleep before release.
+- **Never catch and swallow `ResourceExhausted`.** Let Tenacity see it; otherwise retries don't fire.
+- **Always log rate limit events visibly** (brief_id, cycle, attempt) so the dashboard can surface them.
 
 ---
 

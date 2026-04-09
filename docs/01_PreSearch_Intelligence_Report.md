@@ -20,7 +20,7 @@ All constraints were locked before any architecture or code decisions were made.
 | Ad Volume | 50+ ads minimum | Hard requirement for delivery scope |
 | Quality Threshold | 7.0 / 10 average across 5 dimensions | Non-negotiable floor, autonomously enforced |
 | Human-in-the-Loop | Minimal — fully autonomous self-healing | System detects and fixes its own failures |
-| Iteration Cap | Max 5 cycles per brief | Prevents infinite loops — unresolvable logged after failure |
+| Iteration Cap | Max 3 cycles per brief (MAX_CYCLES = 3) | Prevents infinite loops — unresolvable logged after failure. Originally scoped as "up to 5"; locked at 3 during PR2 after calibration showed convergence within 3 cycles for most briefs. |
 | Variations per Brief | 5 variations per brief | Locked generation constraint across all briefs |
 | PII Policy | Zero PII in any generated content | Hard constraint from project specification |
 | Reproducibility | Deterministic seeds on all generation calls | Required for testing and submission verification |
@@ -150,7 +150,7 @@ Judge Reliability: Claude Sonnet 4.5 used as primary judge (Anthropic).
 
 - Domain locked: Facebook & Instagram paid social ads only
 - Brand locked: Shreelakshmi Tutors SAT prep, empowering voice, results-focused
-- Scale defined: 50+ ads, 7.0/10 threshold, max 5 iteration cycles
+- Scale defined: 50+ ads, 7.0/10 threshold, max 3 iteration cycles (originally scoped as 5; locked at 3 during PR2 calibration)
 - Human-in-loop minimized: fully autonomous with unresolvable fallback path
 
 ### Phase 2: Architecture
@@ -162,8 +162,8 @@ Judge Reliability: Claude Sonnet 4.5 used as primary judge (Anthropic).
 
 ### Phase 3: Risks Mitigated
 
-- Rate limits: tenacity exponential backoff + Gemini 2.5 fallback on same API key
-- Quality plateau: 5-cycle cap then unresolvable flag then auto-continue
+- Rate limits: tenacity exponential backoff on Gemini + Claude Haiku 4.5 fallback drafter + per-provider semaphores in `rate_limiter.py` + Anthropic call delay for TPM compliance (see DECISION_LOG "Rate Limit Throttling")
+- Quality plateau: 3-cycle cap then unresolvable flag then auto-continue
 - PII risk: zero real user data — all content is generated from briefs
 - Reproducibility: deterministic seeds on all generation calls
 
