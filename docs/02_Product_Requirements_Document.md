@@ -28,7 +28,7 @@
 | v2 Image Generation | Companion ad creative per passing ad via Gemini 2.5 Flash Image with 2.0s stagger delay. |
 | Performance-per-Token | Cost per publishable ad tracked. ROI documented in decision log. |
 | Failure Handling | After 3 cycles: `status = unresolvable`, logged, auto-continue. No human needed. |
-| Streamlit Dashboard | 5-page UI: Dashboard, Library, Self-Healing, Run Pipeline, Settings with st.radio navigation and caching. |
+| Streamlit Dashboard | 5-page UI: Dashboard, Library, Self-Healing, Run Pipeline, Settings . |
 | Gallery Filtering | Filter ads by status: All Ads, Top Performers (score >= 8.0), Needs Image (missing image). |
 | UI Enhancements | Read more toggle using HTML `<details><summary>` tags. Full-height ad images with no cropping. |
 
