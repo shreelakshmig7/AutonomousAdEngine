@@ -26,9 +26,9 @@ Built initially for Shreelakshmi Tutors' SAT prep ad campaigns, the pipeline is 
 
 | Metric | Value |
 | --- | --- |
-| Ads published per run | **52** out of 75 attempts (15 briefs × 5 variations) |
-| Pass rate through self-healing | **69%** |
-| Average quality across published ads | **8.8 / 10** |
+| Ads published per run | **62** out of 75 attempts (15 briefs × 5 variations) |
+| Pass rate through self-healing | **83%** |
+| Average quality across published ads | **8.3 / 10** |
 | End-to-end runtime | **~10 minutes** |
 | Quality threshold | 7.0 / 10 average across 5 dimensions |
 | Iteration cap | 3 cycles per variation |
